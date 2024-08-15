@@ -49,16 +49,15 @@ app.use((err, req, res, next) => {
 });
 
 // Routes
-app.post("/testCustomer", async(req,res) =>{
-    let sampleCustomer = await Customer.create({
-        username : "hercules12",
-        email : "hercules12@gmail.com",
-        password : "123asdc",
-    });
+import customerRouter from "./routes/costumer.route.js"
 
+<<<<<<< HEAD
     console.log(sampleCustomer);
     let customer = await Customer.findById(sampleCustomer._id)
     if(!customer) res.status(404).send("Not found")    
     res.status(200).send(customer);
 })
 >>>>>>> 4ccb03a (FIxed database connectivity issue, added middlewares and added Customer, Vendor, Product and Order models)
+=======
+app.use("/api/customer", customerRouter)
+>>>>>>> fe896f9 (Added Register and login controllers and routes. Added bycrypt and fixed bugs. Added ApiResponse)

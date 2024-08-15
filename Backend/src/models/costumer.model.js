@@ -4,8 +4,12 @@
 import { Schema , model } from "mongoose";
 =======
 import mongoose, { Schema, model } from "mongoose";
+<<<<<<< HEAD
 >>>>>>> 4ccb03a (FIxed database connectivity issue, added middlewares and added Customer, Vendor, Product and Order models)
 
+=======
+import bycrypt from "bcrypt"
+>>>>>>> fe896f9 (Added Register and login controllers and routes. Added bycrypt and fixed bugs. Added ApiResponse)
 
 const customerSchema = new Schema({
     username: {
@@ -57,7 +61,7 @@ export default Customer;
 >>>>>>> 0382384 (Test if works)
 =======
 // Hashes the password before saving the document
-userSchema.pre("save", async function (next) {
+customerSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next()             // Checks if the password has been changed
 
     this.password = await bycrypt.hash(this.password, 10)     // encrypt password
@@ -65,7 +69,7 @@ userSchema.pre("save", async function (next) {
 })
 
 // This method compares a given password with the hashed password stored in the database.
-userSchema.methods.isPasswordCorrect = async function(password){
+customerSchema.methods.isPasswordCorrect = async function(password){
     return await bycrypt.compare(password, this.password)
 }
 

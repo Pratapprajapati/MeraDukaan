@@ -67,7 +67,7 @@ const vendorSchema = new Schema({
 });
 
 // Hashes the password before saving the document
-userSchema.pre("save", async function (next) {
+vendorSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next()             // Checks if the password has been changed
 
     this.password = await bycrypt.hash(this.password, 10)     // encrypt password
@@ -75,7 +75,7 @@ userSchema.pre("save", async function (next) {
 })
 
 // This method compares a given password with the hashed password stored in the database.
-userSchema.methods.isPasswordCorrect = async function(password){
+vendorSchema.methods.isPasswordCorrect = async function(password){
     return await bycrypt.compare(password, this.password)
 }
 

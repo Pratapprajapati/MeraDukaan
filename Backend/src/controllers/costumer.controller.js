@@ -41,26 +41,30 @@ const login = async (req, res) => {
     return res.status(200).json( new ApiResponse(200, customer, "Login successful!!"))
 }
 
-// const updateCustomer = async (req, res) => {
+const updateCustomer = async (req, res) => {
     
-//     const { username, email, password, primary, secondary, address, city, pincode} = req.body
+    const { username, email, password, primary, secondary, address, city, pincode} = req.body
 
-//     const user = await Customer.findById()
+    const curUser = req.user._id    
+    if (!curUser) return res.status(400).json( new ApiResponse(400, "No user"))
 
-//     if (username) user.username = username
-//     if (email) user.email = email
-//     if (primary) user.primary = primary
-//     if (secondary) user.secondary = secondary
-//     if (address) user.address = address
-//     if (city) user.city = city
-//     if (pincode) user.pincode = pincode
+    const user = await Customer.findById(req.user._id)
 
-//     const customer = await Customer.findById(user?._id).select("-password")
+    if (username) user.username = username
+    if (email) user.email = email
+    if (primary) user.contact.primary = primary
+    if (secondary) user.contact.secondary = secondary
+    if (address) user.location.address = address
+    if (city) user.location.city = city
+    if (pincode) user.location.pincode = pincode
+    user.save({validateBeforeSave: false})
+    
+    const customer = await Customer.findById(user?._id).select("-password")
 
-//     return res.status(201).json( new ApiResponse(201, customer, "Customer created!"))
-// }
+    return res.status(201).json( new ApiResponse(201, customer, "Customer created!"))
+}
 
 export {
     register,
-    login
+    updateCustomer
 }

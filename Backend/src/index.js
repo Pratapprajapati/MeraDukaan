@@ -7,10 +7,9 @@ import cors from "cors"
 >>>>>>> 4ccb03a (FIxed database connectivity issue, added middlewares and added Customer, Vendor, Product and Order models)
 import { connect } from "mongoose";
 import express from "express"
-// import cookieparser from "cookieparser"
-
-import Customer from "./models/costumer.model.js";
-
+import passport from "./middlewares/passport.middleware.js";
+import session from "express-session";
+import cookieParser from 'cookie-parser';
 
 dotenv.config({ path: "./env" })
 
@@ -25,7 +24,18 @@ app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }));
 app.use(express.json({ limit: "16kb" }))
 app.use(express.urlencoded({ extended: true, limit: "16kb" }))
 app.use(express.static("public"));
-// app.use(cookieparser())
+app.use(cookieParser())
+
+// Express session middleware (required by Passport.js)
+app.use(session({
+    secret: 'your-secret-key', // Change this to a secure key
+    resave: false,
+    saveUninitialized: false
+}));
+
+// Initialize Passport.js and session
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Database connection
 (async () => {

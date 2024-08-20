@@ -1,5 +1,7 @@
-import Customer from "../models/costumer.model.js"
+import Customer from "../models/customer.model.js"
 import ApiResponse from "../utils/ApiResponse.js"
+import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 const register = async (req, res) => {
     
@@ -24,23 +26,63 @@ const register = async (req, res) => {
     return res.status(201).json( new ApiResponse(201, customer, "Customer created!"))
 }
 
+const generateAccessAndRefreshTokens = async (customerId) => {
+    try {
+        const customer = await Customer.findById(customerId)
+        
+        const accessToken = customer.generateAccessToken()
+        const refreshToken = customer.generateRefreshToken()
+        
+        customer.refreshToken = refreshToken                // save the refreshToken in customer's db
+        await customer.save({ validateBeforeSave: false })
+
+        return { accessToken, refreshToken }
+
+    } catch (error) {
+        return res.json(new ApiResponse(500, [], "Something went wrong while generation tokens!"))
+    }
+}
+
+// Cookies cannot be accessed by client-side scriptsand are sent by HTTPS only 
+const options = { httpOnly: true, secure: true }
+
+// LOGIN
 const login = async (req, res) => {
+    // Fetch username or email and password
     const {username, email, password} = req.body
     if (!username && !email) new ApiResponse(400, "Username or Email is required!!")
 
+    // Search for user
     const user = await Customer.findOne({
         $or: [{ username }, { email }]
     })
     if (!user) return res.status(400).json( new ApiResponse(400, "Incorrect username or email"))
 
+    // Check for password
     const validPassword = await user.isPasswordCorrect(password)
     if (!validPassword) return res.status(400).json( new ApiResponse(400,"Password incorrect"))
 
-    const customer = await Customer.findById(user?._id).select("-password")
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
 
-    return res.status(200).json( new ApiResponse(200, customer, "Login successful!!"))
+    // If everything checks out
+    const customer = await Customer.findById(user?._id).select("-password -refreshToken")
+
+    return res.status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                   customer, accessToken, refreshToken
+                },
+                "Customer logged in successfully!!"
+            )
+        )
 }
 
+
+// UPDATE USER
 const updateCustomer = async (req, res) => {
     
     const { username, email, password, primary, secondary, address, city, pincode} = req.body
@@ -66,5 +108,6 @@ const updateCustomer = async (req, res) => {
 
 export {
     register,
+    login,
     updateCustomer
 }

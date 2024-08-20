@@ -39,7 +39,8 @@ const customerSchema = new Schema({
             count: {
                 type: Number,
                 default: 1
-            }
+            },
+            _id: false
         }
     ],
     refreshToken: {

@@ -37,7 +37,9 @@ connectDB()                         // promise is returned
 
 // Routes
 import customerRouter from "./routes/customer.route.js"
+import productRouter from "./routes/product.routes.js"
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     console.log(sampleCustomer);
     let customer = await Customer.findById(sampleCustomer._id)
@@ -48,3 +50,7 @@ import customerRouter from "./routes/customer.route.js"
 =======
 app.use("/api/customer", customerRouter)
 >>>>>>> fe896f9 (Added Register and login controllers and routes. Added bycrypt and fixed bugs. Added ApiResponse)
+=======
+app.use("/api/customer", customerRouter)
+app.use("/api/product", productRouter)
+>>>>>>> 60ef479 (Added Customer controllers routes and Product controllers and routes)

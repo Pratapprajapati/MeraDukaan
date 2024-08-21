@@ -22,13 +22,10 @@ const orderSchema = new Schema({
                 type: Number,
                 default: 1
             },
-            price: {
-                type: Number,
-                required: true
-            },
             total: {
                 type: Number,
-                required: true
+                required: true,
+                default: 0
             }
         }
     ],
@@ -39,7 +36,7 @@ const orderSchema = new Schema({
     },
     orderStatus: {
         type: String,
-        enum: ["pending", "shipped", "delivered", "canceled"],
+        enum: ["pending", "shipped", "delivered", "cancelled"],
         default: "pending"
     },
     paymentMethod: {
@@ -49,6 +46,16 @@ const orderSchema = new Schema({
     },
     paymentImg: {
         type: String
+    },
+    description: {
+        customer: {
+            type: String,
+            default: ""
+        },
+        vendor: {
+            type: String,
+            default: ""
+        },
     }
 }, {
     timestamps: true
@@ -57,7 +64,7 @@ const orderSchema = new Schema({
 // Pre-save middleware to calculate total for each item and the total bill amount
 orderSchema.pre("save", function(next) {
     this.orderItems.forEach(item => {
-        item.total = item.count * item.price;  // Calculate total for each item
+        item.total = item.count * item.product.price;  // Calculate total for each item
     });
 
     this.bill = this.orderItems.reduce((acc, item) => acc + item.total, 0); // Calculate total bill

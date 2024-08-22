@@ -36,9 +36,10 @@ connectDB()                         // promise is returned
 
 
 // Routes
-import customerRouter from "./routes/customer.route.js"
-import productRouter from "./routes/product.route.js"
-import orderRouter from "./routes/order.route.js"
+import customerRouter from "./routes/customer.routes.js"
+import productRouter from "./routes/product.routes.js"
+import orderRouter from "./routes/order.routes.js"
+import vendorRouter from "./routes/vendor.routes.js"
 
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -55,8 +56,13 @@ app.use("/api/customer", customerRouter)
 =======
 app.use("/api/customer", customerRouter)
 app.use("/api/product", productRouter)
+<<<<<<< HEAD
 >>>>>>> 60ef479 (Added Customer controllers routes and Product controllers and routes)
 =======
 app.use("/api/product", productRouter)
 app.use("/api/order", orderRouter)
 >>>>>>> 7cb4ec8 (Added removeProduct and getInventory)
+=======
+app.use("/api/order", orderRouter)
+app.use("/api/vendor", vendorRouter)
+>>>>>>> 4a0caa0 (Added vender controls, seperate auths and routes with updated auth details)

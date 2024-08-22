@@ -1,6 +1,8 @@
 <<<<<<< HEAD
 =======
 import { Schema, model } from "mongoose";
+import bycrypt from "bcrypt"
+import jwt from "jsonwebtoken"
 
 const vendorSchema = new Schema({
     username: {
@@ -46,12 +48,17 @@ const vendorSchema = new Schema({
     qrCodeImage: {
         type : String,
     },
+    shopOpen: {
+        type: String,
+        required: true,
+        default: "Everyday"
+    },
     shopTimings: {
         start: {
             type : String,
             required : true
         },
-        to: {
+        end: {
             type : String,
             required : true
         }
@@ -61,6 +68,9 @@ const vendorSchema = new Schema({
         required : true,
         default: "General",
         enum: ["General", "Grocery", "Stationary", "Pharmacy", "Electronics and Hardware", "Other"]
+    },
+    refreshToken: {
+        type: String
     }
 }, {
     timestamps: true
@@ -77,6 +87,35 @@ vendorSchema.pre("save", async function (next) {
 // This method compares a given password with the hashed password stored in the database.
 vendorSchema.methods.isPasswordCorrect = async function(password){
     return await bycrypt.compare(password, this.password)
+}
+
+// This method generates a JWT access token with user details.
+vendorSchema.methods.generateAccessToken = function(){
+    return jwt.sign(                                               //jwt.sign(payload or data, secretKey, options (Expiry))
+        {
+            _id: this._id,
+            email: this.email,
+            username: this.username,
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+        }
+    )
+}
+
+// This method generates a JWT refresh token with minimal user data.
+// used to obtain a new access token when the current one expires.
+vendorSchema.methods.generateRefreshToken = function(){
+    return jwt.sign(
+        {
+            _id: this._id,
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
+        }
+    )
 }
 
 const Vendor = model("Vendor",vendorSchema);

@@ -1,4 +1,6 @@
 import Customer from "../models/customer.model.js"
+import Order from "../models/order.model.js"
+import Review from "../models/review.model.js"
 import ApiResponse from "../utils/ApiResponse.js"
 
 const register = async (req, res) => {
@@ -161,6 +163,7 @@ const addToCart = async (req, res) => {
     return res.status(200).json(new ApiResponse(200, customer.cart, "Cart updated successfully"));
 }
 
+// CLEAR CART
 const clearCart = async (req, res) => {
     const customer = await Customer.findByIdAndUpdate(
         req.user._id,
@@ -171,6 +174,31 @@ const clearCart = async (req, res) => {
     return res.status(200).json(new ApiResponse(200, customer, "Cleared cart"))
 }
 
+// ADD REVIEW
+const addReview = async (req, res) => {
+    const {orderId} = req.params
+    if (!orderId) return res.status(404).json(new ApiResponse(404, null, "Order Id missing"))
+
+    const {rating, feedback} = req.body
+
+    const order = await Order.findById(orderId)
+    if (!order) return res.status(404).json(new ApiResponse(404, null, "Order doesn't exist"))
+
+    if ((order.customer).toString() !== (req.user._id).toString()) {
+        return res.status(400).json(new ApiResponse(400, null, "Wrong user"))
+    }
+    
+    if (order.orderStatus !== "delivered") return res.status(400).json(new ApiResponse(400, null, "Order incomplete"))
+
+    const review = await Review.create({
+        order: orderId,
+        rating,
+        feedback        
+    })
+    if (!review) return res.status(500).json(new ApiResponse(500, null, "Unable to create review"))
+
+    return res.status(201).json(new ApiResponse(201, review, "Review added"))
+}
 
 export {
     register,
@@ -181,4 +209,5 @@ export {
     getCurrentUser,
     addToCart,
     clearCart,
+    addReview,
 }

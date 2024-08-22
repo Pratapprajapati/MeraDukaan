@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-    register, login, logout, updateCustomer, changePassword, getCurrentUser, addToCart, clearCart
+    register, login, logout, updateCustomer, changePassword, getCurrentUser, addToCart, clearCart, addReview
 } from "../controllers/customer.controller.js"
 import { verifyJWT_Customer } from "../middlewares/auth.middleware.js";
 
@@ -20,6 +20,8 @@ router.get("/current", verifyJWT_Customer, getCurrentUser);
 
 router.post("/cart/add", verifyJWT_Customer,addToCart);
 
-router.post("/cart/clear", verifyJWT_Customer, clearCart);
+router.delete("/cart/clear", verifyJWT_Customer, clearCart);
+
+router.post("/review/:orderId", verifyJWT_Customer, addReview);
 
 export default router

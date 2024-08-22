@@ -24,12 +24,6 @@ const customerSchema = new Schema({
         address: { type: String, required: true },
         pincode: { type: Number, required: true },
     },
-    orderHistory: [
-        {
-            type: mongoose.Types.ObjectId,
-            ref: "Order"
-        }
-    ],
     cart: [
         {
             product: {

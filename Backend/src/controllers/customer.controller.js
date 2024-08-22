@@ -80,7 +80,7 @@ const login = async (req, res) => {
 }
 
 // LOGOUT
-const logout = async (res, req) => {
+const logout = async (req, res) => {
     await Customer.findByIdAndUpdate(
         req.user?._id,
         { $unset: { refreshToken: 1 } }
@@ -95,7 +95,7 @@ const logout = async (res, req) => {
 
 // UPDATE USER
 const updateCustomer = async (req, res) => {
-    const { username, email, password, primary, secondary, address, city, pincode } = req.body
+    const { username, email, primary, secondary, address, city, pincode } = req.body
 
     const curUser = req.user._id
     if (!curUser) return res.status(400).json(new ApiResponse(400, "No user"))
@@ -113,7 +113,7 @@ const updateCustomer = async (req, res) => {
 
     const customer = await Customer.findById(user?._id).select("-password")
 
-    return res.status(201).json(new ApiResponse(201, customer, "Customer created!"))
+    return res.status(201).json(new ApiResponse(201, customer, "Customer updated!"))
 }
 
 // CHANGE PASSWORD

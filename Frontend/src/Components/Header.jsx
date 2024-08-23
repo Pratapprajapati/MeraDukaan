@@ -19,7 +19,7 @@ const Header = () => {
                 <ul className="flex space-x-6">
                     {
                         navlist.map(nav => (
-                            <li className=" overflow-hidden transform hover:scale-125 transition-transform">
+                            <li key={nav.title} className=" overflow-hidden transform hover:scale-125 transition-transform">
                                 <a href="#" className="text-gray-900 text-xl hover:text-gray-900 hover:font-bold ">
                                     {nav.title}
                                 </a>

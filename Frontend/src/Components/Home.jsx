@@ -1,7 +1,7 @@
 import React from "react";
-import {
-    Carrot
-} from "lucide-react"
+import { categories } from "./Listings/Categories";
+import {MoveRight} from "lucide-react"
+import { useNavigate } from "react-router-dom";
 
 // Sample shop data array
 const shops = [
@@ -13,26 +13,14 @@ const shops = [
     { id: 6, name: "Shop 6", image: "https://via.placeholder.com/150" },
 ];
 
-const categories = [
-    { id: 1, name: "Food and groceries" },
-    { id: 2, name: "Stationary" },
-    { id: 3, name: "Dairy" },
-    { id: 4, name: "Electronics and hardware" },
-    { id: 5, name: "General" },
-    { id: 6, name: "Shop 6" },
-];
+const categoryList = categories.slice(0, 5)
 
-// Reusable ShopCard component
-const ShopCard = ({ name, image }) => (
-    <div className="min-w-[400px] h-[300px] bg-black/20 text-gray-900 shadow-md rounded-lg overflow-hidden">
-        <img src={image} alt={name} className="w-full h-60 object-cover" />
-        <div className="p-4 text-center">
-            <h4 className="text-lg font-bold text-white">{name}</h4>
-        </div>
-    </div>
-);
 
 const Home = () => {
+    
+    const navigate = useNavigate()
+
+
     return (
         <main className="container mx-auto mt-8">
             <section className="text-center">
@@ -71,29 +59,36 @@ const Home = () => {
                     ))}
                 </div>
             </section>
-            {/* SHOP LISTING */}
+
+            {/* CATEGORY LISTING */}
             <section className="mt-12">
                 <div className="flex justify-between">
                     <h3 className="text-3xl font-bold text-gray-100 mb-4">
                         Product Categories
                     </h3>
-                    {/* <h3 className="flex items-center text-lg font-medium cursor-pointer hover:text-yellow-500 transform hover:scale-105 transition-transform">
-                        More shops
-                    </h3> */}
                 </div>
                 <div className="pb-4 grid sm:grid-cols-2 lg:grid-cols-3">
-                    {categories.map((cat) => (
+                    {categoryList.map((cat) => (
                         <div
                             key={cat.id}
-                            className="flex flex-row bg-gray-700 text-gray-900 shadow-md rounded-lg overflow-hidden border border-black/20 hover:border-gray-400 m-3 items-center"
+                            className={`flex flex-row ${cat.color} shadow-md rounded-lg overflow-hidden border cursor-pointer border-black/20 hover:border-white m-3 items-center transform hover:scale-95 transition-transform`}
                         >
-                            <Carrot className="text-white h-10 w-10 ms-4"/>
+                            <h1 className="p-4 pe-2 text-3xl">{cat.icon}</h1>
                             <div className="p-4">
-                                <h4 className="text-lg font-bold text-white">{cat.name}</h4>
-                                <h4 className="text-gray-400">Shops: 4</h4>
+                                <h4 className="text-xl font-bold">{cat.name}</h4>
+                                <h4 className="font-medium">Shops: 4</h4>
                             </div>
                         </div>
                     ))}
+                    <div
+                        onClick={() => navigate("/categories")}
+                        className={`flex flex-row bg-gray-600 shadow-md rounded-lg overflow-hidden border cursor-pointer border-black/20 hover:border-white m-3 items-center transform hover:scale-95 transition-transform`}
+                    >
+                        <h1 className="p-4 pe-2 text-3xl"></h1>
+                        <div className="p-4">
+                            <h4 className="text-xl font-bold">View More Categories <MoveRight/></h4>
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>

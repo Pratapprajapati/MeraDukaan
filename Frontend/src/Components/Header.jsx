@@ -1,3 +1,4 @@
+import { NavLink } from "react-router-dom";
 import logo from "../assets/logo.png"
 
 const Header = () => {
@@ -12,10 +13,13 @@ const Header = () => {
     return (
         <header className="bg-teal-500 p-4 shadow-md">
             <div className="container mx-auto flex justify-between items-center">
-                <div className="flex items-center cursor-pointer transform hover:scale-105 transition-transform">
+                <NavLink
+                    to={"/"}
+                    className="flex items-center cursor-pointer transform hover:scale-105 transition-transform"
+                >
                     <img src={logo} alt="Logo" className="h-24 -my-2" />
                     <h1 className="text-3xl font-bold text-gray-900">MeraDukaan</h1>
-                </div>
+                </NavLink>
                 <ul className="flex space-x-6">
                     {
                         navlist.map(nav => (

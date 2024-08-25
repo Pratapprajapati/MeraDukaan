@@ -1,7 +1,7 @@
 import React from "react";
 import { categories } from "./Listings/Categories";
 import {MoveRight} from "lucide-react"
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 // Sample shop data array
 const shops = [
@@ -37,9 +37,11 @@ const Home = () => {
                         Shops near you
                         <span className="text-gray-400 text-base ms-2">(Shops registered with MeraDukaan are only displayed here)</span>
                     </h3>
-                    <h3 className="flex items-center text-lg font-medium cursor-pointer hover:text-yellow-500 transform hover:scale-105 transition-transform">
-                        More shops
-                    </h3>
+                    <NavLink to={"/shops"}
+                        className="flex items-center text-lg font-medium cursor-pointer hover:text-yellow-500 transform hover:scale-105 transition-transform"
+                    >
+                        More shops <MoveRight className="ms-2 mt-1"/>
+                    </NavLink>
                 </div>
                 <div className="flex overflow-x-scroll space-x-4 pb-4 custom-scrollbar">
                     {shops.map((shop) => (

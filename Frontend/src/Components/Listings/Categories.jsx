@@ -1,17 +1,17 @@
 
 
 export const categories = [
-    { id: 1, name: "Fruits and Vegetables", icon: "🍎", color: "bg-green-500 text-white" },
-    { id: 2, name: "Books and Stationary", icon: "📚", color: "bg-yellow-500 text-white" },
-    { id: 3, name: "Dairy Products", icon: "🥛", color: "bg-blue-500 text-white" },
-    { id: 4, name: "Electronics and Hardware", icon: "🔌", color: "bg-gray-700 text-white" },
-    { id: 5, name: "Packaged Foods & Daily Essentials", icon: "🛒", color: "bg-orange-500 text-white" },
+    { id: 1, name: "Packaged Foods & Daily Essentials", icon: "🛒", color: "bg-orange-500 text-white" },
+    { id: 2, name: "Fruits and Vegetables", icon: "🍎", color: "bg-green-500 text-white" },
+    { id: 3, name: "Books and Stationary", icon: "📚", color: "bg-yellow-500 text-white" },
+    { id: 4, name: "Dairy Products", icon: "🥛", color: "bg-blue-500 text-white" },
+    { id: 5, name: "Electronics and Hardware", icon: "🔌", color: "bg-gray-700 text-white" },
     { id: 6, name: "Furniture and Decor", icon: "🛋️", color: "bg-purple-600 text-white" },
     { id: 7, name: "Clothing and Accessories", icon: "👗", color: "bg-pink-500 text-white" },
     { id: 8, name: "Kitchenware and Utilities", icon: "🍴", color: "bg-red-500 text-white" },
     { id: 9, name: "Gift Shop and Jewelry", icon: "🎁", color: "bg-teal-500 text-white" },
     { id: 10, name: "Kid Supplies and Toys", icon: "🧸", color: "bg-blue-400 text-white" },
-    { id: 11, name: "Health and Wellness", icon: "💊", color: "bg-green-400 text-white" },
+    { id: 11, name: "Health and Wellness", icon: "💊", color: "bg-green-600 text-white" },
     { id: 12, name: "Sports and Fitness", icon: "🏋️‍♂️", color: "bg-indigo-500 text-white" },
 ];
 

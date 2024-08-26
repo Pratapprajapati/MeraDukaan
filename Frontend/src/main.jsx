@@ -7,6 +7,8 @@ import Home from './Components/Home.jsx'
 import Categories from './Components/Listings/Categories.jsx'
 import Shops from './Components/Listings/Shops.jsx'
 import Customer from './Components/Profiles/Customer.jsx'
+import Cart from './Components/Listings/Cart.jsx'
+import Order from './Components/Listings/Order.jsx'
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -15,6 +17,8 @@ const router = createBrowserRouter(
             <Route path='/categories' element={<Categories />} />
             <Route path='/shops' element={<Shops />} />
             <Route path='/customer' element={<Customer />} />
+            <Route path='/cart' element={<Cart />} />
+            <Route path='/order' element={<Order />} />
         </Route>
     )
 )

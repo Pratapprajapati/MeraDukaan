@@ -10,6 +10,7 @@ import Customer from './Components/Profiles/Customer.jsx'
 import Vendor from './Components/Profiles/Vendor.jsx'
 import Cart from './Components/Listings/Cart.jsx'
 import Order from './Components/Listings/Order.jsx'
+import Inventory from './Components/Listings/Inventory.jsx'
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -21,6 +22,7 @@ const router = createBrowserRouter(
             <Route path='/vendor' element={<Vendor />} />
             <Route path='/cart' element={<Cart />} />
             <Route path='/order' element={<Order />} />
+            <Route path='/inventory' element={<Inventory />} />
         </Route>
     )
 )

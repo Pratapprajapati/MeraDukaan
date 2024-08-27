@@ -1,43 +1,36 @@
 import React from 'react';
 import img from "./Mcd.webp";
-import { X, MapPin, Phone, CalendarClock, Store, Truck, ArrowRightLeft, CreditCard } from 'lucide-react';
+import { MapPin, Phone, CalendarClock, Store, Truck, ArrowRightLeft, CreditCard } from 'lucide-react';
+import { categories } from '../Listings/Categories';
 
 const products = [
     {
         id: 1,
-        name: 'Nike Air Force 1 07 LV8',
-        href: '#',
-        price: '₹47,199',
-        originalPrice: '₹48,900',
-        discount: '5% Off',
-        color: 'Orange',
-        size: '8 UK',
-        imageSrc:
-            'https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/54a510de-a406-41b2-8d62-7f8c587c9a7e/air-force-1-07-lv8-shoes-9KwrSk.png',
+        products: 49,
     },
     {
         id: 2,
-        name: 'Nike Blazer Low 77 SE',
-        href: '#',
-        price: '₹1,549',
-        originalPrice: '₹2,499',
-        discount: '38% off',
-        color: 'White',
-        leadTime: '3-4 weeks',
-        size: '8 UK',
-        imageSrc:
-            'https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/e48d6035-bd8a-4747-9fa1-04ea596bb074/blazer-low-77-se-shoes-0w2HHV.png',
+        products: 44,
     },
     {
-        id: 3,
-        name: 'Nike Air Max 90',
-        href: '#',
-        price: '₹2219 ',
-        originalPrice: '₹999',
-        discount: '78% off',
-        color: 'Black',
-        imageSrc:
-            'https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/fd17b420-b388-4c8a-aaaa-e0a98ddf175f/dunk-high-retro-shoe-DdRmMZ.png',
+        id: 5,
+        products: 64,
+    },
+    {
+        id: 7,
+        products: 64,
+    },
+    {
+        id: 11,
+        products: 86,
+    },
+    {
+        id: 9,
+        products: 4,
+    },
+    {
+        id: 6,
+        products: 6,
     },
 ];
 
@@ -69,9 +62,9 @@ const vendor = {
 export default function VendorDisplayPage() {
     return (
         <div className="text-white min-h-screen py-8  ">
-            <div className="md:mx-20 px-4 flex flex-col gap-8">
+            <div className="md:mx-10 px-4 flex flex-col xl:flex-row gap-8">
                 {/* Vendor Card */}
-                <div className="flex-4 bg-black/30 rounded-lg shadow-lg shadow-black/50">
+                <div className="flex-4 bg-black/30 rounded-lg shadow-lg shadow-black/50 xl:w-9/12">
                     <div className=''>
                         <img
                             src={vendor.shopImage}
@@ -80,7 +73,7 @@ export default function VendorDisplayPage() {
                         />
                     </div>
                     <div className="p-6">
-                        <h2 className="text-3xl font-bold text-teal-500 mb-4">{vendor.shopName}</h2>
+                        <h2 className="text-3xl font-bold text-yellow-500 mb-4">{vendor.shopName}</h2>
                         <div className='flex flex-col lg:flex-row max-lg:space-y-6'>
                             <div className="text-lg font-medium text-gray-300 space-y-6 w-full lg:w-1/2">
                                 <p className='line-clamp-3'>
@@ -126,56 +119,37 @@ export default function VendorDisplayPage() {
                 </div>
 
                 {/* Product Card */}
-                {/* <div className="flex-2 bg-gray-800 rounded-lg p-4 shadow-lg w-3/12">
-                    <h1 className='font-semibold text-3xl'>
+                <div className="flex-2 bg-black/30 rounded-lg p-4 shadow-lg shadow-black/50 xl:w-3/12">
+                    <h1 className='font-semibold text-3xl text-yellow-500'>
                         Product categories:
                     </h1>
-                    <div className="mt-6 space-y-6 shadow-inner">
-                        <ul className="space-y-4">
+                    <div className="mt-6 space-y-6 shadow-inner flex flex-col justify-between">
+                        <ul className="space-y-4 overflow-y-auto h-64 xl:h-[500px]">
                             {products.map((product) => (
-                                <li key={product.id} className="flex items-center gap-4">
-                                    <img
-                                        src={product.imageSrc}
-                                        alt={product.name}
-                                        className="h-16 w-16 rounded object-contain"
-                                    />
+                                <li key={product.id} className={`flex rounded-md p-3 items-center gap-4 bg-black/40 hover:bg-teal-600 cursor-pointer transform hover:scale-95 transition-transform`}>
                                     <div>
-                                        <h3 className="text-sm text-gray-100">{product.name}</h3>
-                                        <dl className="mt-0.5 space-y-px text-[10px] text-gray-600">
-                                            <div>
-                                                <dd className="inline font-bold">{product.price}</dd>
-                                            </div>
-                                            <div>
-                                                <dt className="inline">Color:</dt>
-                                                <dd className="inline">{product.color}</dd>
-                                            </div>
-                                        </dl>
+                                        <h3 className="text-lg font-semibold text-white">{categories[product.id].name}</h3>
+                                        <p className="text- font-medium text-white">Products: {product.products}</p>
                                     </div>
                                 </li>
                             ))}
                         </ul>
-                        <div className="space-y-4 text-center">
+                        <div className="xl:space-y-4 text-center mt-auto border-t border-t-gray-300 pt-3 flex flex-row xl:flex-col">
                             <button
                                 type="button"
-                                className="w-full rounded-md border border-black px-3 py-2 text-sm font-semibold text-black shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+                                className="w-full max:xl:mx-2 rounded-md bg-teal-500 px-3 py-2 text-lg font-semibold text-black shadow-sm hover:bg-teal-600  transform hover:scale-95 transition-transform"
                             >
-                                View Cart (3)
+                                View Order (3) &rarr;
                             </button>
                             <button
                                 type="button"
-                                className="w-full rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-                            >
-                                Checkout
-                            </button>
-                            <a
-                                href="#"
-                                className="inline-block text-sm text-gray-600 transition hover:text-gray-700 hover:underline hover:underline-offset-4"
+                                className="w-full max:xl:mx-2 rounded-md bg-yellow-500 px-2 py-2 text-lg font-semibold text-black shadow-sm hover:bg-yellow-600  transform hover:scale-95 transition-transform"
                             >
                                 Continue shopping &rarr;
-                            </a>
+                            </button>
                         </div>
                     </div>
-                </div> */}
+                </div>
             </div>
         </div>
     );

@@ -5,11 +5,6 @@ const productSchema = new Schema({
         type: String,
         required: true
     },
-    vendor: {
-        type: mongoose.Types.ObjectId,
-        ref: "Vendor",
-        required: true
-    },
     price: {
         type: Number,
         required: true
@@ -18,15 +13,6 @@ const productSchema = new Schema({
         type: String,
         required: true
     },
-    stock: {
-        type: Boolean,
-        required: true,
-        default: true
-    },
-    description: {
-        type: String,
-        default: ""
-    }
 }, {
     timestamps: true
 });

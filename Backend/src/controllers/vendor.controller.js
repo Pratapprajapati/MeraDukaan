@@ -6,7 +6,7 @@ const registerVendor = async (req, res) => {
 
     const {
         username, email, password,
-        shopName, registrationNumber, shopType, delivery,
+        shopName, registrationNumber, shopType, delivery, returnPol,
         city, address, pincode,
         primary, secondary,
         start, end, shopOpen
@@ -37,6 +37,7 @@ const registerVendor = async (req, res) => {
         shopType,
         delivery,
         shopOpen,
+        returnPol,
         registrationNumber,
         location: { city, address, pincode },
         contact: { primary, secondary },
@@ -122,7 +123,7 @@ const logout = async (req, res) => {
 // UPDATE USER
 const updateVendor = async (req, res) => {
     const {
-        email,
+        email, returnPol,
         shopName, shopType, delivery,
         city, address, pincode,
         primary, secondary,
@@ -142,6 +143,7 @@ const updateVendor = async (req, res) => {
     if (address) user.location.address = address
     if (city) user.location.city = city
     if (pincode) user.location.pincode = pincode
+    if (returnPol) user.location.returnPol = returnPol
 
     if (shopName) user.shopName = shopName
     if (shopType) user.shopType = shopType

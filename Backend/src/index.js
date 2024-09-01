@@ -38,6 +38,7 @@ connectDB()                         // promise is returned
 // Routes
 import customerRouter from "./routes/customer.routes.js"
 import productRouter from "./routes/product.routes.js"
+import inventoryRouter from "./routes/inventory.routes.js"
 import orderRouter from "./routes/order.routes.js"
 import vendorRouter from "./routes/vendor.routes.js"
 
@@ -57,9 +58,13 @@ app.use("/api/customer", customerRouter)
 app.use("/api/customer", customerRouter)
 app.use("/api/product", productRouter)
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 60ef479 (Added Customer controllers routes and Product controllers and routes)
 =======
 app.use("/api/product", productRouter)
+=======
+app.use("/api/inventory", inventoryRouter)
+>>>>>>> dc4fd55 (Added Inventory model, control and routes. Changed Product mod, cont and route. Added return Pol in vendor model)
 app.use("/api/order", orderRouter)
 >>>>>>> 7cb4ec8 (Added removeProduct and getInventory)
 =======

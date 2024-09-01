@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-    addProduct, removeProduct, updateProduct, getInventory
+    addProduct, removeProduct, updateProduct
 } from "../controllers/product.controller.js"
 import { verifyJWT_Vendor } from "../middlewares/auth.middleware.js";
 
@@ -11,7 +11,5 @@ router.use(verifyJWT_Vendor)
 router.post("/add", addProduct)
 
 router.route("/:productId").delete(removeProduct).patch(updateProduct)
-
-router.get("/vendor/:vendorId", getInventory)
 
 export default router

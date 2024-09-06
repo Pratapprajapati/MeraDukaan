@@ -23,7 +23,11 @@ const inventorySchema = new Schema({
         description: {
             type: String,
             default: ""
-        }
+        },
+        discount: {
+            type: Number,
+            default: 0
+        },
     }]
 }, {
     timestamps: true

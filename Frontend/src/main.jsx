@@ -4,6 +4,7 @@ import App from './App.jsx'
 import './index.css'
 import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route } from "react-router-dom"
 import Home from './Components/Home.jsx'
+import About from './Components/About.jsx'
 import Categories from './Components/Listings/Categories.jsx'
 import Shops from './Components/Listings/Shops.jsx'
 import Customer from './Components/Profiles/Customer.jsx'
@@ -18,6 +19,7 @@ const router = createBrowserRouter(
             <Route index element={<Home />} />
             <Route path='/categories' element={<Categories />} />
             <Route path='/shops' element={<Shops />} />
+            <Route path='/about' element={<About />} />
             <Route path='/customer' element={<Customer />} />
             <Route path='/vendor' element={<Vendor />} />
             <Route path='/cart' element={<Cart />} />

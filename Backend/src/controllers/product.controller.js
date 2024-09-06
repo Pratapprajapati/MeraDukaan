@@ -5,7 +5,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js"
 
 // ADD PRODUCT
 const addProduct = async (req, res) => {
-    const { name, category, price } = req.body
+    const { name, category, subCategory, price } = req.body
 
     const productPath = req.file?.path
     if (!productPath) return res.status(404).json(new ApiResponse(404, null, "Shop image missing"))
@@ -14,7 +14,7 @@ const addProduct = async (req, res) => {
     if (!productCloud) return res.status(404).json(new ApiResponse(404, null, "Shop image not found"))
 
     const product = await Product.create({
-        name, category, price, image: productCloud.secure_url
+        name, category, subCategory, price, image: productCloud.secure_url
     })
     if (!product) return res.status(500).json(new ApiResponse(500, null, "Something went wrong"))
 
@@ -34,13 +34,14 @@ const updateProduct = async (req, res) => {
     const { productId } = req.params
     if (!productId || !isValidObjectId(productId)) return res.status(400).json(new ApiResponse(400, "", "Product Id missing"))
 
-    const { price, category } = req.body
+    const { price, category, subCategory } = req.body
 
     const product = await Product.findById(productId)
     if (!product) return res.status(404).json(new ApiResponse(404, "", "Product doesn't exist"))
 
     if (price) product.price = price
     if (category) product.category = category
+    if (subCategory) product.subCategory = subCategory
 
     const updatedProduct = await product.save({ validateBeforeSave: false })
     return res.status(200).json(new ApiResponse(200, updatedProduct, "Product updated successfully"))

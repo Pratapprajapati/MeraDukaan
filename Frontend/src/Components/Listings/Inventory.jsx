@@ -21,7 +21,7 @@ export const products = [
 ];
 
 export default function Inventory() {
-    const [quantities, setQuantities] = useState(Array(products.length).fill(1));
+    const [quantities, setQuantities] = useState(Array(products.length).fill(0));
 
     const handleIncrease = (index) => {
         const newQuantities = [...quantities];
@@ -30,7 +30,7 @@ export default function Inventory() {
     };
 
     const handleDecrease = (index) => {
-        if (quantities[index] > 1) {
+        if (quantities[index] > 0) {
             const newQuantities = [...quantities];
             newQuantities[index] -= 1;
             setQuantities(newQuantities);
@@ -64,32 +64,37 @@ export default function Inventory() {
                         </p>
                     </div>
                 </div>
-                <div className="flex items-center space-x-2 mx-1 w-full">
-                    <div className="flex items-center bg-gray-900 rounded-lg ps-2 pe-1 py-1 w-full xl:w-96">
-                        <input
-                            type="text"
-                            className="flex-grow bg-transparent px-2  text-white outline-none placeholder-gray-500"
-                            placeholder="Search"
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    // Handle search when Enter is pressed
-                                }
-                            }}
-                        />
-                        <button title="Search"
-                            className="flex items-center justify-center h-10 w-10 bg-gray-800 rounded-full"
-                            onClick={() => {
-                                // Handle search when the button is clicked
-                            }}
-                        >
-                            <Search size={20} className="text-white" />
-                        </button>
+                <div className=" mx-1 w-full xl:border-l xl:ps-2 xl:border-l-gray-600">
+                    <div className='flex items-center space-x-2'>
+                        <div className="flex items-center bg-gray-900 rounded-lg ps-2 pe-1 py-1 w-full xl:w-96">
+                            <input
+                                type="text"
+                                className="flex-grow bg-transparent px-2  text-white outline-none placeholder-gray-500"
+                                placeholder="Search"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        // Handle search when Enter is pressed
+                                    }
+                                }}
+                            />
+                            <button title="Search"
+                                className="flex items-center justify-center h-10 w-10 bg-gray-800 rounded-full"
+                                onClick={() => {
+                                    // Handle search when the button is clicked
+                                }}
+                            >
+                                <Search size={20} className="text-white" />
+                            </button>
+                        </div>
+                        <select className="flex items-center text-md rounded-lg font-medium cursor-pointer bg-gray-800 text-white py-3 border border-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 transform hover:scale-105 transition-transform">
+                            <option value="near">All Categories</option>
+                            <option value="fav">Favourites</option>
+                            <option value="all">All Shops</option>
+                        </select>
                     </div>
-                    <select className="flex items-center text-md rounded-lg font-medium cursor-pointer bg-gray-800 text-white py-3 border border-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 transform hover:scale-105 transition-transform">
-                        <option value="near">All Categories</option>
-                        <option value="fav">Favourites</option>
-                        <option value="all">All Shops</option>
-                    </select>
+                    <div className='flex justify-center mt-2 -mb-2 text-teal-500 hover:text-teal-600 font-semibold cursor-pointer'>
+                        <p>Place custom order without any products</p>
+                    </div>
                 </div>
             </div>
             <div className="pb-4 mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">

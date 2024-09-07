@@ -7,8 +7,6 @@ const createInventory = async (req, res) => {
 
     const { productList } = req.body
     if (!productList) return res.status(404).json(new ApiResponse(404, null, "Product list missing"))
-    console.log(productList);
-    
 
     const inventory = await Inventory.create({
         _id: req.user._id,

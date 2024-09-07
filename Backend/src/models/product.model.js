@@ -20,6 +20,11 @@ const productSchema = new Schema({
     image: {
         type: String,
         required: true
+    },
+    quantity: {
+        type: String,
+        default: "count",
+        enum: ["count", "weight", "volume"]
     }
 }, {
     timestamps: true

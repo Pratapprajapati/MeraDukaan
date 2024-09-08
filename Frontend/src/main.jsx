@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route } from "react-router-dom"
+import Login from "./Components/AppPages/Login.jsx"
+import VendorRegister from "./Components/AppPages/VendorRegister.jsx"
+import OrdersPage from "./Components/Vendor/OrdersPage.jsx"
 import Home from './Components/Home.jsx'
 import About from './Components/About.jsx'
 import Categories from './Components/Listings/Categories.jsx'
@@ -17,8 +20,13 @@ const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<App />}>
             <Route index element={<Home />} />
+            <Route path='/signin' element={<Login />} />
+            <Route path='/register/vendor' element={<VendorRegister />} />
             <Route path='/categories' element={<Categories />} />
             <Route path='/shops' element={<Shops />} />
+            <Route path='/vendor' element={<OrdersPage />} >
+                
+            </Route>
             <Route path='/about' element={<About />} />
             <Route path='/customer' element={<Customer />} />
             <Route path='/vendor' element={<Vendor />} />

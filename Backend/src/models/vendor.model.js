@@ -73,6 +73,11 @@ const vendorSchema = new Schema({
         type: String,
         default: "Return"
     },
+    verified: {
+        type: String,
+        default: "pending",
+        enum: ["pending", "verified", "suspended"]
+    },
     refreshToken: {
         type: String
     }

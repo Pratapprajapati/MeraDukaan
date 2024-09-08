@@ -58,3 +58,10 @@
   scrollbar-width: thin; /* or auto */
   scrollbar-color: #4fd1c5 #2d2d2d;
 }
+.logo {
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #efff64a9);
+}

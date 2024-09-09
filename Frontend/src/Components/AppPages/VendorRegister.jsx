@@ -112,7 +112,7 @@ export default function VendorRegister() {
                     </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 tracking-wider">
+                <form onSubmit={handleSubmit} className="p-6">
                     <div className="mb-8">
                         <h2 className="text-xl font-semibold mb-2">Personal Details</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

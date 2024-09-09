@@ -1,98 +1,53 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ArrowRight } from 'lucide-react'
+import { Link, useNavigate } from "react-router-dom"
+import axios from "axios"
+import Cookies from "js-cookie"
+import CryptoJS from 'crypto-js'
 
-export default function SignInTwo() {
+export default function SignIn() {
     const [userType, setUserType] = useState('customer')
+    const [formData, setFormData] = useState({ username: "", email: "", password: "" })
 
-    const toggleUserType = (type) => {
-        setUserType(type)
+    const navigate = useNavigate()
+    const [errorMessage, setErrorMessage] = useState("");
+
+    // If user logged in then redirect to home page
+    useEffect(() => {
+        const user = Cookies.get("user") ? true : false
+
+        if (user) navigate(-1)
+    }, [])
+
+    const handleInput = (e) => {
+        const { name, value } = e.target
+        setFormData(prevData => ({ ...prevData, [name]: value, username: formData.email }))
+        setErrorMessage("")
     }
 
-    const renderForm = () => (
-        <form action="#" method="POST" className="mt-8">
-            <div className="space-y-5">
-                <div>
-                    <label htmlFor="email" className="text-base font-medium text-gray-900">
-                        Email address
-                    </label>
-                    <div className="mt-2">
-                        <input
-                            className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
-                            type="email"
-                            id="email"
-                            placeholder="Email"
-                        />
-                    </div>
-                </div>
-                <div>
-                    <div className="flex items-center justify-between">
-                        <label htmlFor="password" className="text-base font-medium text-gray-900">
-                            Password
-                        </label>
-                        <a href="#" className="text-sm font-semibold text-black hover:underline">
-                            Forgot password?
-                        </a>
-                    </div>
-                    <div className="mt-2">
-                        <input
-                            className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
-                            type="password"
-                            id="password"
-                            placeholder="Password"
-                        />
-                    </div>
-                </div>
-                {/* Placeholder for additional fields based on userType */}
-                {userType === 'customer' && (
-                    <div>
-                        {/* Additional fields specific to customer */}
-                        {/* Example: */}
-                        {/* <div>
-              <label htmlFor="customer-field" className="text-base font-medium text-gray-900">
-                Customer Field
-              </label>
-              <input
-                className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
-                type="text"
-                id="customer-field"
-                placeholder="Customer specific field"
-              />
-            </div> */}
-                    </div>
-                )}
-                {userType === 'vendor' && (
-                    <div>
-                        {/* Additional fields specific to vendor */}
-                        {/* Example: */}
-                        {/* <div>
-              <label htmlFor="vendor-field" className="text-base font-medium text-gray-900">
-                Vendor Field
-              </label>
-              <input
-                className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
-                type="text"
-                id="vendor-field"
-                placeholder="Vendor specific field"
-              />
-            </div> */}
-                    </div>
-                )}
-                <div>
-                    <button
-                        type="button"
-                        className="inline-flex w-full items-center justify-center rounded-md bg-black px-3.5 py-2.5 font-semibold leading-7 text-white hover:bg-black/80"
-                    >
-                        Get started <ArrowRight className="ml-2" size={16} />
-                    </button>
-                </div>
-            </div>
-        </form>
-    )
+    const handleForm = (e) => {
+        e.preventDefault()
+        setFormData({ ...formData, username: formData.email })
+        // console.log(formData);
+
+        if (userType === "vendor") {
+            axios.post("/api/vendor/login", formData)
+                .then(res => {
+                    const vendor = res.data.data.vendor
+                    const vendorData = CryptoJS.AES.encrypt(JSON.stringify(vendor), "secretKey").toString()
+                    Cookies.set("user", vendorData)
+
+                    navigate("/vendor")
+                })
+                .catch(e => setErrorMessage(e.response.data.message))
+        }
+    }
+
 
     return (
         <section>
             <div className="grid grid-cols-1 lg:grid-cols-2 h-screen">
-                <div className="relative flex items-end px-4 pb-10 pt-60 sm:px-6 sm:pb-16 md:justify-center lg:px-8 lg:pb-24">
+                <div className="relative flex items-end px-4 pb-10 pt-60 sm:px-6 sm:pb-16 md:justify-center lg:px-8 lg:pb-24 max-lg:hidden">
                     <div className="absolute inset-0">
                         <img
                             className="h-full w-full rounded-md object-cover object-top"
@@ -182,21 +137,11 @@ export default function SignInTwo() {
                 {/* Right side content with modifications */}
                 <div className="flex items-center justify-center px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
                     <div className="xl:mx-auto xl:w-full xl:max-w-sm 2xl:max-w-md">
-                        <h2 className="text-3xl font-bold leading-tight text-black sm:text-4xl">Sign in</h2>
-                        <p className="mt-2 text-sm text-gray-600">
-                            Don't have an account?{' '}
-                            <a
-                                href="#"
-                                title=""
-                                className="font-semibold text-black transition-all duration-200 hover:underline"
-                            >
-                                Create a free account
-                            </a>
-                        </p>
+                        <h2 className="text-3xl font-bold leading-tight text-white sm:text-4xl">Sign in</h2>
                         {/* User type toggle buttons */}
-                        <div className="mt-6 flex space-x-4 bg-gray-200 p-1 rounded-md">
+                        <div className="mt-6 font-semibold flex space-x-4 bg-gray-200 p-1 rounded-md">
                             <button
-                                onClick={() => toggleUserType('customer')}
+                                onClick={() => setUserType('customer')}
                                 className={`flex-1 py-2 px-4 rounded-md transition-colors duration-300 ${userType === 'customer'
                                     ? 'bg-black text-white'
                                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -205,7 +150,7 @@ export default function SignInTwo() {
                                 Customer
                             </button>
                             <button
-                                onClick={() => toggleUserType('vendor')}
+                                onClick={() => setUserType('vendor')}
                                 className={`flex-1 py-2 px-4 rounded-md transition-colors duration-300 ${userType === 'vendor'
                                     ? 'bg-black text-white'
                                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -214,12 +159,74 @@ export default function SignInTwo() {
                                 Vendor
                             </button>
                         </div>
-                        {/* Render the appropriate form based on user type */}
-                        {renderForm()}
-                        {/* Social sign-in buttons */}
-                        <div className="mt-3 space-y-3">
-                            {/* ... (Google and Facebook buttons remain unchanged) ... */}
-                        </div>
+                        <form onSubmit={e => handleForm(e)} className="mt-8">
+                            <div className="space-y-5">
+                                <div>
+                                    <label htmlFor="email" className="text-base font-medium text-gray-300">
+                                        Email address or your username
+                                    </label>
+                                    <div className="mt-2">
+                                        <input
+                                            className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
+                                            id="email" name="email" required placeholder="Email or username"
+                                            value={formData.email}
+                                            onChange={(e) => handleInput(e)}
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="flex items-center justify-between">
+                                        <label htmlFor="password" className="text-base font-medium text-gray-300">
+                                            Password
+                                        </label>
+                                        <a href="#" className="text-sm font-semibold text-gray-400 hover:underline">
+                                            Forgot password?
+                                        </a>
+                                    </div>
+                                    <div className="mt-2">
+                                        <input
+                                            className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
+                                            type="password" id="password" name="password" required placeholder="Password"
+                                            value={formData.password}
+                                            onChange={(e) => handleInput(e)}
+                                        />
+                                    </div>
+                                </div>
+                                {errorMessage && (
+                                    <div className="mb-2 p-3 bg-red-100 border font-semibold border-red-400 text-red-700 rounded">
+                                        {errorMessage}
+                                    </div>
+                                )}
+                                <div>
+                                    <button
+                                        type="submit"
+                                        className="inline-flex w-full items-center justify-center rounded-md bg-black px-3.5 py-2.5 font-semibold leading-7 text-white hover:bg-black/80"
+                                    >
+                                        Get started <ArrowRight className="ml-2" size={16} />
+                                    </button>
+                                </div>
+                                <span className="mt-2 text-gray-300 flex justify-center text-sm">
+                                    Don't have an account? &nbsp;
+
+                                    {userType === 'customer' && (
+                                        <Link
+                                            to={""}
+                                            className="font-semibold text-teal-500 transition-all duration-200 hover:underline"
+                                        >
+                                            Create a free account as Customer
+                                        </Link>
+                                    )}
+                                    {userType === 'vendor' && (
+                                        <Link
+                                            to={"/register/vendor"}
+                                            className="font-semibold text-teal-500 transition-all duration-200 hover:underline"
+                                        >
+                                            Register your shop as a vendor
+                                        </Link>
+                                    )}
+                                </span>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

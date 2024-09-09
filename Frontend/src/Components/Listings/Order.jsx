@@ -213,7 +213,7 @@ export default function Order() {
                                 <div className="flex py-6">
                                     <div className="flex-shrink-0">
                                     </div>
-                                    <div className="px-5 flex flex-1 flex-col justify-between tracking-wide">
+                                    <div className="px-5 flex flex-1 flex-col justify-between">
                                         <div className='flex justify-between items-center -mt-2'>
                                             <h3 className="text-lg font-semibold text-white">
                                                 {item.name}

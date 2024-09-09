@@ -15,7 +15,7 @@ router.route("/register").post(
     registerVendor
 )
 
-router.get("/login", login)
+router.post("/login", login)
 
 router.get("/logout", verifyJWT_Vendor, logout)
 

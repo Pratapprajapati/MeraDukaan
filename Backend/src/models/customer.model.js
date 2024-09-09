@@ -3,6 +3,10 @@ import bycrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 
 const customerSchema = new Schema({
+    userType: {
+        type: String,
+        default: "customer"
+    },
     username: {
         type: String,
         required: true
@@ -27,8 +31,18 @@ const customerSchema = new Schema({
     cart: [
         {
             product: {
-                type: mongoose.Types.ObjectId,
-                ref: "Product"
+                _id: {
+                    type: mongoose.Types.ObjectId,
+                    ref: "Product"
+                },
+                name: String,
+                category: String,
+                price: Number,
+                stock: Boolean,
+                description: String
+            },
+            vendor: {
+
             },
             count: {
                 type: Number,

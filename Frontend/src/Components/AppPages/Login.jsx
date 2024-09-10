@@ -3,7 +3,6 @@ import { ArrowRight } from 'lucide-react'
 import { Link, useNavigate } from "react-router-dom"
 import axios from "axios"
 import Cookies from "js-cookie"
-import CryptoJS from 'crypto-js'
 
 export default function SignIn() {
     const [userType, setUserType] = useState('customer')
@@ -28,14 +27,10 @@ export default function SignIn() {
     const handleForm = (e) => {
         e.preventDefault()
         setFormData({ ...formData, username: formData.email })
-        // console.log(formData);
 
         if (userType === "vendor") {
             axios.post("/api/vendor/login", formData)
                 .then(res => {
-                    const vendor = res.data.data.vendor
-                    const vendorData = CryptoJS.AES.encrypt(JSON.stringify(vendor), "secretKey").toString()
-                    Cookies.set("user", vendorData)
 
                     navigate("/vendor")
                 })

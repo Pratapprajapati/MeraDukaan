@@ -24,7 +24,7 @@ export default function SidebarTwo() {
         <div className="flex h-screen">
             {/* Sidebar */}
             <aside
-                className={`fixed inset-y-0 right-0 z-30 w-64 transform bg-black overflow-y-auto border-l px-5 py-8 transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:w-64 lg:bg-black lg:border-l lg:px-5 lg:py-8 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                className={`fixed inset-y-0 right-0 z-30 w-64 transform bg-black overflow-y-auto max-sm:border-l px-5 py-8 transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:w-64 lg:bg-black lg:px-5 lg:py-8 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
             >
                 <div className="flex items-center justify-end">
                     <button className="text-white lg:hidden" onClick={toggleSidebar}>
@@ -39,7 +39,7 @@ export default function SidebarTwo() {
                                 Navigation
                             </label>
                             <NavLink
-                                to="/vendor"
+                                to="/vendor/overview"
                                 className={({ isActive }) =>
                                     `flex transform items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-gray-50 text-gray-700' : 'text-gray-200 hover:bg-gray-50 hover:text-gray-700'
                                     }`
@@ -49,7 +49,7 @@ export default function SidebarTwo() {
                                 <span className="mx-2">Overview</span>
                             </NavLink>
                             <NavLink
-                                to="/dashboard"
+                                to="/vendor/dashboard"
                                 className={({ isActive }) =>
                                     `flex transform items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-gray-50 text-gray-700' : 'text-gray-200 hover:bg-gray-50 hover:text-gray-700'
                                     }`
@@ -59,7 +59,7 @@ export default function SidebarTwo() {
                                 <span className="mx-2">Dashboard</span>
                             </NavLink>
                             <NavLink
-                                to="/order-history"
+                                to="/vendor/history"
                                 className={({ isActive }) =>
                                     `flex transform items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-gray-100 text-gray-800' : 'text-gray-200 hover:bg-gray-100 hover:text-gray-800'
                                     }`
@@ -75,7 +75,7 @@ export default function SidebarTwo() {
                                 Management
                             </label>
                             <NavLink
-                                to="/inventory"
+                                to="/vendor/inventory"
                                 className={({ isActive }) =>
                                     `flex transform items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-gray-100 text-gray-800' : 'text-gray-200 hover:bg-gray-100 hover:text-gray-800'
                                     }`
@@ -85,7 +85,7 @@ export default function SidebarTwo() {
                                 <span className="mx-2">Inventory</span>
                             </NavLink>
                             <NavLink
-                                to="/add-products"
+                                to="/vendor/add-products"
                                 className={({ isActive }) =>
                                     `flex transform items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-gray-100 text-gray-800' : 'text-gray-200 hover:bg-gray-100 hover:text-gray-800'
                                     }`

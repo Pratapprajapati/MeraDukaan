@@ -10,7 +10,6 @@ function App() {
     const navigate = useNavigate()
 
     const signedIn = Cookies.get("user")
-    console.log(signedIn);
     
     let user = signedIn ? decrypt() : null
 

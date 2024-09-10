@@ -14,8 +14,10 @@ import Customer from './Components/Profiles/Customer.jsx'
 import Vendor from './Components/Profiles/Vendor.jsx'
 import Cart from './Components/Listings/Cart.jsx'
 import Order from './Components/Listings/Order.jsx'
-import Inventory from './Components/Listings/Inventory.jsx'
+import StoreFront from './Components/Listings/Inventory.jsx'
+import Inventory from './Components/Vendor/Inventory.jsx'
 import OrderDetails from './Components/Vendor/OrderDetail.jsx'
+import Error from './Components/AppPages/ErrorPage.jsx'
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -25,14 +27,16 @@ const router = createBrowserRouter(
             <Route path='/register/vendor' element={<VendorRegister />} />
             <Route path='/categories' element={<Categories />} />
             <Route path='/shops' element={<Shops />} />
-            <Route path='/vendor' element={<OrdersPage />} />
+            <Route path='/vendor/overview' element={<OrdersPage />} />
             <Route path='vendor/order' element={<OrderDetails />} />
+            <Route path='vendor/inventory' element={<Inventory />} />
             <Route path='/about' element={<About />} />
             <Route path='/customer' element={<Customer />} />
             <Route path='/vendor' element={<Vendor />} />
             <Route path='/cart' element={<Cart />} />
             <Route path='/order' element={<Order />} />
-            <Route path='/inventory' element={<Inventory />} />
+            <Route path='/storefront' element={<StoreFront />} />
+            <Route path='/*' element={<Error />} />
         </Route>
     )
 )

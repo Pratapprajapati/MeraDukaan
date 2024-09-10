@@ -1,24 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Info, Plus, Minus, Store, MapPin, MoveRight, ArrowRightLeft } from 'lucide-react';
 import img from "../Profiles/img1.webp"
-
-export const products = [
-    { id: 1, name: "Nike Air Max 90", price: "₹8,999", category: "Footwear", inStock: true, description: "The Nike Air Max 90 stays true to its OG roots with an iconic Waffle outsole." },
-    { id: 2, name: "Sony WH-1000XM4", price: "₹24,990", category: "Electronics", inStock: true, description: "Industry-leading noise canceling with Dual Noise Sensor technology." },
-    { id: 3, name: "Adidas Ultraboost", price: "₹14,999", category: "Footwear", inStock: false, description: "Responsive running shoes with a snug, sock-like fit." },
-    { id: 4, name: "Samsung Galaxy S21", price: "₹69,999", category: "Electronics", inStock: true, description: "Pro-grade camera and 8K video for the creators." },
-    { id: 5, name: "Wooden Coffee Table", price: "₹5,499", category: "Furniture", inStock: true, description: "Crafted with durable wood, perfect for your living room." },
-    { id: 6, name: "Apple MacBook Air M2", price: "₹1,14,990", category: "Electronics", inStock: false, description: "Apple's thinnest and lightest notebook, completely transformed by the M2 chip." },
-    { id: 7, name: "Fitbit Charge 4", price: "₹9,999", category: "Health & Wellness", inStock: true, description: "Fitbit's most advanced fitness & health tracker." },
-    { id: 8, name: "IKEA Dining Set", price: "₹19,999", category: "Furniture", inStock: true, description: "Modern and minimalistic dining set perfect for family dinners." },
-    { id: 9, name: "Canon EOS 1500D", price: "₹31,999", category: "Electronics", inStock: false, description: "Capture stunning images with this easy-to-use DSLR camera." },
-    { id: 10, name: "Nike Dri-FIT T-Shirt", price: "₹1,199", category: "Clothing", inStock: true, description: "Lightweight and breathable T-shirt ideal for your workouts." },
-    { id: 11, name: "Samsung QLED 4K TV", price: "₹89,999", category: "Electronics", inStock: true, description: "Unveil hidden details with vibrant colors in 4K resolution." },
-    { id: 12, name: "Puma Running Shoes", price: "₹3,999", category: "Footwear", inStock: false, description: "Engineered for superior cushioning and grip." },
-    { id: 13, name: "Reebok Yoga Mat", price: "₹1,499", category: "Sports & Fitness", inStock: true, description: "High-density mat with superior grip and comfort." },
-    { id: 14, name: "Sony PlayStation 5", price: "₹49,999", category: "Electronics", inStock: false, description: "Next-gen gaming console with ultra-high-speed SSD." },
-    { id: 15, name: "H&M Cotton Hoodie", price: "₹1,799", category: "Clothing", inStock: true, description: "Soft and warm hoodie made with organic cotton." },
-];
+import { products } from './sampleData';
 
 export default function Inventory() {
     const [quantities, setQuantities] = useState(Array(products.length).fill(0));

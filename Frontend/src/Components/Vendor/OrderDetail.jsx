@@ -1,65 +1,7 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 import { Trash } from 'lucide-react';
-
-const cartItems = [
-    {
-        id: 1,
-        name: 'Product 1',
-        color: 'Red',
-        size: 'L',
-        originalPrice: '₹1,999',
-        price: '₹1,499',
-        discount: '25% off',
-        quantity: 2,
-        imageSrc: '/path/to/image1.jpg',
-    },
-    {
-        id: 2,
-        name: 'Product 2',
-        color: 'Blue',
-        size: 'M',
-        originalPrice: '₹2,499',
-        price: '₹1,999',
-        discount: '20% off',
-        quantity: 1,
-        imageSrc: '/path/to/image2.jpg',
-    },
-    {
-        id: 3,
-        name: 'Product 1',
-        color: 'Red',
-        size: 'L',
-        originalPrice: '₹1,999',
-        price: '₹1,499',
-        discount: '25% off',
-        quantity: 2,
-        imageSrc: '/path/to/image1.jpg',
-    },
-    {
-        id: 4,
-        name: 'Product 2',
-        color: 'Blue',
-        size: 'M',
-        originalPrice: '₹2,499',
-        price: '₹1,999',
-        discount: '20% off',
-        quantity: 1,
-        imageSrc: '/path/to/image2.jpg',
-    },
-    {
-        id: 5,
-        name: 'Product 2',
-        color: 'Blue',
-        size: 'M',
-        originalPrice: '₹2,499',
-        price: '₹1,999',
-        discount: '20% off',
-        quantity: 1,
-        imageSrc: '/path/to/image2.jpg',
-    },
-    // Add more cart items as needed
-];
+import { cartItems } from '../Listings/sampleData';
 
 const Modal = ({ isOpen, onClose, title, children }) => {
     if (!isOpen) return null;
@@ -210,17 +152,18 @@ export default function Order() {
 
                     <div className='flex justify-between mt-6 max-sm:space-x-4'>
                         <button
-                            className="px-4 py-2 bg-green-500 text-gray-950 text-2xl font-semibold rounded"
-                            onClick={() => setIsAcceptModalOpen(true)}
-                        >
-                            Accept Order
-                        </button>
-                        <button
-                            className="px-4 py-2 bg-red-500 text-gray-950 text-2xl font-semibold rounded"
+                            className="px-4 py-2 bg-red-500 hover:bg-red-600 text-gray-950 text-2xl font-semibold rounded transform hover:scale-90 transition-transform"
                             onClick={() => setIsRejectModalOpen(true)}
                         >
                             Reject Order
                         </button>
+                        <button
+                            className="px-4 py-2 bg-green-500 hover:bg-green-600 text-gray-950 text-2xl font-semibold rounded transform hover:scale-90 transition-transform"
+                            onClick={() => setIsAcceptModalOpen(true)}
+                        >
+                            Accept Order
+                        </button>
+
                     </div>
                 </div>
 
@@ -237,13 +180,13 @@ export default function Order() {
                 />
                 <div className="flex justify-between space-x-2">
                     <button
-                        className="px-4 py-2 bg-gray-300 text-black font-semibold rounded"
+                        className="px-4 py-2 bg-gray-300 text-black font-semibold rounded transform hover:scale-90 transition-transform"
                         onClick={() => setIsAcceptModalOpen(false)}
                     >
                         Go Back
                     </button>
                     <button
-                        className="px-4 py-2 bg-green-500 text-black font-semibold rounded"
+                        className="px-4 py-2 bg-green-500 text-black font-semibold rounded transform hover:scale-90 transition-transform"
                         onClick={handleAccept}
                     >
                         Accept Order
@@ -262,13 +205,13 @@ export default function Order() {
                 />
                 <div className="flex justify-between space-x-2">
                     <button
-                        className="px-4 py-2 bg-gray-300 text-black font-semibold rounded"
+                        className="px-4 py-2 bg-gray-300 text-black font-semibold rounded transform hover:scale-90 transition-transform"
                         onClick={() => setIsRejectModalOpen(false)}
                     >
                         Go Back
                     </button>
                     <button
-                        className="px-4 py-2 bg-red-500 text-black font-semibold rounded"
+                        className="px-4 py-2 bg-red-500 text-black font-semibold rounded transform hover:scale-90 transition-transform"
                         onClick={handleReject}
                     >
                         Reject Order

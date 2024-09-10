@@ -1,6 +1,7 @@
 import Vendor from "../models/vendor.model.js"; // Adjust the path as necessary
 import ApiResponse from "../utils/ApiResponse.js"; // Adjust the path as necessary
 import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
+import CryptoJS from 'crypto-js'
 
 const registerVendor = async (req, res) => {
 
@@ -92,17 +93,14 @@ const login = async (req, res) => {
     // If everything checks out
     const vendor = await Vendor.findById(user?._id).select("-password -refreshToken")
 
+    const vendorData = CryptoJS.AES.encrypt(JSON.stringify(vendor), "secretKey").toString()
+
     return res.status(200)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
+        .cookie("user", vendorData)
         .json(
-            new ApiResponse(
-                200,
-                {
-                    vendor
-                },
-                "Vendor logged in successfully!!"
-            )
+            new ApiResponse(200, vendor,"Vendor logged in successfully!!")
         )
 }
 

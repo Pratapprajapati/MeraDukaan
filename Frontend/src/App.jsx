@@ -10,6 +10,8 @@ function App() {
     const navigate = useNavigate()
 
     const signedIn = Cookies.get("user")
+    console.log(signedIn);
+    
     let user = signedIn ? decrypt() : null
 
     useEffect(() => {
@@ -18,13 +20,11 @@ function App() {
 
     if (!signedIn) return <Outlet />
     
-    if (user.userType === "vendor") return <Sidebar />
-
     return (
         <div className='font-poppins tracking-wider'>
-            {/* <Header/> */}
-            <Outlet/>
-            {/* <Footer /> */}
+            {
+                user.userType === "vendor" ? <Sidebar /> : <Outlet/>
+            }
         </div>
     )
 }

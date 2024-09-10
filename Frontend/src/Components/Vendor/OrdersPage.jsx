@@ -299,46 +299,29 @@ export default function Orders() {
                 {filteredOrders.map((order) => (
                     <div key={order.id} className="flex flex-col bg-gray-800 shadow-lg shadow-black/40 overflow-hidden rounded-lg md:flex-row border border-gray-800">
                         <div className="w-full md:w-2/6 md:border-r border-gray-700 py-3 px-4">
-                            <div className="flex flex-col space-y-3">
+                            <div className="flex flex-col space-y-1.5">
                                 <div className="text-2xl font-bold text-yellow-500">Order ID: {order.id}</div>
                                 <div className="text-xl font-bold text-gray-300">{order.customer.name}</div>
-                                <div className="text-md text-gray-400 space-y-2">
-                                    <p><span className="font-semibold">Address:</span> {order.customer.address}</p>
-                                    <p><span className="font-semibold">Contact:</span> {order.customer.contact}</p>
-                                    {order.customer.note && (
-                                        <p><span className="font-semibold">Note:</span> {order.customer.note}</p>
-                                    )}
-                                    {order.payment && (
-                                        <p><span className="font-semibold">Payment:</span> {order.payment}</p>
-                                    )}
-                                </div>
-
+                                <p className="text-md text-gray-400"><span className="font-semibold">Address:</span> {order.customer.address}</p>
+                                {order.customer.note && (
+                                    <p className="text-md text-gray-400"><span className="font-semibold">Note: </span>{order.customer.note}</p>
+                                )}
+                                <p className="text-md text-gray-400"><span className="font-semibold">Status:</span> {order.status}</p>
                             </div>
                         </div>
-                        <div className="flex-1 p-2 flex flex-col justify-between">
+                        <div className="flex-1 px-2 py-1.5 flex flex-col justify-between">
                             <div>
                                 <h3 className="text-lg font-semibold mb-2">Cart Items</h3>
-                                <div className="max-h-48 overflow-y-auto pr-2">
-                                    <ul className="space-y-4">
-                                        {order.products.map((product, index) => (
-                                            <li key={index} className="flex items-center gap-4 bg-gray-700 p-2 rounded">
-                                                <img
-                                                    src={`/api/placeholder/64/64`}
-                                                    alt={product.name}
-                                                    className="h-16 w-16 rounded object-contain bg-gray-600"
-                                                />
-                                                <div>
-                                                    <h4 className="text-sm text-gray-200">{product.name}</h4>
-                                                    <dl className="mt-0.5 space-y-px text-xs text-gray-400">
-                                                        <div>
-                                                            <dd className="inline font-bold">{product.price}</dd>
-                                                        </div>
-                                                    </dl>
-                                                </div>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
+                                <ul className="mt-4 text-sm font-medium text-gray-400 list-disc list-inside">
+                                    {order.products.slice(0, 3).map((product, index) => (
+                                        <li key={index}>
+                                            {product.name} - {product.price}
+                                        </li>
+                                    ))}
+                                    {order.products.length > 3 && (
+                                        <li>...and {order.products.length - 3} other items</li>
+                                    )}
+                                </ul>
                             </div>
                             <div className="mt-4">
                                 <hr className="my-2 border-t border-gray-600" />

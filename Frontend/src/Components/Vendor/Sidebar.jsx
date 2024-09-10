@@ -1,21 +1,32 @@
 import React, { useState } from 'react';
-import { Menu, Home, BarChart, History, Archive, PlusCircle, LogOut } from 'lucide-react';
-import { Outlet, NavLink } from 'react-router-dom';
+import { Menu, Home, BarChart, History, Archive, PlusCircle, LogOut, X } from 'lucide-react';
+import { Outlet, useNavigate, NavLink } from 'react-router-dom';
+import axios from 'axios';
 
 export default function SidebarTwo() {
     const [isOpen, setIsOpen] = useState(false);
+
+    const navigate = useNavigate()
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     };
 
+    const logout = () => {
+        axios.get("/api/vendor/logout")
+            .then(res => {
+                navigate("/signin")
+            })
+            .catch(e => console.log(e))
+    }
+
     return (
         <div className="flex h-screen">
             {/* Sidebar */}
             <aside
-                className={`fixed inset-y-0 left-0 z-30 w-64 transform bg-black overflow-y-auto border-r px-5 py-8 transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:w-64 lg:static lg:bg-black lg:border-r lg:px-5 lg:py-8 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+                className={`fixed inset-y-0 right-0 z-30 w-64 transform bg-black overflow-y-auto border-l px-5 py-8 transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:w-64 lg:bg-black lg:border-l lg:px-5 lg:py-8 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
             >
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-end">
                     <button className="text-white lg:hidden" onClick={toggleSidebar}>
                         {isOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
@@ -89,25 +100,24 @@ export default function SidebarTwo() {
                             <label className="px-3 text-xs font-semibold uppercase text-white">
                                 Account
                             </label>
-                            <NavLink
-                                to="/logout"
-                                className={({ isActive }) =>
-                                    `flex transform items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-gray-100 text-gray-800' : 'text-gray-200 hover:bg-gray-100 hover:text-gray-800'
-                                    }`
-                                }
+                            <p
+                                onClick={logout}
+                                className= "flex transform cursor-pointer items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 text-gray-200 hover:bg-gray-100 hover:text-gray-800"
+                                
                             >
                                 <LogOut className="h-5 w-5" aria-hidden="true" />
                                 <span className="mx-2">Logout</span>
-                            </NavLink>
+                            </p>
                         </div>
                     </nav>
-                </div>            </aside>
+                </div>
+            </aside>
 
             {/* Overlay for Mobile */}
             {isOpen && <div className="fixed inset-0 bg-black opacity-50 lg:hidden" onClick={toggleSidebar}></div>}
 
             {/* Main Content */}
-            <div className={`flex-1 transition-all duration-300 ${isOpen ? 'lg:ml-64' : ''}`}>
+            <div className={`flex-1 transition-all duration-300 ${isOpen ? 'lg:mr-64' : ''}`}>
                 {/* Mobile Header with Toggle Button */}
                 <div className="lg:hidden flex justify-between items-center p-4 bg-gray-900 text-white">
                     <h1 className="text-lg font-semibold">My App</h1>

@@ -15,6 +15,7 @@ import Vendor from './Components/Profiles/Vendor.jsx'
 import Cart from './Components/Listings/Cart.jsx'
 import Order from './Components/Listings/Order.jsx'
 import Inventory from './Components/Listings/Inventory.jsx'
+import OrderDetails from './Components/Vendor/OrderDetail.jsx'
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -24,9 +25,8 @@ const router = createBrowserRouter(
             <Route path='/register/vendor' element={<VendorRegister />} />
             <Route path='/categories' element={<Categories />} />
             <Route path='/shops' element={<Shops />} />
-            <Route path='/vendor' element={<OrdersPage />} >
-                
-            </Route>
+            <Route path='/vendor' element={<OrdersPage />} />
+            <Route path='vendor/order' element={<OrderDetails />} />
             <Route path='/about' element={<About />} />
             <Route path='/customer' element={<Customer />} />
             <Route path='/vendor' element={<Vendor />} />

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Menu, Home, BarChart, History, Archive, PlusCircle, LogOut, X } from 'lucide-react';
 import { Outlet, useNavigate, NavLink } from 'react-router-dom';
+import logo from "../assets/logo.png"
 import axios from 'axios';
 
 export default function SidebarTwo() {
@@ -33,6 +34,9 @@ export default function SidebarTwo() {
                 </div>
 
                 <div className="mt-6 flex flex-1 flex-col justify-between">
+                    <div className='flex justify-center'>
+                        <img src={logo} className='h-24 w-24' />
+                    </div>
                     <nav className="-mx-3 space-y-6">
                         <div className="space-y-3">
                             <label className="px-3 text-xs font-semibold uppercase text-white">
@@ -102,8 +106,8 @@ export default function SidebarTwo() {
                             </label>
                             <p
                                 onClick={logout}
-                                className= "flex transform cursor-pointer items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 text-gray-200 hover:bg-gray-100 hover:text-gray-800"
-                                
+                                className="flex transform cursor-pointer items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 text-gray-200 hover:bg-gray-100 hover:text-gray-800"
+
                             >
                                 <LogOut className="h-5 w-5" aria-hidden="true" />
                                 <span className="mx-2">Logout</span>

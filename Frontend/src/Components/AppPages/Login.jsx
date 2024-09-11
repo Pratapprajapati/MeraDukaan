@@ -31,8 +31,7 @@ export default function SignIn() {
         if (userType === "vendor") {
             axios.post("/api/vendor/login", formData)
                 .then(res => {
-
-                    navigate("/vendor")
+                    navigate("/vendor/overview")
                 })
                 .catch(e => setErrorMessage(e.response.data.message))
         }

@@ -1,7 +1,7 @@
 import { Ban, Clock, PackageCheck, Truck } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { orders } from '../Listings/sampleData';
+import { orders } from '../../Listings/sampleData';
 
 const orderIcons = {
     "Pending": <Clock className='inline-flex ms-2 my-1'/> ,

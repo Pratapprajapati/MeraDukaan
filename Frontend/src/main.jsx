@@ -5,7 +5,6 @@ import './index.css'
 import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route } from "react-router-dom"
 import Login from "./Components/AppPages/Login.jsx"
 import VendorRegister from "./Components/AppPages/VendorRegister.jsx"
-import OrdersPage from "./Components/Vendor/OrdersPage.jsx"
 import Home from './Components/Home.jsx'
 import About from './Components/About.jsx'
 import Categories from './Components/Listings/Categories.jsx'
@@ -16,8 +15,10 @@ import Cart from './Components/Listings/Cart.jsx'
 import Order from './Components/Listings/Order.jsx'
 import StoreFront from './Components/Listings/Inventory.jsx'
 import Inventory from './Components/Vendor/Inventory.jsx'
-import OrderDetails from './Components/Vendor/OrderDetail.jsx'
+import OrderDetails from './Components/Vendor/Orders/OrderDetail.jsx'
+import OrdersPage from "./Components/Vendor/Orders/OrdersPage.jsx"
 import Error from './Components/AppPages/ErrorPage.jsx'
+import Product from './Components/Vendor/Products/ProductList.jsx'
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -30,6 +31,7 @@ const router = createBrowserRouter(
             <Route path='/vendor/overview' element={<OrdersPage />} />
             <Route path='vendor/order' element={<OrderDetails />} />
             <Route path='vendor/inventory' element={<Inventory />} />
+            <Route path='vendor/products' element={<Product />} />
             <Route path='/about' element={<About />} />
             <Route path='/customer' element={<Customer />} />
             <Route path='/vendor' element={<Vendor />} />

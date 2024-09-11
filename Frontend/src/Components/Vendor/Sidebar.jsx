@@ -85,7 +85,7 @@ export default function SidebarTwo() {
                                 <span className="mx-2">Inventory</span>
                             </NavLink>
                             <NavLink
-                                to="/vendor/add-products"
+                                to="/vendor/products"
                                 className={({ isActive }) =>
                                     `flex transform items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-gray-100 text-gray-800' : 'text-gray-200 hover:bg-gray-100 hover:text-gray-800'
                                     }`

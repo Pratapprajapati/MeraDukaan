@@ -88,7 +88,7 @@ export default function ProductList() {
     );
 
     return (
-        <div className="p-4 bg-gray-900 min-h-screen text-white rounded-lg">
+        <div className="p-4 bg-black/20 shadow-2xl shadow-black min-h-screen text-white rounded-lg">
             <h1 className="text-3xl font-bold mb-6">Add Product</h1>
 
             <div className='flex items-center space-x-2 mb-6'>

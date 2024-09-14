@@ -5,17 +5,16 @@ import {
 import verifyJWT from "../middlewares/auth.middleware.js";
 
 const router = Router()
-router.use(verifyJWT)
 
-router.post("/", placeOrder)
+router.post("/", verifyJWT("customer"), placeOrder)
 
-router.get("/history/:duration", getOrderHistory)
+router.get("/history/:duration", verifyJWT("vendor"), getOrderHistory)
 
-router.get("/today", getTodaysOrders)
+router.get("/today", verifyJWT("vendor"), getTodaysOrders)
 
-router.get("/:orderId", getOrderById)
+router.get("/:orderId", verifyJWT("both"), getOrderById)
 
-router.patch("/manage/:orderId", manageOrder)
+router.patch("/manage/:orderId",verifyJWT("both"), manageOrder)
 
 
 export default router

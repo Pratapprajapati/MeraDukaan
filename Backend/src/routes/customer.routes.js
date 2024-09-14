@@ -10,20 +10,20 @@ router.post("/register", register)
 
 router.get("/login", login)
 
-router.get("/logout", verifyJWT, logout);
+router.get("/logout", verifyJWT("customer"), logout);
 
-router.patch("/update", verifyJWT, updateCustomer);
+router.patch("/update", verifyJWT("customer"), updateCustomer);
 
-router.patch("/password", verifyJWT, changePassword);
+router.patch("/password", verifyJWT("customer"), changePassword);
 
-router.get("/current", verifyJWT, getCurrentUser);
+router.get("/current", verifyJWT("customer"), getCurrentUser);
 
-router.get("/cart", verifyJWT, getCart);
+router.get("/cart", verifyJWT("customer"), getCart);
 
-router.post("/cart/add", verifyJWT,addToCart);
+router.post("/cart/add", verifyJWT("customer"),addToCart);
 
-router.delete("/cart/clear", verifyJWT, clearCart);
+router.delete("/cart/clear", verifyJWT("customer"), clearCart);
 
-router.post("/review/:orderId", verifyJWT, addReview);
+router.post("/review/:orderId", verifyJWT("customer"), addReview);
 
 export default router

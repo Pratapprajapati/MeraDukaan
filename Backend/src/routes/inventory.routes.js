@@ -6,13 +6,12 @@ import verifyJWT from "../middlewares/auth.middleware.js";
 
 const router = Router()
 
-router.use(verifyJWT)
+router.post("/", verifyJWT("vendor"), createInventory)
 
-router.route("/").post(createInventory).get(getInventory)
-router.route("/:vendorId").get(getInventory)
+router.get("/:vendorId", verifyJWT("both"), getInventory)
 
-router.post("/add", addProduct)
+router.post("/add", verifyJWT("vendor"), addProduct)
 
-router.route("/:productId").patch(updateProduct).delete(removeProduct)
+router.route("/product/:productId", verifyJWT("vendor")).patch(updateProduct).delete(removeProduct)
 
 export default router

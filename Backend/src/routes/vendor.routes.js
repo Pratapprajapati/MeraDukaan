@@ -17,16 +17,16 @@ router.route("/register").post(
 
 router.post("/login", login)
 
-router.get("/logout", verifyJWT, logout)
+router.get("/logout", verifyJWT("vendor"), logout)
 
-router.get("/current", verifyJWT, getCurrentUser)
+router.get("/current", verifyJWT("vendor"), getCurrentUser)
 
-router.patch("/update/details", verifyJWT, updateVendor)
+router.patch("/update/details", verifyJWT("vendor"), updateVendor)
 
-router.patch("/update/password", verifyJWT, changePassword)
+router.patch("/update/password", verifyJWT("vendor"), changePassword)
 
-router.patch("/update/shopImage", verifyJWT, upload.single("shopImage"), changeShopImage)
+router.patch("/update/shopImage", verifyJWT("vendor"), upload.single("shopImage"), changeShopImage)
 
-router.patch("/update/qrCode", verifyJWT, upload.single("qrCodeImage"), changeQrCodeImage)
+router.patch("/update/qrCode", verifyJWT("vendor"), upload.single("qrCodeImage"), changeQrCodeImage)
 
 export default router

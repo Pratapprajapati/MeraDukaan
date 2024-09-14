@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
-import { Trash } from 'lucide-react';
 import { cartItems } from '../../Listings/sampleData';
 
 const Modal = ({ isOpen, onClose, title, children }) => {

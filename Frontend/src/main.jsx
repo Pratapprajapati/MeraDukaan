@@ -22,28 +22,33 @@ import Product from './Components/Vendor/Products/ProductList.jsx'
 import AddProduct from './Components/Vendor/Products/AddProduct.jsx'
 import NewProduct from './Components/Vendor/Products/NewProduct.jsx'
 import Dashboard from './Components/Vendor/Dashboard.jsx'
+import OrderHistory from './Components/Vendor/Orders/OrderHistory.jsx'
 
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<App />}>
             <Route index element={<Home />} />
             <Route path='/signin' element={<Login />} />
+
             <Route path='/register/vendor' element={<VendorRegister />} />
-            <Route path='/categories' element={<Categories />} />
-            <Route path='/shops' element={<Shops />} />
             <Route path='/vendor/overview' element={<OrdersPage />} />
             <Route path='vendor/order' element={<OrderDetails />} />
+            <Route path='vendor/history' element={<OrderHistory />} />
+            <Route path='vendor/dashboard' element={<Dashboard />} />
             <Route path='vendor/inventory' element={<Inventory />} />
             <Route path='vendor/products' element={<Product />} />
-            <Route path='vendor/dashboard' element={<Dashboard />} />
             <Route path='vendor/products/add' element={<AddProduct />} />
             <Route path='vendor/products/new' element={<NewProduct />} />
+            <Route path='/vendor/shop' element={<Vendor />} />
+
+            <Route path='/categories' element={<Categories />} />
+            <Route path='/shops' element={<Shops />} />
             <Route path='/about' element={<About />} />
             <Route path='/customer' element={<Customer />} />
-            <Route path='/vendor/shop' element={<Vendor />} />
             <Route path='/cart' element={<Cart />} />
             <Route path='/order' element={<Order />} />
             <Route path='/storefront' element={<StoreFront />} />
+            
             <Route path='/*' element={<Error />} />
         </Route>
     )

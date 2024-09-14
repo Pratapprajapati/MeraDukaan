@@ -1,8 +1,8 @@
 import { Router } from "express";
 import {
-    register, login, logout, updateCustomer, changePassword, getCurrentUser, addToCart, clearCart, addReview
+    register, login, logout, updateCustomer, changePassword, getCurrentUser, addToCart, clearCart, getCart, addReview
 } from "../controllers/customer.controller.js"
-import { verifyJWT_Customer } from "../middlewares/auth.middleware.js";
+import verifyJWT from "../middlewares/auth.middleware.js";
 
 const router = Router()
 
@@ -10,18 +10,20 @@ router.post("/register", register)
 
 router.get("/login", login)
 
-router.get("/logout", verifyJWT_Customer, logout);
+router.get("/logout", verifyJWT, logout);
 
-router.patch("/update", verifyJWT_Customer, updateCustomer);
+router.patch("/update", verifyJWT, updateCustomer);
 
-router.patch("/password", verifyJWT_Customer, changePassword);
+router.patch("/password", verifyJWT, changePassword);
 
-router.get("/current", verifyJWT_Customer, getCurrentUser);
+router.get("/current", verifyJWT, getCurrentUser);
 
-router.post("/cart/add", verifyJWT_Customer,addToCart);
+router.get("/cart", verifyJWT, getCart);
 
-router.delete("/cart/clear", verifyJWT_Customer, clearCart);
+router.post("/cart/add", verifyJWT,addToCart);
 
-router.post("/review/:orderId", verifyJWT_Customer, addReview);
+router.delete("/cart/clear", verifyJWT, clearCart);
+
+router.post("/review/:orderId", verifyJWT, addReview);
 
 export default router

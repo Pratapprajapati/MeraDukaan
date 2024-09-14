@@ -107,7 +107,7 @@ vendorSchema.methods.generateAccessToken = function(){
     return jwt.sign(                                               //jwt.sign(payload or data, secretKey, options (Expiry))
         {
             _id: this._id,
-            email: this.email,
+            userType: this.userType,
             username: this.username,
         },
         process.env.ACCESS_TOKEN_SECRET,

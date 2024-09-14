@@ -1,14 +1,19 @@
 import { Router } from "express";
 import {
-    placeOrder, manageOrder, getOrderHistory
+    placeOrder, manageOrder, getOrderHistory, getOrderById, getTodaysOrders
 } from "../controllers/order.controller.js"
-import { verifyJWT_Customer} from "../middlewares/auth.middleware.js";
+import verifyJWT from "../middlewares/auth.middleware.js";
 
 const router = Router()
+router.use(verifyJWT)
 
-router.post("/", verifyJWT_Customer, placeOrder)
+router.post("/", placeOrder)
 
-router.get("/",getOrderHistory)
+router.get("/history/:duration", getOrderHistory)
+
+router.get("/today", getTodaysOrders)
+
+router.get("/:orderId", getOrderById)
 
 router.patch("/manage/:orderId", manageOrder)
 

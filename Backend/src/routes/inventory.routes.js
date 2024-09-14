@@ -2,11 +2,11 @@ import { Router } from "express";
 import {
     createInventory, addProduct, updateProduct, removeProduct, getInventory
 } from "../controllers/inventory.controller.js"
-import { verifyJWT_Vendor } from "../middlewares/auth.middleware.js";
+import verifyJWT from "../middlewares/auth.middleware.js";
 
 const router = Router()
 
-router.use(verifyJWT_Vendor)
+router.use(verifyJWT)
 
 router.route("/").post(createInventory).get(getInventory)
 router.route("/:vendorId").get(getInventory)

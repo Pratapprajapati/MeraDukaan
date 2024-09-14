@@ -5,6 +5,9 @@ import Product from "../models/product.model.js";
 
 const createInventory = async (req, res) => {
 
+    const existing = await Inventory.findById(req.user._id)
+    if (existing) return res.status(400).json(new ApiResponse(400, null, "Existing inventory"))
+
     const { productList } = req.body
     if (!productList) return res.status(404).json(new ApiResponse(404, null, "Product list missing"))
 
@@ -34,9 +37,9 @@ const addProduct = async (req, res) => {
         product,
         stock,
     }
-    if (price) newProduct[price] = price
-    if (description) newProduct[description] = description
-
+    if (price) newProduct["price"] = price
+    if (description) newProduct["description"] = description
+    
     inventory.productList.push(newProduct)
 
     const updatedList = await inventory.save({ validateBeforeSave: false })

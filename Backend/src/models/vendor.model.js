@@ -9,6 +9,11 @@ const vendorSchema = new Schema({
         type: String,
         default: "vendor"
     },
+    userType: {
+        type: String,
+        default: "active",
+        enum: ["active", "warned", "suspended", "banned"]
+    },
     username: {
         type : String,
         required : true,
@@ -66,6 +71,10 @@ const vendorSchema = new Schema({
             type : String,
             required : true
         }
+    },
+    isOpen: {
+        type: Boolean,
+        default: false
     },
     shopType: {
         type : String,

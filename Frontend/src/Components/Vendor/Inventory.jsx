@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Search, Info, Edit, Check, X } from 'lucide-react';
+import { Search, Edit, Info, Check, X, Trash } from 'lucide-react';
+import Swal from 'sweetalert2';
 import img from "../Profiles/img1.webp";
 import { products } from '../Listings/sampleData';
 
@@ -34,6 +35,34 @@ export default function Inventory() {
         // Implement save logic if you need to persist the changes
     };
 
+    const handleDelete = (id) => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you want to delete this product?',
+            icon: 'warning',
+            color: 'white',
+            background: '#1a1a2e',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete!',
+            cancelButtonText: 'No, cancel',
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Deleted!',
+                    text: 'Product has been deleted.',
+                    icon: 'success',
+                    color: 'white',
+                    background: '#1a1a2e',
+                });
+
+                setEditableProducts(prev =>
+                    prev.filter(product => product.id !== id)
+                );
+            }
+        });
+    };
+
     const handleCategoryChange = (event) => {
         setSelectedCategory(event.target.value);
     };
@@ -52,17 +81,9 @@ export default function Inventory() {
                             type="text"
                             className="flex-grow bg-transparent px-2  text-white outline-none placeholder-gray-500"
                             placeholder="Search"
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    // Handle search when Enter is pressed
-                                }
-                            }}
                         />
                         <button title="Search"
                             className="flex items-center justify-center h-10 w-10 bg-gray-800 rounded-full"
-                            onClick={() => {
-                                // Handle search when the button is clicked
-                            }}
                         >
                             <Search size={20} className="text-white" />
                         </button>
@@ -86,7 +107,7 @@ export default function Inventory() {
                         className="flex flex-row bg-gray-800 shadow-md rounded-lg overflow-hidden border border-black/20 hover:border-white mx-2 p-4 "
                     >
                         <div className='me-2 pe-2'>
-                            <img src={img} className='h-32 w-auto rounded-md' />
+                            <img src={img} className='h-32 w-auto rounded-md' alt={product.name} />
                         </div>
 
                         <div className='flex flex-col w-full'>
@@ -97,23 +118,35 @@ export default function Inventory() {
                                     </h4>
                                     <p className="text-sm text-gray-300">{product.category}</p>
                                 </div>
-                                <div className="relative bottom-4 ms-1">
-                                    <Info
-                                        size={20}
-                                        className="text-teal-500 cursor-pointer"
-                                        onMouseEnter={(e) => {
-                                            const tooltip = e.currentTarget.nextSibling;
-                                            tooltip.classList.remove('hidden');
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            const tooltip = e.currentTarget.nextSibling;
-                                            tooltip.classList.add('hidden');
-                                        }}
-                                    />
-                                    <div className="absolute hidden w-48 p-2 text-xs text-white bg-black rounded-lg shadow-lg -right-2 top-8 z-10">
-                                        {product.description}
+                                {editMode === product.id ? (
+                                    <div className="relative bottom-3 ms-1">
+                                        <button
+                                            className="text-red-500 cursor-pointer"
+                                            onClick={() => handleDelete(product.id)}
+                                        >
+                                            <Trash size={20} />
+                                        </button>
                                     </div>
-                                </div>
+
+                                ) : (
+                                    <div className="relative bottom-4 ms-1">
+                                        <Info
+                                            size={20}
+                                            className="text-teal-500 cursor-pointer"
+                                            onMouseEnter={(e) => {
+                                                const tooltip = e.currentTarget.nextSibling;
+                                                tooltip.classList.remove('hidden');
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                const tooltip = e.currentTarget.nextSibling;
+                                                tooltip.classList.add('hidden');
+                                            }}
+                                        />
+                                        <div className="absolute hidden w-48 p-2 text-xs text-white bg-black rounded-lg shadow-lg -right-2 top-8 z-10">
+                                            {product.description}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             {editMode === product.id ? (

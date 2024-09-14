@@ -7,12 +7,21 @@ const customerSchema = new Schema({
         type: String,
         default: "customer"
     },
+    userStatus: {
+        type: String,
+        default: "active",
+        enum: ["active", "warned", "banned"]
+    },
     username: {
         type: String,
         required: true
     },
     email: {
         type: String,
+        required: true
+    },
+    age: {
+        type: Number,
         required: true
     },
     password: {

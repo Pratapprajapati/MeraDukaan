@@ -43,11 +43,11 @@ export default function Inventory() {
         : editableProducts.filter((product) => product.category === selectedCategory);
 
     return (
-        <div className="container px-2 mx-auto">
-            <h1 className='text-3xl font-semibold mb-2'>Inventory</h1>
+        <div className="p-4 bg-black/20 shadow-2xl shadow-black min-h-screen text-white rounded-lg">
+            <h1 className='text-3xl font-semibold mb-6'>Inventory</h1>
             <div className=" mx-1 w-full ">
-                <div className='flex items-center space-x-2'>
-                    <div className="flex items-center bg-gray-900 rounded-lg ps-2 pe-1 py-1 w-full xl:w-full">
+                <div className='flex max-sm:flex-col max-sm:space-y-2 items-center md:space-x-2 mb-6'>
+                    <div className="flex items-center bg-gray-900 rounded-lg ps-2 pe-1 py-1 w-full border border-gray-800">
                         <input
                             type="text"
                             className="flex-grow bg-transparent px-2  text-white outline-none placeholder-gray-500"
@@ -68,7 +68,7 @@ export default function Inventory() {
                         </button>
                     </div>
                     <select
-                        className="flex items-center text-md rounded-lg font-medium cursor-pointer bg-gray-800 text-white py-3 border border-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 transform hover:scale-105 transition-transform"
+                        className="flex max-sm:w-full items-center text-md rounded-lg font-medium cursor-pointer bg-gray-800 text-white py-3 border border-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 transform hover:scale-105 transition-transform"
                         value={selectedCategory}
                         onChange={handleCategoryChange}
                     >

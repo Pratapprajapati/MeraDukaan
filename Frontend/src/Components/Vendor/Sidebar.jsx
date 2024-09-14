@@ -132,20 +132,25 @@ export default function SidebarTwo() {
             </aside>
 
             {/* Overlay for Mobile */}
-            {isOpen && <div className="fixed inset-0 bg-black opacity-50 lg:hidden" onClick={toggleSidebar}></div>}
+            {isOpen && (
+                <div
+                    className="fixed inset-0 bg-black opacity-50 lg:hidden"
+                    onClick={toggleSidebar}
+                ></div>
+            )}
 
             {/* Main Content */}
-            <div className={`flex-1 transition-all duration-300 ${isOpen ? 'lg:mr-64' : ''}`}>
+            <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Mobile Header with Toggle Button */}
                 <div className="lg:hidden flex justify-between items-center p-4 bg-gray-900 text-white">
                     <h1 className="text-lg font-semibold">My App</h1>
                     <button onClick={toggleSidebar}>
-                        {isOpen ? <X size={24} /> : <Menu size={24} />}
+                        <Menu size={24} />
                     </button>
                 </div>
 
                 {/* Main Content Area */}
-                <div className="p-4 overflow-y-scroll h-screen">
+                <div className="flex-1 overflow-y-auto p-4">
                     <Outlet />
                 </div>
             </div>

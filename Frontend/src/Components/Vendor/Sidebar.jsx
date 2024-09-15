@@ -35,8 +35,20 @@ export default function SidebarTwo() {
 
                 <div className=" flex flex-col justify-between h-full">
                     <div>
-                        <div className='flex justify-center'>
-                            <img src={logo} className='h-24 w-24' alt="Logo" />
+                        <div className='flex justify-center mb-10'>
+                            <img src={logo} className={`h-24 w-24 shopOpen`} alt="Logo"
+                                onMouseEnter={(e) => {
+                                    const tooltip = e.currentTarget.nextSibling;
+                                    tooltip.classList.remove('hidden');
+                                }}
+                                onMouseLeave={(e) => {
+                                    const tooltip = e.currentTarget.nextSibling;
+                                    tooltip.classList.add('hidden');
+                                }}
+                            />
+                            <div className="absolute hidden w-fit p-2 text-xs text-white bg-gray-950 rounded-lg shadow-lg top-32 max-lg:top-36 z-10">
+                                Shop is open for business
+                            </div>
                         </div>
                         <nav className="-mx-3 space-y-6 mt-6">
                             <div className="space-y-3">
@@ -51,7 +63,7 @@ export default function SidebarTwo() {
                                     }
                                 >
                                     <Home className="h-5 w-5" aria-hidden="true" />
-                                    <span className="mx-2">Overview</span>
+                                    <span className="mx-2">Home</span>
                                 </NavLink>
                                 <NavLink
                                     to="/vendor/dashboard"
@@ -118,7 +130,7 @@ export default function SidebarTwo() {
                             </div>
                         </nav>
                     </div>
-                    
+
                     <div className="mt-6">
                         <p
                             onClick={logout}

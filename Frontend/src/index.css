@@ -63,5 +63,16 @@
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #efff64a9);
+  filter: drop-shadow(0 0 1em #efff64a9);
+}
+
+.shopOpen {
+  will-change: filter;
+  transition: filter 300ms;
+  filter: drop-shadow(0 0 1em #06f345);
+}
+.shopClosed {
+  will-change: filter;
+  transition: filter 300ms;
+  filter: drop-shadow(0 0 1em #06f345);
 }

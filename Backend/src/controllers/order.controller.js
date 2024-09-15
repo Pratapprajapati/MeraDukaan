@@ -10,11 +10,11 @@ const placeOrder = async (req, res) => {
 
     if (!isValidObjectId(vendor)) return res.status(400).json(new ApiResponse(400, "", "Vendor not vendorId"))
 
-    // for (let prod of cart) {
-    //     const product = await Product.findById(prod.product)
-    //     return res.status(400).json(new ApiResponse(400, null, "Product not found."))
-    //     prod.product = product
-    // }
+    for (let prod of cart) {
+        const product = await Product.findById(prod.product).select("name price")
+        if (!product) return res.status(400).json(new ApiResponse(400, null, "Product not found."))
+        prod.product = product
+    }
 
     const order = await Order.create({
         customer: req.user._id,
@@ -115,29 +115,32 @@ const getTodaysOrders = async (req, res) => {
     return res.status(200).json(new ApiResponse(200, modifiedOrders, "Order fetched."))
 }
 
+
+// TIME PERIODS 
+const now = new Date()
+
+const past7Days = new Date()
+past7Days.setDate(now.getDate() - 7)
+
+const past30Days = new Date()
+past30Days.setDate(now.getDate() - 30)
+
+const pastYear = new Date()
+pastYear.setMonth(now.getMonth() - 12)
+
+const limit = {
+    week: past7Days,
+    month: past30Days,
+    year: pastYear
+}
+
+
 // ORDER HISTORY
 const getOrderHistory = async (req, res) => {
     const userId = req.user._id
 
     const { duration } = req.params
     if (!duration) return res.status(200).json(new ApiResponse(200, history, "Duration required"))
-
-    const now = new Date()
-
-    const past7Days = new Date()
-    past7Days.setDate(now.getDate() - 7)
-
-    const past30Days = new Date()
-    past30Days.setDate(now.getDate() - 30)
-
-    const pastYear = new Date()
-    pastYear.setMonth(now.getMonth() - 12)
-
-    const limit = {
-        week: past7Days,
-        month: past30Days,
-        year: pastYear
-    }
 
     const history = await Order.find({
         createdAt: { $gte: limit[duration] },
@@ -157,10 +160,33 @@ const getOrderHistory = async (req, res) => {
     return res.status(200).json(new ApiResponse(200, modifiedHistory, "Order history fetched"))
 }
 
+
+// ORDERS OVERVIEW
+const orderOverview = async (req, res) => {
+    const userId = req.user._id
+
+    const { duration } = req.params
+    if (!duration) return res.status(200).json(new ApiResponse(200, history, "Duration required"))
+
+    const overview = await Order.find({
+        createdAt: { $gte: limit[duration] },
+        vendor: userId
+    })
+        .select("bill orderStatus")
+
+    const total = overview.reduce((sum, curr) => {
+        return sum + curr.bill
+    }, 0)
+   overview.push({total})
+
+    return res.status(200).json(new ApiResponse(200, overview, "Order overview fetched"))
+}
+
 export {
     placeOrder,
     manageOrder,
     getOrderById,
     getOrderHistory,
     getTodaysOrders,
+    orderOverview,
 }

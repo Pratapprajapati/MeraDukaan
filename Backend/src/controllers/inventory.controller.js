@@ -39,7 +39,7 @@ const addProduct = async (req, res) => {
     }
     if (price) newProduct["price"] = price
     if (description) newProduct["description"] = description
-    
+
     inventory.productList.push(newProduct)
 
     const updatedList = await inventory.save({ validateBeforeSave: false })
@@ -55,7 +55,7 @@ const updateProduct = async (req, res) => {
     const { price, description, stock } = req.body
 
     const inventory = await Inventory.findById(req.user?._id)
-    
+
     const product = inventory.productList.find(prod => prod.product._id.toString() === productId);
     if (!product) {
         return res.status(404).json(new ApiResponse(404, "", "Product not found in inventory"));
@@ -110,13 +110,12 @@ const getInventory = async (req, res) => {
         {
             $unwind: "$productDetails"  // Deconstruct the productDetails array
         },
-                    {
-                $project: {
-                    "productDetails.createdAt": 0,  // Exclude createdAt
-                    "productDetails.updatedAt": 0,  // Exclude updatedAt
-                }
-            },
-
+        {
+            $project: {
+                "productDetails.createdAt": 0,  // Exclude createdAt
+                "productDetails.updatedAt": 0,  // Exclude updatedAt
+            }
+        },
         {
             $addFields: {
                 "productList.product": "$productDetails"  // Replace the product field in productList with the full product details
@@ -133,10 +132,84 @@ const getInventory = async (req, res) => {
     return res.status(200).json(new ApiResponse(200, inventory, "Inventory fetched"))
 }
 
+const inventoryOverview = async (req, res) => {
+    const inventoryData = await Inventory.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(req.user._id)
+            }
+        },
+        {
+            $unwind: "$productList"
+        },
+        {
+            $lookup: {
+                from: "products",
+                localField: "productList.product",
+                foreignField: "_id",
+                as: "productDetails"
+            }
+        },
+        {
+            $unwind: "$productDetails"
+        },
+        {
+            $project: {
+                "productDetails.category": 1,
+                "productDetails.subCategory": 1,
+            }
+        },
+        {
+            $addFields: {
+                "productList.product": "$productDetails"  // Replace the product field in productList with the full product details
+            }
+        },
+        {
+            $group: {
+                _id: "$_id",
+                productList: { $push: "$productList" },  // Reconstruct the productList array
+            }
+        }
+    ]);
+
+    // Check if inventory data is empty
+    if (inventoryData.length === 0) {
+        return res.status(400).json(new ApiResponse(400, null, "Couldn't fetch inventory"));
+    }
+
+    // Assuming you expect only one inventory record for the user
+    const inventory = inventoryData[0];
+
+    const categoryCount = {};
+
+    inventory.productList.forEach(({ product }) => {
+        const { category, subCategory } = product;
+
+        // If the category doesn't exist, initialize it
+        if (!categoryCount[category]) {
+            categoryCount[category] = {};
+        }
+
+        // If the subCategory doesn't exist within the category, initialize it
+        if (!categoryCount[category][subCategory]) {
+            categoryCount[category][subCategory] = 0;
+        }
+
+        // Increment the count of subCategory
+        categoryCount[category][subCategory]++;
+    });
+
+    console.log(categoryCount);
+
+    return res.status(200).json(new ApiResponse(200, categoryCount, "Inventory overview fetched"));
+};
+
+
 export {
     createInventory,
     addProduct,
     updateProduct,
     removeProduct,
     getInventory,
+    inventoryOverview,
 }

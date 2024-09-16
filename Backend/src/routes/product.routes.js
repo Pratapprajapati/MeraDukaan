@@ -7,14 +7,12 @@ import { upload } from "../middlewares/multer.middleware.js"
 
 const router = Router()
 
-router.use(verifyJWT("both"))
+router.post("/add", upload.single("image"), verifyJWT("vendor"), addProduct)
 
-router.post("/add", upload.single("image"), addProduct)
+router.route("/:productId", verifyJWT("vendor")).delete(removeProduct).patch(updateProduct)
 
-router.route("/:productId").delete(removeProduct).patch(updateProduct)
+router.get("/search", verifyJWT("both"), searchProduct)
 
-router.route("/search").get(searchProduct)
-
-router.route("/all").get(allProducts)
+router.get("/all", verifyJWT("both"), allProducts)
 
 export default router

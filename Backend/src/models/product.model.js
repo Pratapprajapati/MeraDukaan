@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 
 const productSchema = new Schema({
     name: {
@@ -26,6 +26,10 @@ const productSchema = new Schema({
         type: String,
         default: "count",
         enum: ["count", "weight", "volume"]
+    },
+    addedBy: {
+        type: mongoose.Types.ObjectId,
+        ref: "Vendor"
     }
 }, {
     timestamps: true

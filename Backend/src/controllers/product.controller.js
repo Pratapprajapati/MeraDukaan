@@ -15,7 +15,7 @@ const addProduct = async (req, res) => {
     if (!productCloud) return res.status(404).json(new ApiResponse(404, null, "Shop image not found"))
 
     const product = await Product.create({
-        name, category, subCategory, price, image: productCloud.secure_url
+        name, category, subCategory, price, image: productCloud.secure_url, addedBy: req.user._id
     })
     if (!product) return res.status(500).json(new ApiResponse(500, null, "Something went wrong"))
 

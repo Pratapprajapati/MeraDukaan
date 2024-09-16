@@ -9,7 +9,7 @@ const vendorSchema = new Schema({
         type: String,
         default: "vendor"
     },
-    userType: {
+    userStatus: {
         type: String,
         default: "active",
         enum: ["active", "warned", "suspended", "banned"]

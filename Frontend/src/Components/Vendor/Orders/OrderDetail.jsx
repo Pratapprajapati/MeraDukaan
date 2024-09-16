@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 import { cartItems } from '../../Listings/sampleData';
 
-const Modal = ({ isOpen, onClose, title, children }) => {
+const Modal = ({ isOpen, title, children }) => {
     if (!isOpen) return null;
 
     return (
@@ -20,7 +20,7 @@ export default function Order() {
         customerName: "John Doe",
         totalItems: 5,
         totalPrice: "₹7,850",
-        orderStatus: "Pending",
+        orderStatus: "pending",
         orderNumber: "ORD12345",
         note: "Please deliver between 2-4 PM."
     });
@@ -149,21 +149,29 @@ export default function Order() {
                         </div>
                     </div>
 
-                    <div className='flex justify-between mt-6 max-sm:space-x-4'>
-                        <button
-                            className="px-4 py-2 bg-red-500 hover:bg-red-600 text-gray-950 text-2xl font-semibold rounded transform hover:scale-90 transition-transform"
-                            onClick={() => setIsRejectModalOpen(true)}
-                        >
-                            Reject Order
-                        </button>
-                        <button
-                            className="px-4 py-2 bg-green-500 hover:bg-green-600 text-gray-950 text-2xl font-semibold rounded transform hover:scale-90 transition-transform"
-                            onClick={() => setIsAcceptModalOpen(true)}
-                        >
-                            Accept Order
-                        </button>
+                    {
+                        customerDetails.orderStatus == "pending" ? (
+                            <div className='flex justify-between mt-6 max-sm:space-x-4'>
+                                <button
+                                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-gray-950 text-2xl font-semibold rounded transform hover:scale-90 transition-transform"
+                                    onClick={() => setIsRejectModalOpen(true)}
+                                >
+                                    Reject Order
+                                </button>
+                                <button
+                                    className="px-4 py-2 bg-green-500 hover:bg-green-600 text-gray-950 text-2xl font-semibold rounded transform hover:scale-90 transition-transform"
+                                    onClick={() => setIsAcceptModalOpen(true)}
+                                >
+                                    Accept Order
+                                </button>
+                            </div>
+                        ) : (
+                            <div className='w-full mt-2 bg-teal-800 p-2 rounded-lg text-3xl capitalize text-white font-semibold text-center'>
+                                -- {customerDetails.orderStatus} --
+                            </div>
+                        )
+                    }
 
-                    </div>
                 </div>
 
             </div>

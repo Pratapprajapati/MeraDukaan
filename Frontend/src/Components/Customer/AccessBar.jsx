@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { Menu, Home, BarChart, History, Archive, PlusCircle, LogOut, X, Store } from 'lucide-react';
+import { Menu, ShoppingCart, History, User, LogOut, X, Store, Archive, CalendarClock } from 'lucide-react';
 import { Outlet, useNavigate, NavLink } from 'react-router-dom';
-import logo from "../assets/logo.png"
+import logo from "../assets/logo.png";
 import axios from 'axios';
 
-export default function Sidebar() {
+export default function AccessBar() {
     const [isOpen, setIsOpen] = useState(false);
-
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
@@ -16,14 +15,14 @@ export default function Sidebar() {
     const logout = () => {
         axios.get("/api/vendor/logout")
             .then(res => {
-                navigate("/signin")
+                navigate("/signin");
             })
-            .catch(e => console.log(e))
-    }
+            .catch(e => console.log(e));
+    };
 
     return (
         <div className="flex h-screen">
-            {/* Sidebar */}
+            {/* AccessBar */}
             <aside
                 className={`fixed inset-y-0 right-0 z-30 w-64 transform bg-black overflow-y-auto max-sm:border-l px-5 py-8 transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:w-64 lg:bg-black lg:px-5 lg:py-8 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
             >
@@ -33,99 +32,85 @@ export default function Sidebar() {
                     </button>
                 </div>
 
-                <div className=" flex flex-col justify-between h-full">
+                <div className="flex flex-col justify-between h-full">
                     <div>
-                        <div className='flex justify-center mb-10'>
-                            <img src={logo} className={`h-24 w-24 shopOpen`} alt="Logo"
-                                onMouseEnter={(e) => {
-                                    const tooltip = e.currentTarget.nextSibling;
-                                    tooltip.classList.remove('hidden');
-                                }}
-                                onMouseLeave={(e) => {
-                                    const tooltip = e.currentTarget.nextSibling;
-                                    tooltip.classList.add('hidden');
-                                }}
-                            />
-                            <div className="absolute hidden w-fit p-2 text-xs text-white bg-gray-950 rounded-lg shadow-lg top-32 max-lg:top-36 z-10">
-                                Shop is open for business
-                            </div>
+                        <div className="flex justify-center mb-10">
+                            <img src={logo} className="h-24 w-24 logo" alt="Logo" />
                         </div>
+
                         <nav className="-mx-3 space-y-6 mt-6">
+                            {/* Navigation Section */}
                             <div className="space-y-3">
                                 <label className="px-3 text-xs font-semibold uppercase text-white">
                                     Navigation
                                 </label>
                                 <NavLink
-                                    to="/vendor/overview"
+                                    to="/nearby-shops"
                                     className={({ isActive }) =>
-                                        `flex transform items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-gray-50 text-gray-700' : 'text-gray-200 hover:bg-gray-50 hover:text-gray-700'
-                                        }`
+                                        `flex transform items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-gray-50 text-gray-700' : 'text-gray-200 hover:bg-gray-50 hover:text-gray-700'}`
                                     }
                                 >
-                                    <Home className="h-5 w-5" aria-hidden="true" />
-                                    <span className="mx-2">Home</span>
+                                    <Store className="h-5 w-5" aria-hidden="true" />
+                                    <span className="mx-2">Nearby Shops</span>
                                 </NavLink>
                                 <NavLink
-                                    to="/vendor/dashboard"
+                                    to="/products"
                                     className={({ isActive }) =>
-                                        `flex transform items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-gray-50 text-gray-700' : 'text-gray-200 hover:bg-gray-50 hover:text-gray-700'
-                                        }`
+                                        `flex transform items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-gray-50 text-gray-700' : 'text-gray-200 hover:bg-gray-50 hover:text-gray-700'}`
                                     }
                                 >
-                                    <BarChart className="h-5 w-5" aria-hidden="true" />
-                                    <span className="mx-2">Dashboard</span>
+                                    <Archive className="h-5 w-5" aria-hidden="true" />
+                                    <span className="mx-2">Products</span>
                                 </NavLink>
+                            </div>
+
+                            {/* Management Section */}
+                            <div className="space-y-3">
+                                <label className="px-3 text-xs font-semibold uppercase text-white">
+                                    Orders
+                                </label>
                                 <NavLink
-                                    to="/vendor/history"
+                                    to="/recent-orders"
                                     className={({ isActive }) =>
-                                        `flex transform items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-gray-100 text-gray-800' : 'text-gray-200 hover:bg-gray-100 hover:text-gray-800'
-                                        }`
+                                        `flex transform items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-gray-50 text-gray-700' : 'text-gray-200 hover:bg-gray-50 hover:text-gray-700'}`
                                     }
                                 >
                                     <History className="h-5 w-5" aria-hidden="true" />
+                                    <span className="mx-2">Recent Orders</span>
+                                </NavLink>
+                                <NavLink
+                                    to="/order-history"
+                                    className={({ isActive }) =>
+                                        `flex transform items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-gray-50 text-gray-700' : 'text-gray-200 hover:bg-gray-50 hover:text-gray-700'}`
+                                    }
+                                >
+                                    <CalendarClock className="h-5 w-5" aria-hidden="true" />
                                     <span className="mx-2">Order History</span>
                                 </NavLink>
                             </div>
 
-                            <div className="space-y-3">
-                                <label className="px-3 text-xs font-semibold uppercase text-white">
-                                    Management
-                                </label>
-                                <NavLink
-                                    to="/vendor/inventory"
-                                    className={({ isActive }) =>
-                                        `flex transform items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-gray-100 text-gray-800' : 'text-gray-200 hover:bg-gray-100 hover:text-gray-800'
-                                        }`
-                                    }
-                                >
-                                    <Archive className="h-5 w-5" aria-hidden="true" />
-                                    <span className="mx-2">Inventory</span>
-                                </NavLink>
-                                <NavLink
-                                    to="/vendor/products"
-                                    className={({ isActive }) =>
-                                        `flex transform items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-gray-100 text-gray-800' : 'text-gray-200 hover:bg-gray-100 hover:text-gray-800'
-                                        }`
-                                    }
-                                >
-                                    <PlusCircle className="h-5 w-5" aria-hidden="true" />
-                                    <span className="mx-2">Add Products</span>
-                                </NavLink>
-                            </div>
-
+                            {/* Account Section */}
                             <div className="space-y-3">
                                 <label className="px-3 text-xs font-semibold uppercase text-white">
                                     Account
                                 </label>
                                 <NavLink
-                                    to="/vendor/shop"
+                                    to="/profile"
                                     className={({ isActive }) =>
-                                        `flex transform items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-gray-100 text-gray-800' : 'text-gray-200 hover:bg-gray-100 hover:text-gray-800'
-                                        }`
+                                        `flex transform items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-gray-50 text-gray-700' : 'text-gray-200 hover:bg-gray-50 hover:text-gray-700'}`
                                     }
                                 >
-                                    <Store className="h-5 w-5" aria-hidden="true" />
-                                    <span className="mx-2">Shop Details</span>
+                                    <User className="h-5 w-5" aria-hidden="true" />
+                                    <span className="mx-2">Your Profile</span>
+                                </NavLink>
+                                <NavLink
+                                    to="/cart"
+                                    className={({ isActive }) =>
+                                        `flex transform items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-300 ${isActive ? 'bg-gray-50 text-gray-700' : 'text-gray-200 hover:bg-gray-50 hover:text-gray-700'}`
+                                    }
+                                >
+                                    <ShoppingCart className="h-5 w-5" aria-hidden="true" />
+                                    <span className="mx-2">Cart</span>
                                 </NavLink>
                             </div>
                         </nav>

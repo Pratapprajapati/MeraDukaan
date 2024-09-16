@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
-import { cartItems } from '../../Listings/sampleData';
+import { cartItems } from '../Listings/sampleData';
 
 const Modal = ({ isOpen, title, children }) => {
     if (!isOpen) return null;

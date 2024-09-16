@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, PackageCheck, Truck, XCircle, AlertTriangle, CheckCircle, Filter } from 'lucide-react';
-import { sampleOrders } from '../../Listings/sampleData';
+import { sampleOrders } from '../Listings/sampleData';
 
 const orderStatuses = {
     "Pending": { icon: <Clock className="h-5 w-5" />, color: "text-yellow-500" },

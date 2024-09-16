@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, Phone, Clock, Truck, CreditCard, RefreshCw, Info, Edit, Save } from 'lucide-react';
+import { MapPin, Phone, Clock, Truck, CreditCard, RefreshCw, Info, Edit, Save, Store } from 'lucide-react';
 import img from '../assets/Mcd.webp';
 
 const ShopDetailsPage = () => {
@@ -16,6 +16,7 @@ const ShopDetailsPage = () => {
       primary: "+1 555-555-1234",
       secondary: "+1 555-555-5678"
     },
+    isOpen: true,
     shopOpen: "Open now",
     shopTimings: {
       start: "09:00 AM",
@@ -84,23 +85,40 @@ const ShopDetailsPage = () => {
             <h1 className="mt-1 text-3xl font-bold text-yellow-400 leading-tight">
               <EditableField name="shopName" value={vendor.shopName} />
             </h1>
-            <div className="mt-2 text-gray-300 flex">
-              <MapPin className="h-5 w-5 mr-2 flex-shrink-0" />
-              <div>
-                <EditableField name="location.address" value={vendor.location.address} />
-                <div className="mt-2">
-                  <EditableField name="location.city" value={vendor.location.city} />
-                  {' - '}
-                  <EditableField name="location.pincode" value={vendor.location.pincode} />
+            <div className="mt-2 text-gray-300 flex flex-col">
+              <div className='flex'>
+                <MapPin className="h-5 w-5 mr-2 flex-shrink-0" />
+                <div>
+                  <EditableField name="location.address" value={vendor.location.address} />
+                  <div className="mt-2">
+                    <EditableField name="location.city" value={vendor.location.city} />
+                    {' - '}
+                    <EditableField name="location.pincode" value={vendor.location.pincode} />
+                  </div>
                 </div>
-                <div className="p-4 flex justify-end">
-                  <button
-                    onClick={toggleEdit}
-                    className="flex items-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-                  >
-                    {isEditing ? <><Save className="mr-2" /> Save</> : <><Edit className="mr-2" /> Edit</>}
-                  </button>
+              </div>
+
+              <div className="py-4 flex max-sm:flex-col justify-between max-sm:space-y-3 border-t border-t-gray-700 mt-3 -mb-3 ">
+                <div className='flex items-center max-sm:border-b border-b-gray-700 pb-2'>
+                  <Store className="h-7 w-7 mr-2 flex-shrink-0" />
+                  <div className='text-lg'>
+                    Shop Status:
+                    <button onClick={() => setVendor({ ...vendor, isOpen: !vendor.isOpen })}
+                      className={`${vendor.isOpen ? "bg-green-600 text-black" : "bg-red-600 text-white"} rounded-lg ml-2 px-3`}
+                    >
+                      {vendor.isOpen ? "Online" : "Offline"}
+                    </button>
+                  </div>
+
                 </div>
+
+                <button
+                  onClick={toggleEdit}
+                  className="flex items-center bg-teal-500 hover:bg-teal-600 text-black font-bold py-2 px-4 rounded"
+                >
+                  {isEditing ? <><Save className="mr-2" /> Save</> : <><Edit className="mr-2" /> Edit</>}
+                </button>
+
               </div>
             </div>
           </div>

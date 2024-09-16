@@ -9,20 +9,21 @@ import Home from './Components/Home.jsx'
 import About from './Components/About.jsx'
 import Categories from './Components/Listings/Categories.jsx'
 import Shops from './Components/Listings/Shops.jsx'
-import Customer from './Components/Profiles/Customer.jsx'
+import Customer from './Components/Customer/Customer.jsx'
 import Vendor from './Components/Vendor/Vendor.jsx'
 import Cart from './Components/Listings/Cart.jsx'
 import Order from './Components/Listings/Order.jsx'
 import StoreFront from './Components/Listings/Inventory.jsx'
 import Inventory from './Components/Vendor/Inventory.jsx'
-import OrderDetails from './Components/Vendor/Orders/OrderDetail.jsx'
-import OrdersPage from "./Components/Vendor/Orders/OrdersPage.jsx"
+import OrderDetails from './Components/Orders/OrderDetail.jsx'
+import OrdersPage from "./Components/Orders/OrdersPage.jsx"
 import Error from './Components/AppPages/ErrorPage.jsx'
 import Product from './Components/Vendor/Products/ProductList.jsx'
 import AddProduct from './Components/Vendor/Products/AddProduct.jsx'
 import NewProduct from './Components/Vendor/Products/NewProduct.jsx'
 import Dashboard from './Components/Vendor/Dashboard.jsx'
-import OrderHistory from './Components/Vendor/Orders/OrderHistory.jsx'
+import OrderHistory from './Components/Orders/OrderHistory.jsx'
+import AccessBar from './Components/Customer/AccessBar.jsx'
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -40,6 +41,7 @@ const router = createBrowserRouter(
             <Route path='vendor/products/add' element={<AddProduct />} />
             <Route path='vendor/products/new' element={<NewProduct />} />
             <Route path='/vendor/shop' element={<Vendor />} />
+            <Route path='/accessbar' element={<AccessBar />} />
 
             <Route path='/categories' element={<Categories />} />
             <Route path='/shops' element={<Shops />} />

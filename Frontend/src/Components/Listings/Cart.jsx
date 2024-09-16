@@ -1,10 +1,12 @@
-import { ShoppingCart } from "lucide-react";
+import React from 'react';
+import { ShoppingCart, Clock } from "lucide-react";
 
 const vendors = [
     {
         id: 1,
         shopName: 'Local Shop 1',
         shopAddress: '123 Market St, City, State',
+        isOpen: true,
         products: [
             { name: 'Nike Air Force 1 07 LV8', price: '₹61,999' },
             { name: 'Nike Run Division, Airmax Pro Ultra Mens Runnig Shoes', price: '₹22,500' },
@@ -18,6 +20,7 @@ const vendors = [
         id: 2,
         shopName: 'Local Shop 2',
         shopAddress: '456 High St, City, State',
+        isOpen: false,
         products: [
             { name: 'Product 1', price: '₹12,000' },
             { name: 'Product 2', price: '₹9,500' },
@@ -28,51 +31,55 @@ const vendors = [
 ];
 
 export default function Cart() {
+    const handleCardClick = (id) => {
+        console.log(`Clicked on vendor ${id}`);
+    };
+
     return (
         <div className="mx-auto my-4 max-w-6xl px-2 md:my-6 md:px-0">
             <h2 className="text-3xl font-bold text-teal-500 flex items-end">
                 <ShoppingCart className="inline-flex w-10 h-10 me-2 items-start"/>Your Cart
             </h2>
-            <div className="mt-3  text-gray-300">
+            <div className="mt-3 text-gray-300">
                 Your cart items are sorted according to their respective vendors
             </div>
             <div className="mt-8 flex flex-col space-y-8">
                 {vendors.map((vendor) => (
-                    <div key={vendor.id} className="flex flex-col bg-gray-900 shadow-lg shadow-black/40 overflow-hidden rounded-lg  md:flex-row">
-                        <div className="w-2/5 border-r my-2 border-gray-400">
-                            <div className="p-8">
-                                <div className="flex flex-col space-y-3">
-                                    <div className="mb-4">
-                                        <div className="text-2xl font-bold text-yellow-500 line-clamp-2 mb-4">{vendor.shopName} horse riding school</div>
-                                        <div className="text-md font-medium text-gray-400 mt-2 line-clamp-3">{vendor.shopAddress}fhvhjfrhjgrhf rhbgrghbghbrghkrbggeeg bjkgegkg hkbghkegg</div>
-                                        <div className="text-md font-medium text-gray-400 mt-2 line-clamp-3">New York - 100009</div>
-                                    </div>
-                                    <div className="text-lg font-medium text-black flex justify-center">
-                                        <button className='bg-yellow-600 w-full font-semibold px-5 py-2 rounded-md transform hover:scale-90 transition-transform'>
-                                            View Order
-                                        </button>
-                                    </div>
+                    <div
+                        key={vendor.id}
+                        onClick={() => handleCardClick(vendor.id)}
+                        className="flex flex-col bg-gray-800 shadow-lg shadow-black/40 overflow-hidden rounded-lg md:flex-row border border-gray-800 cursor-pointer hover:bg-gray-700 transition-colors"
+                    >
+                        <div className="w-full md:w-2/5 py-3 px-4 md:border-r border-gray-600 my-3 ">
+                            <div className="flex flex-col space-y-1.5 -my-3">
+                                <div className="flex justify-between">
+                                    <p className='text-2xl font-bold text-yellow-500'>{vendor.shopName}</p>
+                                    {vendor.isOpen ? 
+                                        <span className="text-green-500 flex items-center"><Clock className="w-4 h-4 mr-1" /> Open</span> : 
+                                        <span className="text-red-500 flex items-center"><Clock className="w-4 h-4 mr-1" /> Closed</span>
+                                    }
                                 </div>
+                                <p className="text-md text-gray-400 line-clamp-2"><span className="font-semibold">Address:</span> {vendor.shopAddress}</p>
                             </div>
                         </div>
-                        <div className="flex-1 p-8 flex flex-col justify-between">
-                            <div>
-                                <h1 className='text-lg'>Cart Items</h1>
+                        <div className="w-full md:w-3/5 py-3 px-4 flex flex-col justify-between">
+                            <div className=''>
+                                <h3 className="text-lg font-semibold mb-2">Cart Items</h3>
                                 <ul className="mt-4 text-sm font-medium text-gray-400 list-disc list-inside">
-                                    {vendor.products.slice(0, 3).map((product, index) => (
-                                        <li key={index}>
+                                    {vendor.products.slice(0, 2).map((product, index) => (
+                                        <li key={index} className='truncate'>
                                             {product.name} - {product.price}
                                         </li>
                                     ))}
-                                    {vendor.products.length > 3 && (
-                                        <li>...and {vendor.products.length - 3} other items</li>
+                                    {vendor.products.length > 2 && (
+                                        <li>...and {vendor.products.length - 2} other items</li>
                                     )}
                                 </ul>
                             </div>
-                            <div className="mt-auto"> {/* Ensures that the following content is pushed to the bottom */}
-                                <hr className="my-2 border-t border-t-gray-200" />
+                            <div className="md:mt-4">
+                                <hr className="my-2 border-t border-gray-600" />
                                 <div className="text-right">
-                                    <h3 className="text-2xl font-bold text-teal-500">Total: <span className='text-yellow-500'>{vendor.total}</span></h3>
+                                    <h3 className="text-2xl font-bold">Total: <span className="text-yellow-500">{vendor.total}</span></h3>
                                 </div>
                             </div>
                         </div>
@@ -81,4 +88,4 @@ export default function Cart() {
             </div>
         </div>
     );
-};
+}

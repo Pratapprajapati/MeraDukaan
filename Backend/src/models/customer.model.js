@@ -40,24 +40,25 @@ const customerSchema = new Schema({
     cart: [
         {
             product: {
-                _id: {
-                    type: mongoose.Types.ObjectId,
-                    ref: "Product"
-                },
-                name: String,
-                category: String,
-                price: Number,
-                stock: Boolean,
-                description: String
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Product',
+                required: true
             },
             vendor: {
-
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Inventory',
+                required: true
             },
             count: {
                 type: Number,
-                default: 1
+                required: true,
+                min: [1, 'Product count must be at least 1'],
+                validate: {
+                    validator: Number.isInteger,
+                    message: '{VALUE} is not an integer value'
+                }
             },
-            _id: false
+            _id: false  // Optionally set to false if you don't want mongoose to add an _id field to every cart item
         }
     ],
     refreshToken: {

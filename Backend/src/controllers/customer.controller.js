@@ -1,11 +1,14 @@
+import mongoose from "mongoose"
+import ApiResponse from "../utils/ApiResponse.js"
 import Customer from "../models/customer.model.js"
+import Inventory from "../models/inventory.model.js"
 import Order from "../models/order.model.js"
 import Review from "../models/review.model.js"
-import ApiResponse from "../utils/ApiResponse.js"
+import Product from "../models/product.model.js"
 
 const register = async (req, res) => {
 
-    const { username, email, password, primary, secondary, address, city, pincode } = req.body
+    const { username, email, age, password, primary, secondary, address, city, pincode } = req.body
 
     const existingUser = await Customer.findOne({
         $or: [{ username }, { email }]
@@ -14,7 +17,8 @@ const register = async (req, res) => {
 
     const user = await Customer.create({
         username,
-        email,
+        email, 
+        age,
         password,
         contact: { primary, secondary },
         location: { address, city, pincode }
@@ -140,28 +144,55 @@ const getCurrentUser = async (req, res) => {
 
 // ADD TO CART
 const addToCart = async (req, res) => {
-    const { productId, count } = req.body;
-    if (count < 1) return res.status(401).json(new ApiResponse(401, null, "Product count must be atleast 1"))
+    const { vendorId, productId, count } = req.body;
 
-    // Find the customer
+    // Validate count
+    if (count < 1) {
+        return res.status(400).json(new ApiResponse(400, null, "Product count must be at least 1"));
+    }
+
+    // Find customer
     const customer = await Customer.findById(req.user._id);
     if (!customer) return res.status(404).json(new ApiResponse(404, null, "Customer not found"));
 
-    // Check if the product is already in the cart
-    const cartItem = customer.cart.find(item => item.product == (productId));
+    // Find inventory of the vendor
+    const inventory = await Inventory.findById(vendorId);
+    if (!inventory) return res.status(404).json(new ApiResponse(404, null, "Vendor's inventory not found"));
 
-    if (cartItem) {
-        cartItem.count = count
-    } else {
-        // If product is not in the cart and count is positive, add it to the cart
-        customer.cart.push({ product: productId, count });
+    // Find the product in inventory
+    const inventoryProduct = inventory.productList.find(prod => prod.product.toString() === productId);
+    if (!inventoryProduct) return res.status(404).json(new ApiResponse(404, null, "Product not found in the vendor's inventory"));
+
+    // Find the product in the main product collection
+    const product = await Product.findById(productId);
+    if (!product) return res.status(404).json(new ApiResponse(404, null, "Product not found"));
+
+    // Check if stock is sufficient
+    if (!inventoryProduct.stock) {
+        return res.status(400).json(new ApiResponse(400, null, "Insufficient stock"));
     }
 
-    // Save the updated cart
+    // Check if the product already exists in the cart
+    const cartItemIndex = customer.cart.findIndex(item => item.product.toString() === productId && item.vendor.toString() === vendorId);
+
+    if (cartItemIndex > -1) {
+        // If the product is already in the cart, update the count
+        customer.cart[cartItemIndex].count += count;
+    } else {
+        // Otherwise, add it to the cart
+        customer.cart.push({
+            product: productId,
+            vendor: vendorId,
+            count
+        });
+    }
+
+    // Save the updated customer cart
     await customer.save();
 
-    return res.status(200).json(new ApiResponse(200, customer.cart, "Cart updated successfully"));
-}
+    return res.status(200).json(new ApiResponse(200, customer.cart, "Product added to cart successfully"));
+
+};
 
 // CLEAR CART
 const clearCart = async (req, res) => {
@@ -174,12 +205,110 @@ const clearCart = async (req, res) => {
     return res.status(200).json(new ApiResponse(200, customer, "Cleared cart"))
 }
 
+const getCart = async (req, res) => {
+    try {
+        // Aggregate customer cart with product and inventory details
+        const customerCart = await Customer.aggregate([
+            {
+                $match: { _id: new mongoose.Types.ObjectId(req.user._id) } // Match the customer by ID
+            },
+            {
+                $unwind: "$cart" // Unwind the cart array to work on each cart item separately
+            },
+            {
+
+                $lookup: {
+                    from: "products",
+                    localField: "cart.product", // productId stored in the cart
+                    foreignField: "_id",
+                    as: "productDetails"
+                }
+            },
+            {
+                $unwind: "$productDetails" // Unwind product details since lookup returns an array
+            },
+            {
+                $lookup: {
+                    from: "inventories",
+                    localField: "cart.vendor",
+                    foreignField: "_id",
+                    as: "inventoryDetails"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$inventoryDetails",
+                    preserveNullAndEmptyArrays: true // Allow nulls in case no inventory details match
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    "cart.product": {
+                        _id: "$productDetails._id",
+                        name: "$productDetails.name",
+                        category: "$productDetails.category",
+                        subCategory: "$productDetails.subCategory",
+                        price: "$productDetails.price"
+                    },
+                    "cart.inventoryDetails": {
+                        stock: "$inventoryDetails.stock",
+                        description: "$inventoryDetails.description",
+                        discount: "$inventoryDetails.discount"
+                    },
+                    "cart.vendor": "$cart.vendor",
+                    "cart.price": {
+                        $cond: {
+                            if: { $gt: ["$inventoryDetails.price", 0] },
+                            then: "$inventoryDetails.price",
+                            else: "$productDetails.price"
+                        } // If inventory has its own price, use it, else use product price
+                    },
+                    "cart.count": "$cart.count", // Keep the count as it is
+                }
+            }
+        ]);
+
+        // If no cart found, return an error
+        if (!customerCart.length) {
+            return res.status(404).json(new ApiResponse(404, null, "Cart not found"));
+        }
+
+        // Log the intermediate customerCart to check if inventory details were fetched
+        console.log("Customer Cart with Details:", customerCart);
+
+        // Group cart items by vendorId
+        let cartByVendor = {};
+        customerCart.forEach(item => {
+            const vendorId = item.cart.vendor.toString();
+            if (!cartByVendor[vendorId]) {
+                cartByVendor[vendorId] = [];
+            }
+            cartByVendor[vendorId].push({
+                product: item.cart.product,
+                price: item.cart.price,
+                count: item.cart.count,
+                stock: item.cart.inventoryDetails ? item.cart.inventoryDetails.stock : null,
+                description: item.cart.inventoryDetails ? item.cart.inventoryDetails.description : null,
+                discount: item.cart.inventoryDetails ? item.cart.inventoryDetails.discount : null
+            });
+        });
+
+        // Return the cart grouped by vendors
+        return res.status(200).json(new ApiResponse(200, cartByVendor, "Cart fetched successfully"));
+    } catch (error) {
+        console.error("Error fetching cart:", error);
+        return res.status(500).json(new ApiResponse(500, null, "Failed to fetch cart"));
+    }
+};
+
+
 // ADD REVIEW
 const addReview = async (req, res) => {
-    const {orderId} = req.params
+    const { orderId } = req.params
     if (!orderId) return res.status(404).json(new ApiResponse(404, null, "Order Id missing"))
 
-    const {rating, feedback} = req.body
+    const { rating, feedback } = req.body
 
     const order = await Order.findById(orderId)
     if (!order) return res.status(404).json(new ApiResponse(404, null, "Order doesn't exist"))
@@ -187,13 +316,13 @@ const addReview = async (req, res) => {
     if ((order.customer).toString() !== (req.user._id).toString()) {
         return res.status(400).json(new ApiResponse(400, null, "Wrong user"))
     }
-    
+
     if (order.orderStatus !== "delivered") return res.status(400).json(new ApiResponse(400, null, "Order incomplete"))
 
     const review = await Review.create({
         order: orderId,
         rating,
-        feedback        
+        feedback
     })
     if (!review) return res.status(500).json(new ApiResponse(500, null, "Unable to create review"))
 
@@ -210,4 +339,5 @@ export {
     addToCart,
     clearCart,
     addReview,
+    getCart,
 }

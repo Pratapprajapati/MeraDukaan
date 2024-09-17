@@ -39,6 +39,7 @@ const orderSchema = new Schema({
         enum: ["pending", "cancelled", "accepted", "rejected", "incomplete", "delivered", "failed"],
         default: "pending"
     },
+    code: Number,
     paymentMethod: {
         type: String,
         enum: ["card", "cash", "online"],

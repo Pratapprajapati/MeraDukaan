@@ -27,7 +27,7 @@ const Button = ({ children, className, onClick, variant = 'default' }) => {
     );
 };
 
-const dailyNeeds = ["Packaged Food", "Dairy Products", "Beverages", "Personal Care", "Home Essentials", "Household Items"];
+const dailyNeeds = ["Packaged Food", "Dairy Products", "Beverages", "Personal Care", "Home Essentials"];
 
 
 export default function ProductList() {

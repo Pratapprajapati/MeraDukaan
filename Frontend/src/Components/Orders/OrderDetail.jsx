@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
+import Cart, { Total } from './Cart';
 import { cartItems } from '../Listings/sampleData';
 
 const Modal = ({ isOpen, title, children }) => {
@@ -83,39 +84,7 @@ export default function Order() {
             </h1>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Cart Items Section */}
-                <div className="bg-black/20 text-gray-900 p-6 rounded-lg shadow-md flex flex-col h-full">
-                    <h2 className="text-2xl font-bold text-teal-500 mb-4">Cart Items</h2>
-                    <div className="flex-1 overflow-y-auto space-y-4 max-h-[500px]">
-                        {cartItems.map((item) => (
-                            <div key={item.id} className="bg-black/20 text-gray-900 rounded-lg shadow-sm cursor-pointer">
-                                <div className="flex py-6">
-                                    <div className="flex-shrink-0"></div>
-                                    <div className="px-5 flex flex-1 flex-col justify-between">
-                                        <div className='flex justify-between items-center -mt-2'>
-                                            <h3 className="text-lg font-semibold text-white">
-                                                {item.name}
-                                            </h3>
-                                            <p className="text-lg text-yellow-400 font-medium">
-                                                {item.price}
-                                            </p>
-                                        </div>
-                                        <div className='space-y-1 mt-1'>
-                                            <h1 className='text-gray-400 text-sm'>Category: Food</h1>
-                                            <h1 className='text-gray-400 text-sm'>Quantity: {item.quantity}</h1>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="mt-3 bg-black/30 p-4 rounded-lg">
-                        <div className="flex justify-between text-xl text-white">
-                            <p>Total Products: <span className='text-yellow-500'>{customerDetails.totalItems}</span></p>
-                            <p>Total Bill: <span className='text-yellow-500 font-semibold'>{customerDetails.totalPrice}</span></p>
-                        </div>
-                    </div>
-                </div>
-
+                <Cart cartItems={cartItems} />
 
                 {/* Customer Details Section */}
                 <div className="bg-black/20 text-gray-900 p-6 rounded-lg shadow-md flex flex-col justify-between h-full">
@@ -149,29 +118,31 @@ export default function Order() {
                         </div>
                     </div>
 
-                    {
-                        customerDetails.orderStatus == "pending" ? (
-                            <div className='flex justify-between mt-6 max-sm:space-x-4'>
-                                <button
-                                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-gray-950 text-2xl font-semibold rounded transform hover:scale-90 transition-transform"
-                                    onClick={() => setIsRejectModalOpen(true)}
-                                >
-                                    Reject Order
-                                </button>
-                                <button
-                                    className="px-4 py-2 bg-green-500 hover:bg-green-600 text-gray-950 text-2xl font-semibold rounded transform hover:scale-90 transition-transform"
-                                    onClick={() => setIsAcceptModalOpen(true)}
-                                >
-                                    Accept Order
-                                </button>
-                            </div>
-                        ) : (
-                            <div className='w-full mt-2 bg-teal-800 p-2 rounded-lg text-3xl capitalize text-white font-semibold text-center'>
-                                -- {customerDetails.orderStatus} --
-                            </div>
-                        )
-                    }
-
+                    <div>
+                        <Total products={customerDetails.totalItems} bill={customerDetails.totalPrice}/>
+                        {
+                            customerDetails.orderStatus == "pending" ? (
+                                <div className='flex justify-between mt-6 max-sm:space-x-4'>
+                                    <button
+                                        className="px-4 py-2 bg-red-500 hover:bg-red-600 text-gray-950 text-2xl font-semibold rounded transform hover:scale-90 transition-transform"
+                                        onClick={() => setIsRejectModalOpen(true)}
+                                    >
+                                        Reject Order
+                                    </button>
+                                    <button
+                                        className="px-4 py-2 bg-green-500 hover:bg-green-600 text-gray-950 text-2xl font-semibold rounded transform hover:scale-90 transition-transform"
+                                        onClick={() => setIsAcceptModalOpen(true)}
+                                    >
+                                        Accept Order
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className='w-full mt-2 bg-teal-800 p-2 rounded-lg text-3xl capitalize text-white font-semibold text-center'>
+                                    -- {customerDetails.orderStatus} --
+                                </div>
+                            )
+                        }
+                    </div>
                 </div>
 
             </div>

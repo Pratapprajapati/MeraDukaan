@@ -5,6 +5,7 @@ import Inventory from "../models/inventory.model.js"
 import Order from "../models/order.model.js"
 import Review from "../models/review.model.js"
 import Product from "../models/product.model.js"
+import CryptoJS from 'crypto-js'
 
 const register = async (req, res) => {
 
@@ -54,26 +55,29 @@ const options = { httpOnly: true, secure: true }
 const login = async (req, res) => {
     // Fetch username or email and password
     const { username, email, password } = req.body
-    if (!username && !email) new ApiResponse(400, "Username or Email is required!!")
+    if (!username && !email) new ApiResponse(400, null, "Username or Email is required!!")
 
     // Search for user
     const user = await Customer.findOne({
         $or: [{ username }, { email }]
     })
-    if (!user) return res.status(400).json(new ApiResponse(400, "Incorrect username or email"))
+    if (!user) return res.status(400).json(new ApiResponse(400, null, "Incorrect username or email"))
 
     // Check for password
     const validPassword = await user.isPasswordCorrect(password)
-    if (!validPassword) return res.status(400).json(new ApiResponse(400, "Password incorrect"))
+    if (!validPassword) return res.status(400).json(new ApiResponse(400, null, "Password incorrect"))
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
 
     // If everything checks out
     const customer = await Customer.findById(user?._id).select("-password -refreshToken")
 
+    const customerData = CryptoJS.AES.encrypt(JSON.stringify(customer), "secretKey").toString()
+
     return res.status(200)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
+        .cookie("user", customerData)
         .json(
             new ApiResponse(
                 200,

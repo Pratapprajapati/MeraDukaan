@@ -76,3 +76,8 @@
   transition: filter 300ms;
   filter: drop-shadow(0 0 1em #06f345);
 }
+.home {
+  will-change: filter;
+  transition: filter 300ms;
+  filter: drop-shadow(0 0 1em #efff64a9);
+}

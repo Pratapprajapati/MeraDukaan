@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import logo from "../assets/logo.png";
 import { Link, useNavigate } from 'react-router-dom';
+import Cookies from "js-cookie"
 import Toggle from 'react-toggle'
 import "react-toggle/style.css";
 
@@ -34,7 +35,12 @@ export default function VendorRegister() {
     const [passwordMatch, setPasswordMatch] = useState(false);
 
     const navigate = useNavigate();
+    // If user logged in then redirect to home page
+    useEffect(() => {
+        const user = Cookies.get("user") ? true : false
 
+        if (user) navigate(-1)
+    }, [])
 
     const handlePasswordChange = (e) => {
         const value = e.target.value;

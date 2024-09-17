@@ -35,6 +35,13 @@ export default function SignIn() {
                 })
                 .catch(e => setErrorMessage(e.response.data.message))
         }
+        else {
+            axios.post("/api/customer/login", formData)
+            .then(res => {
+                console.log("hello");
+            })
+            .catch(e => setErrorMessage(e.response.data.message))
+        }
     }
 
 

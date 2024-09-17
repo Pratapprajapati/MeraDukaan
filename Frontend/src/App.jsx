@@ -1,6 +1,5 @@
-import Header from './Components/Header'
-import Footer from './Components/Footer'
 import Sidebar from "./Components/Vendor/Sidebar"
+import AccessBar from "./Components/Customer/AccessBar.jsx"
 import { Outlet, useNavigate } from 'react-router-dom'
 import { decrypt } from './Components/utility.js'
 import Cookies from "js-cookie"
@@ -22,7 +21,7 @@ function App() {
     return (
         <div className='font-poppins tracking-wider'>
             {
-                user.userType === "vendor" ? <Sidebar /> : <Outlet/>
+                user.userType === "vendor" ? <Sidebar /> : <AccessBar/>
             }
         </div>
     )

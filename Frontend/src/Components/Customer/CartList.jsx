@@ -1,5 +1,8 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { ShoppingCart, Clock } from "lucide-react";
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Loading from '../AppPages/Loading';
 
 const vendors = [
     {
@@ -31,6 +34,18 @@ const vendors = [
 ];
 
 export default function Cart() {
+
+    const customer = useOutletContext()
+    const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        customer.userType != "customer" ? navigate(-1) : null
+        setLoading(false)
+    })
+
+    if (loading) return <Loading />;
+
     const handleCardClick = (id) => {
         console.log(`Clicked on vendor ${id}`);
     };
@@ -38,7 +53,7 @@ export default function Cart() {
     return (
         <div className="mx-auto my-4 max-w-6xl px-2 md:my-6 md:px-0">
             <h2 className="text-3xl font-bold text-teal-500 flex items-end">
-                <ShoppingCart className="inline-flex w-10 h-10 me-2 items-start"/>Your Cart
+                <ShoppingCart className="inline-flex w-10 h-10 me-2 items-start" />Your Cart
             </h2>
             <div className="mt-3 text-gray-300">
                 Your cart items are sorted according to their respective vendors
@@ -54,8 +69,8 @@ export default function Cart() {
                             <div className="flex flex-col space-y-1.5 -my-3">
                                 <div className="flex justify-between">
                                     <p className='text-2xl font-bold text-yellow-500'>{vendor.shopName}</p>
-                                    {vendor.isOpen ? 
-                                        <span className="text-green-500 flex items-center"><Clock className="w-4 h-4 mr-1" /> Open</span> : 
+                                    {vendor.isOpen ?
+                                        <span className="text-green-500 flex items-center"><Clock className="w-4 h-4 mr-1" /> Open</span> :
                                         <span className="text-red-500 flex items-center"><Clock className="w-4 h-4 mr-1" /> Closed</span>
                                     }
                                 </div>

@@ -5,6 +5,8 @@ import { cartItems } from '../Listings/sampleData';
 import Cart, { Total } from './Cart';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Loading from '../AppPages/Loading';
+
 
 function Alert() {
     Swal.fire({
@@ -39,8 +41,16 @@ export default function Order() {
     });
     const [note, setNote] = useState('');
 
-    const vendor = useOutletContext()
+    const customer = useOutletContext()
     const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        customer.userType != "customer" ? navigate(-1) : null
+        setLoading(false)
+    })
+
+    if (loading) return <Loading />;
 
     return (
         <div className="container mx-auto p-1.5 sm:p-6">

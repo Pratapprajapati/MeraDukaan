@@ -4,7 +4,6 @@ const dailyNeeds = [
     "Beverages",
     "Personal Care",
     "Home Essentials",
-    "Household Items",
 ]
 
 const stationery = [
@@ -78,6 +77,25 @@ export const cartItems = [
     // Add more cart items as needed
 ];
 
+// For customer product list
+export const sampleProducts = [
+    { id: 1, name: "Organic Milk", subCategory: "Dairy Products", shops: 12, image: "/api/placeholder/200/200" },
+    { id: 2, name: "Whole Grain Bread", subCategory: "Packaged Food", shops: 8, image: "/api/placeholder/200/200" },
+    { id: 3, name: "Fresh Orange Juice", subCategory: "Beverages", shops: 15, image: "/api/placeholder/200/200" },
+    { id: 4, name: "Toothpaste", subCategory: "Personal Care", shops: 20, image: "/api/placeholder/200/200" },
+    { id: 5, name: "Laundry Detergent", subCategory: "Home Essentials", shops: 10, image: "/api/placeholder/200/200" },
+    { id: 6, name: "Paper Towels", subCategory: "Home Essentials", shops: 18, image: "/api/placeholder/200/200" },
+    { id: 7, name: "Greek Yogurt", subCategory: "Dairy Products", shops: 9, image: "/api/placeholder/200/200" },
+    { id: 8, name: "Cereal", subCategory: "Packaged Food", shops: 14, image: "/api/placeholder/200/200" },
+    { id: 9, name: "Coffee Beans", subCategory: "Beverages", shops: 22, image: "/api/placeholder/200/200" },
+    { id: 10, name: "Shampoo", subCategory: "Personal Care", shops: 17, image: "/api/placeholder/200/200" },
+    { id: 11, name: "Dish Soap", subCategory: "Home Essentials", shops: 13, image: "/api/placeholder/200/200" },
+    { id: 12, name: "Toilet Paper", subCategory: "Home Essentials", shops: 25, image: "/api/placeholder/200/200" },
+    { id: 13, name: "Canned Soup", subCategory: "Packaged Food", shops: 11, image: "/api/placeholder/200/200" },
+    { id: 14, name: "Energy Drink", subCategory: "Beverages", shops: 19, image: "/api/placeholder/200/200" },
+    { id: 15, name: "Hand Sanitizer", subCategory: "Personal Care", shops: 30, image: "/api/placeholder/200/200" },
+];
+
 // For dashboard
 export const orderData = {
     '7 days': {
@@ -132,15 +150,58 @@ export const products = [
     { id: 15, name: "H&M Cotton Hoodie", price: "₹1,799", category: "Clothing", inStock: true, description: "Soft and warm hoodie made with organic cotton." },
 ];
 
+// Recent orders
+export const recentOrders = [
+    {
+        id: 1,
+        shopName: "Fresh Mart",
+        shopAddress: "123 Main St, Anytown, USA",
+        products: [
+            { name: "Apples", price: "$2.99" },
+            { name: "Milk", price: "$3.50" },
+            { name: "Bread", price: "$2.00" },
+        ],
+        total: "$8.49",
+        status: "delivered",
+        placedAt: "2023-09-15T14:30:00Z"
+    },
+    {
+        id: 2,
+        shopName: "Quick Bites",
+        shopAddress: "456 Oak Ave, Another City, USA",
+        products: [
+            { name: "Sandwich", price: "$5.99" },
+            { name: "Soda", price: "$1.50" },
+        ],
+        total: "$7.49",
+        status: "accepted",
+        placedAt: "2023-09-16T12:15:00Z"
+    },
+    {
+        id: 3,
+        shopName: "Grocery World",
+        shopAddress: "789 Pine St, Somewhere, USA",
+        products: [
+            { name: "Chicken", price: "$8.99" },
+            { name: "Rice", price: "$3.99" },
+            { name: "Vegetables", price: "$4.50" },
+            { name: "Sauce", price: "$2.00" },
+        ],
+        total: "$19.48",
+        status: "pending",
+        placedAt: "2023-09-17T09:45:00Z"
+    },
+];
+
 export const sampleOrders = [
-    { id: "ORD001", date: "2024-09-11", status: "Delivered", total: "$120.50", items: 3, customerName: "Alice Johnson" },
-    { id: "ORD002", date: "2024-09-11", status: "Processing", total: "$85.00", items: 2, customerName: "Bob Smith" },
-    { id: "ORD003", date: "2024-09-10", status: "Pending", total: "$200.75", items: 4, customerName: "Charlie Brown" },
-    { id: "ORD004", date: "2024-09-10", status: "Cancelled", total: "$50.25", items: 1, customerName: "David Miller" },
-    { id: "ORD005", date: "2024-08-26", status: "Incomplete", total: "$150.00", items: 3, customerName: "Eva Green" },
-    { id: "ORD006", date: "2024-08-26", status: "Accepted", total: "$95.50", items: 2, customerName: "Frank White" },
-    { id: "ORD007", date: "2024-08-13", status: "Rejected", total: "$180.25", items: 4, customerName: "Grace Lee" },
-    { id: "ORD008", date: "2024-08-13", status: "Failed", total: "$75.00", items: 1, customerName: "Henry Ford" },
+    { id: "ORD001", date: "2024-09-11", status: "delivered", total: "$120.50", items: 3, customerName: "Alice Johnson" },
+    { id: "ORD002", date: "2024-09-11", status: "delivered", total: "$85.00", items: 2, customerName: "Bob Smith" },
+    { id: "ORD003", date: "2024-09-10", status: "pending", total: "$200.75", items: 4, customerName: "Charlie Brown" },
+    { id: "ORD004", date: "2024-09-10", status: "cancelled", total: "$50.25", items: 1, customerName: "David Miller" },
+    { id: "ORD005", date: "2024-08-26", status: "incomplete", total: "$150.00", items: 3, customerName: "Eva Green" },
+    { id: "ORD006", date: "2024-08-26", status: "accepted", total: "$95.50", items: 2, customerName: "Frank White" },
+    { id: "ORD007", date: "2024-08-13", status: "rejected", total: "$180.25", items: 4, customerName: "Grace Lee" },
+    { id: "ORD008", date: "2024-08-13", status: "failed", total: "$75.00", items: 1, customerName: "Henry Ford" },
 ];
 
 // Orders overview page

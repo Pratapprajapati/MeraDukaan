@@ -38,7 +38,7 @@ export default function SignIn() {
         else {
             axios.post("/api/customer/login", formData)
             .then(res => {
-                console.log("hello");
+                navigate("/")
             })
             .catch(e => setErrorMessage(e.response.data.message))
         }

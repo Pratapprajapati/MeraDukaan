@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { sampleProducts } from '../Listings/sampleData';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Loading from '../AppPages/Loading';
 
 // Custom Button component
 const Button = ({ children, className, onClick }) => {
@@ -25,6 +28,17 @@ export default function ProductList() {
         (selectedSubCategory === 'All Categories' || product.subCategory === selectedSubCategory) &&
         (searchTerm ? product.name.toLowerCase().includes(searchTerm.toLowerCase()) : true)
     );
+
+    const customer = useOutletContext()
+    const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        customer.userType != "customer" ? navigate(-1) : null
+        setLoading(false)
+    })
+
+    if (loading) return <Loading />;
 
     const handleSearch = () => {
         console.log('Searching for:', searchTerm);

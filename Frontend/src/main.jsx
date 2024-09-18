@@ -11,8 +11,8 @@ import Categories from './Components/Listings/Categories.jsx'
 import Shops from './Components/Listings/Shops.jsx'
 import Customer from './Components/Customer/Customer.jsx'
 import Vendor from './Components/Vendor/Vendor.jsx'
-import Cart from './Components/Listings/Cart.jsx'
-import Order from './Components/Listings/Order.jsx'
+import Cart from './Components/Customer/CartList.jsx'
+import PlaceOrder from './Components/Orders/PlaceOrder.jsx'
 import StoreFront from './Components/Listings/Inventory.jsx'
 import Inventory from './Components/Vendor/Inventory.jsx'
 import OrderDetails from './Components/Orders/OrderDetail.jsx'
@@ -24,14 +24,19 @@ import NewProduct from './Components/Vendor/Products/NewProduct.jsx'
 import Dashboard from './Components/Vendor/Dashboard.jsx'
 import OrderHistory from './Components/Orders/OrderHistory.jsx'
 import AccessBar from './Components/Customer/AccessBar.jsx'
+import CustomerRegister from './Components/AppPages/CustomerRegister.jsx'
+import Products from './Components/Customer/Products.jsx'
+import RecentOrders from './Components/Orders/RecentOrders.jsx'
+import ViewOrder from './Components/Orders/ViewOrder.jsx'
 
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<App />}>
             <Route index element={<Home />} />
             <Route path='/signin' element={<Login />} />
-
             <Route path='/register/vendor' element={<VendorRegister />} />
+            <Route path='/register/customer' element={<CustomerRegister />} />
+
             <Route path='/vendor/overview' element={<OrdersPage />} />
             <Route path='vendor/order' element={<OrderDetails />} />
             <Route path='vendor/history' element={<OrderHistory />} />
@@ -48,7 +53,11 @@ const router = createBrowserRouter(
             <Route path='/about' element={<About />} />
             <Route path='/customer' element={<Customer />} />
             <Route path='/cart' element={<Cart />} />
-            <Route path='/order' element={<Order />} />
+            <Route path='/order/place' element={<PlaceOrder />} />
+            <Route path='/order/details' element={<ViewOrder />} />
+            <Route path='/order/recent' element={<RecentOrders />} />
+            <Route path='/order/history' element={<OrderHistory />} />
+            <Route path='/products' element={<Products />} />
             <Route path='/storefront' element={<StoreFront />} />
             
             <Route path='/*' element={<Error />} />

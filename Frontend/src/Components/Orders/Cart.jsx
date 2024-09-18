@@ -17,7 +17,6 @@ export default function Cart({ cartItems }) {
 
     const path = useLocation()
     const place = path.pathname.includes("place")
-    console.log(place);
 
     return (
         <div className="bg-black/20 text-gray-900 p-6 rounded-lg shadow-md">

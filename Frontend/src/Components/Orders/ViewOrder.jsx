@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import Swal from 'sweetalert2';
+import { useState, useEffect } from 'react';
 import Cart, { Total } from './Cart';
 import { cartItems } from '../Listings/sampleData';
-import { Clock, PackageCheck, Truck, XCircle, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Clock, PackageCheck,  XCircle, AlertTriangle, CheckCircle } from 'lucide-react';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Loading from '../AppPages/Loading';
 
-const orderStatuses = {
+export const orderStatuses = {
     "pending": { icon: <Clock className="h-5 w-5" />, color: "yellow-500" },
     "cancelled": { icon: <XCircle className="h-5 w-5" />, color: "red-500" },
     "accepted": { icon: <CheckCircle className="h-5 w-5" />, color: "green-500" },
@@ -24,9 +26,20 @@ export default function Order() {
         code: 23214,
         note: "Please deliver between 2-4 PM."
     });
+    
+    const customer = useOutletContext()
+    const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        customer.userType != "customer" ? navigate(-1) : null
+        setLoading(false)
+    })
+
+    if (loading) return <Loading />;
 
     return (
-        <div className="container mx-auto h-screen">
+        <div className="container mx-auto p-2 h-screen">
             <h1 className="text-2xl font-bold text-white mb-6">Order Number:&nbsp;
                 <span className='text-yellow-500'>{customerDetails.orderNumber}</span>
             </h1>
@@ -73,7 +86,7 @@ export default function Order() {
                         </div>
                     </div>
 
-                    <div>
+                    <div className='space-y-3'>
                         <Total products={customerDetails.totalItems} bill={customerDetails.totalPrice} />
                         {
                             customerDetails.orderStatus === "pending" && (

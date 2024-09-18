@@ -1,5 +1,21 @@
-import React, { useState } from 'react';
-import { ShoppingCart } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { PenBox, Save, ShoppingCart } from 'lucide-react';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Loading from '../AppPages/Loading';
+
+const InputField = ({ label, value, onChange, disabled = false, type = "text" }) => (
+    <div>
+        <label className="block text-sm font-medium text-gray-400 mb-1">{label}</label>
+        <input
+            type={type}
+            className={`w-full py-1 text-gray-200 bg-transparent ${disabled ? '' : 'border-b border-gray-600'} focus:outline-none focus:border-teal-500`}
+            value={value}
+            onChange={(e) => onChange && onChange(e.target.value)}
+            disabled={disabled}
+        />
+    </div>
+);
 
 export default function Customer() {
     const [details, setDetails] = useState({
@@ -16,12 +32,22 @@ export default function Customer() {
             pincode: "10001",
         },
     });
-
     const [isEditing, setIsEditing] = useState(false);
+
+    const customer = useOutletContext()
+    const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        customer.userType != "customer" ? navigate(-1) : null
+        setLoading(false)
+    })
+
+    if (loading) return <Loading />;
 
     return (
         <div className="container mx-auto p-4 sm:p-6 max-w-3xl">
-            <div className="bg-black/10 text-gray-900 p-4 sm:p-6 rounded-lg shadow-md">
+            <div className="bg-black/30 text-gray-900 p-4 sm:p-6 rounded-lg shadow-md">
                 <h2 className="text-xl sm:text-2xl font-bold text-teal-500 mb-4 sm:mb-6">Personal Details</h2>
                 <div className="space-y-6">
                     <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
@@ -128,16 +154,20 @@ export default function Customer() {
 
                 <hr className="border-gray-600 my-6" />
 
-                <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
-                    <button 
-                        className="w-full sm:w-auto px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600 transition duration-300" 
+                <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row text-black font-semibold justify-between items-center space-y-4 sm:space-y-0">
+                    <button
+                        className="w-full sm:w-auto px-4 py-2 bg-teal-500 rounded hover:bg-teal-600 transition duration-300"
                         onClick={() => setIsEditing(!isEditing)}
                     >
-                        {isEditing ? 'Save Changes' : 'Edit Profile'}
+                        {isEditing ? (
+                            <div><Save className='inline-flex'/> Save Changes</div>
+                        ) : (
+                            <div><PenBox className='inline-flex'/> Edit Changes</div>
+                        )}
                     </button>
                     <button
-                        className="w-full sm:w-auto px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300 flex items-center justify-center"
-                        onClick={() => {/* Add your cart navigation logic here */}}
+                        className="w-full sm:w-auto px-6 py-2 bg-yellow-600 rounded hover:bg-yellow-600 transition duration-300 flex items-center justify-center"
+                        onClick={() => navigate("/cart")}
                     >
                         <ShoppingCart className="mr-2" /> Go to Cart
                     </button>
@@ -146,16 +176,3 @@ export default function Customer() {
         </div>
     );
 }
-
-const InputField = ({ label, value, onChange, disabled = false, type = "text" }) => (
-    <div>
-        <label className="block text-sm font-medium text-gray-400 mb-1">{label}</label>
-        <input
-            type={type}
-            className={`w-full py-1 text-gray-200 bg-transparent ${disabled ? '' : 'border-b border-gray-600'} focus:outline-none focus:border-teal-500`}
-            value={value}
-            onChange={(e) => onChange && onChange(e.target.value)}
-            disabled={disabled}
-        />
-    </div>
-);

@@ -3,17 +3,22 @@ import { Menu, ShoppingCart, History, User, LogOut, X, Store, Archive, CalendarC
 import { Outlet, useNavigate, NavLink } from 'react-router-dom';
 import logo from "../assets/logo.png";
 import axios from 'axios';
+import { decrypt } from "../utility"
+import Cookies from "js-cookie"
 
 export default function AccessBar() {
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();
+
+    const signedIn = Cookies.get("user")
+    let user = signedIn ? decrypt() : null
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     };
 
     const logout = () => {
-        axios.get("/api/vendor/logout")
+        axios.get("/api/customer/logout")
             .then(res => {
                 navigate("/signin");
             })
@@ -149,8 +154,8 @@ export default function AccessBar() {
                 </div>
 
                 {/* Main Content Area */}
-                <div className="flex-1 overflow-y-auto p-4">
-                    <Outlet />
+                <div className="flex-1 overflow-y-auto sm:p-4">
+                    <Outlet context={user}/>
                 </div>
             </div>
         </div>

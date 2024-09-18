@@ -1,70 +1,32 @@
-import React, { useState } from 'react';
-import { Clock, XCircle, CheckCircle, AlertTriangle, PackageCheck, Truck } from 'lucide-react';
-
-const orderStatuses = {
-    "Pending": { icon: <Clock className="h-5 w-5" />, color: "text-yellow-500" },
-    "Cancelled": { icon: <XCircle className="h-5 w-5" />, color: "text-red-500" },
-    "Accepted": { icon: <CheckCircle className="h-5 w-5" />, color: "text-green-500" },
-    "Rejected": { icon: <XCircle className="h-5 w-5" />, color: "text-red-500" },
-    "Incomplete": { icon: <AlertTriangle className="h-5 w-5" />, color: "text-orange-500" },
-    "Delivered": { icon: <PackageCheck className="h-5 w-5" />, color: "text-green-500" },
-    "Failed": { icon: <XCircle className="h-5 w-5" />, color: "text-red-500" },
-    "Processing": { icon: <Truck className="h-5 w-5" />, color: "text-blue-500" },
-};
-
-const sampleOrders = [
-    {
-        id: 1,
-        shopName: "Fresh Mart",
-        shopAddress: "123 Main St, Anytown, USA",
-        products: [
-            { name: "Apples", price: "$2.99" },
-            { name: "Milk", price: "$3.50" },
-            { name: "Bread", price: "$2.00" },
-        ],
-        total: "$8.49",
-        status: "Delivered",
-        placedAt: "2023-09-15T14:30:00Z"
-    },
-    {
-        id: 2,
-        shopName: "Quick Bites",
-        shopAddress: "456 Oak Ave, Another City, USA",
-        products: [
-            { name: "Sandwich", price: "$5.99" },
-            { name: "Soda", price: "$1.50" },
-        ],
-        total: "$7.49",
-        status: "Processing",
-        placedAt: "2023-09-16T12:15:00Z"
-    },
-    {
-        id: 3,
-        shopName: "Grocery World",
-        shopAddress: "789 Pine St, Somewhere, USA",
-        products: [
-            { name: "Chicken", price: "$8.99" },
-            { name: "Rice", price: "$3.99" },
-            { name: "Vegetables", price: "$4.50" },
-            { name: "Sauce", price: "$2.00" },
-        ],
-        total: "$19.48",
-        status: "Pending",
-        placedAt: "2023-09-17T09:45:00Z"
-    },
-];
+import { useState, useEffect } from 'react';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Loading from '../AppPages/Loading';
+import { orderStatuses } from './ViewOrder';
+import { recentOrders } from '../Listings/sampleData';
 
 export default function RecentOrders() {
     const [selectedStatus, setSelectedStatus] = useState('All');
+    
+    const customer = useOutletContext()
+    const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        customer.userType != "customer" ? navigate(-1) : null
+        setLoading(false)
+    })
 
     const filteredOrders = selectedStatus === 'All'
-        ? sampleOrders
-        : sampleOrders.filter(order => order.status === selectedStatus);
-
+    ? recentOrders
+    : recentOrders.filter(order => order.status === selectedStatus);
+    
     const handleCardClick = (orderId) => {
         console.log('Clicked order:', orderId);
         // Implement your order details logic here
     };
+    
+    if (loading) return <Loading />;
 
     return (
         <div className="p-4 bg-black/20 shadow-2xl shadow-black min-h-screen text-white rounded-lg">
@@ -95,9 +57,9 @@ export default function RecentOrders() {
                             <div className="flex flex-col space-y-1.5 -my-3">
                                 <div className="flex justify-between items-center">
                                     <p className='text-2xl font-bold text-yellow-500'>{order.shopName}</p>
-                                    <div className={`flex items-center ${orderStatuses[order.status].color}`}>
+                                    <div className={`flex items-center text-${orderStatuses[order.status].color}`}>
                                         {orderStatuses[order.status].icon}
-                                        <span className="ml-1">{order.status}</span>
+                                        <span className="ml-2">{order.status}</span>
                                     </div>
                                 </div>
                                 <p className="text-md text-gray-400 line-clamp-2"><span className="font-semibold">Address:</span> {order.shopAddress}</p>

@@ -2,16 +2,28 @@ import React, { useState } from 'react';
 import { Search, Info, Plus, Minus, Store, MapPin, MoveRight, ArrowRightLeft } from 'lucide-react';
 import img from "../Profiles/img1.webp"
 import { products } from './sampleData';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Loading from '../AppPages/Loading';
 
 export default function Inventory() {
     const [quantities, setQuantities] = useState(Array(products.length).fill(0));
+
+    const customer = useOutletContext()
+    const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        customer.userType != "customer" ? navigate(-1) : null
+        setLoading(false)
+    })
 
     const handleIncrease = (index) => {
         const newQuantities = [...quantities];
         newQuantities[index] += 1;
         setQuantities(newQuantities);
     };
-
+    
     const handleDecrease = (index) => {
         if (quantities[index] > 0) {
             const newQuantities = [...quantities];
@@ -19,6 +31,8 @@ export default function Inventory() {
             setQuantities(newQuantities);
         }
     };
+    
+    if (loading) return <Loading />;
 
     return (
         <div className="container mx-auto mt-8">

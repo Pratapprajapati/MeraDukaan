@@ -78,7 +78,7 @@ export default function Order() {
     };
 
     return (
-        <div className="container mx-auto h-screen">
+        <div className="container mx-auto h-screen p-2">
             <h1 className="text-2xl font-bold text-white mb-6">Order Number:&nbsp;
                 <span className='text-yellow-500'>{customerDetails.orderNumber}</span>
             </h1>

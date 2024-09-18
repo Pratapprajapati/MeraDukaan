@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import Cart, { Total } from './Cart';
 import { cartItems } from '../Listings/sampleData';
-import { Clock, PackageCheck,  XCircle, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Clock, PackageCheck, XCircle, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Loading from '../AppPages/Loading';
+import Swal from 'sweetalert2';
 
 export const orderStatuses = {
     "pending": { icon: <Clock className="h-5 w-5" />, color: "yellow-500" },
@@ -21,12 +22,12 @@ export default function Order() {
         customerName: "John Doe",
         totalItems: 5,
         totalPrice: "₹7,850",
-        orderStatus: "delivered",
+        orderStatus: "pending",
         orderNumber: "ORD12345",
         code: 23214,
         note: "Please deliver between 2-4 PM."
     });
-    
+
     const customer = useOutletContext()
     const navigate = useNavigate()
     const [loading, setLoading] = useState(true)
@@ -35,6 +36,34 @@ export default function Order() {
         customer.userType != "customer" ? navigate(-1) : null
         setLoading(false)
     })
+
+    const handleCancelOrder = () => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, cancel it!',
+            cancelButtonText: 'No, Go Back',
+            reverseButtons: true,
+            background: '#1a1a2e',
+            color: 'white'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                setCustomerDetails(prev => ({ ...prev, orderStatus: 'cancelled' }));
+                Swal.fire({
+                    title: 'Cancelled!',
+                    text: 'Your order has been cancelled.',
+                    icon: 'success',
+                    background: '#1a1a2e',
+                    color: 'white'
+                });
+            }
+        });
+    };
+
 
     if (loading) return <Loading />;
 
@@ -90,7 +119,10 @@ export default function Order() {
                         <Total products={customerDetails.totalItems} bill={customerDetails.totalPrice} />
                         {
                             customerDetails.orderStatus === "pending" && (
-                                <button className='w-full mt-2 bg-red-600 hover:bg-red-500 p-2 rounded-lg text-3xl capitalize text-white font-semibold text-center'>
+                                <button
+                                    className='w-full mt-2 bg-red-600 hover:bg-red-500 p-2 rounded-lg text-3xl capitalize text-white font-semibold text-center'
+                                    onClick={handleCancelOrder}
+                                >
                                     Cancel Order
                                 </button>
                             )

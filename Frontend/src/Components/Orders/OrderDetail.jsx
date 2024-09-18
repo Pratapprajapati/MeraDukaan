@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import Cart, { Total } from './Cart';
 import { cartItems } from '../Listings/sampleData';

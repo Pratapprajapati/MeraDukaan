@@ -17,6 +17,7 @@ export default function VendorRegister() {
         registrationNumber: "",
         address: "",
         city: "",
+        area: "",
         pincode: "",
         primary: "",
         secondary: "",
@@ -222,11 +223,6 @@ export default function VendorRegister() {
                                     className={inputStyle}
                                 >
                                     <option value="General">General</option>
-                                    <option value="Grocery">Grocery</option>
-                                    <option value="Stationary">Stationary</option>
-                                    <option value="Pharmacy">Pharmacy</option>
-                                    <option value="Electronics">Electronics and Hardware</option>
-                                    <option value="Other">Other</option>
                                 </select>
                             </div>
                             <div className="mb-2">
@@ -255,6 +251,8 @@ export default function VendorRegister() {
                                     className={`${inputStyle} resize-none`}
                                 />
                             </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                             <div className="mb-2">
                                 <label htmlFor="city" className={labelStyle}>City</label>
                                 <input
@@ -264,6 +262,19 @@ export default function VendorRegister() {
                                     value={formData.city}
                                     onChange={handleInput}
                                     placeholder="City"
+                                    required
+                                    className={inputStyle}
+                                />
+                            </div>
+                            <div className="mb-2">
+                                <label htmlFor="area" className={labelStyle}>Area</label>
+                                <input
+                                    type="text"
+                                    id="area"
+                                    name="area"
+                                    value={formData.area}
+                                    onChange={handleInput}
+                                    placeholder="area"
                                     required
                                     className={inputStyle}
                                 />
@@ -335,6 +346,8 @@ export default function VendorRegister() {
                                     className={inputStyle}
                                 />
                             </div>
+                        </div>
+                        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                             <div className="mb-2">
                                 <label htmlFor="shopTimingsStart" className={labelStyle}>Shop Start Time</label>
                                 <input
@@ -386,34 +399,6 @@ export default function VendorRegister() {
                                     </span>
                                 </div>
                             </div>
-
-                            <div className="mb-2">
-                                <label htmlFor="onlinePayments" className={labelStyle}>Online Payments Accepted?</label>
-                                <div className='mt-3'>
-                                    <Toggle
-                                        id="onlinePayments"
-                                        name="onlinePayments"
-                                        checked={formData.onlinePayments}
-                                        onChange={handleToggleChange('onlinePayments')}
-                                        className="align-middle"
-                                    />
-                                    <span className="ml-2 text-sm text-gray-300">
-                                        {formData.onlinePayments ? "Yes" : "No"}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {formData.onlinePayments && (
-                                <div className="-mb-1">
-                                    <label htmlFor="qrCodeImage" className={labelStyle}>QR Code Image</label>
-                                    <input
-                                        type="file"
-                                        id="qrCodeImage"
-                                        onChange={(e) => setQrCodeImageFile(e.target.files[0])}
-                                        className={`${inputStyle} py-1.5 text-gray-300`}
-                                    />
-                                </div>
-                            )}
                         </div>
                     </div>
 

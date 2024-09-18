@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MapPin, Phone, Clock, Truck, CreditCard, RefreshCw, Info, Edit, Save, Store } from 'lucide-react';
 import img from '../assets/Mcd.webp';
 import { useOutletContext, useNavigate } from 'react-router-dom';

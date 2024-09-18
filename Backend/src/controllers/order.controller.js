@@ -29,13 +29,12 @@ const placeOrder = async (req, res) => {
     return res.status(201).json(new ApiResponse(201, order, "Order placed successfully"))
 }
 
-
 // CHANGE ORDER STATUS
 const manageOrder = async (req, res) => {
     const { orderId } = req.params
     if (!orderId || !isValidObjectId(orderId)) return res.status(400).json(new ApiResponse(400, null, "OrderId missing"))
 
-    const { orderStatus, description } = req.body
+    const { orderStatus, description, code } = req.body
     if (!orderStatus) return res.status(400).json(new ApiResponse(400, null, "Order status missing"))
 
     const statuses = ["pending", "accepted", "incomplete", "undelivered", "delivered", "failed", "cancelled"]
@@ -54,6 +53,15 @@ const manageOrder = async (req, res) => {
     const cond2 = (order.orderStatus == "accepted" && ["incomplete", "failed", "delivered"].includes(orderStatus))
 
     if (!(cond1 || cond2)) return res.status(400).json(new ApiResponse(400, null, "Invalid order status change"))
+
+    if (orderStatus === "accepted") {
+        let code = Math.floor(100000 + Math.random() * 900000)
+        order.code = code
+    }
+
+    if (orderStatus === "delivered" && order?.code != code) {
+        return res.status(400).json(new ApiResponse(400, null, "Invalid code"))
+    }
 
     // Update the order fields
     order.orderStatus = orderStatus;
@@ -177,7 +185,7 @@ const orderOverview = async (req, res) => {
     const total = overview.reduce((sum, curr) => {
         return sum + curr.bill
     }, 0)
-   overview.push({total})
+    overview.push({ total })
 
     return res.status(200).json(new ApiResponse(200, overview, "Order overview fetched"))
 }

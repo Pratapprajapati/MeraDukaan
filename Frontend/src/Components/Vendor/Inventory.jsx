@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Edit, Info, Check, X, Trash } from 'lucide-react';
 import Swal from 'sweetalert2';
-import img from "../Profiles/img1.webp";
+import img from "../assets/img1.webp";
 import { products } from '../Listings/sampleData';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Loading from '../AppPages/Loading';
 
 // Sorting available categories
 const categories = products.reduce((acc, cur) => {
@@ -17,6 +20,15 @@ export default function Inventory() {
     const [editableProducts, setEditableProducts] = useState(products);
     const [editMode, setEditMode] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState("All Categories");
+
+    const vendor = useOutletContext()
+    const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        vendor.userType != "vendor" ? navigate(-1) : null
+        setLoading(false)
+    })
 
     const handleEditToggle = (id) => {
         setEditMode(editMode === id ? null : id);
@@ -70,6 +82,8 @@ export default function Inventory() {
     const filteredProducts = selectedCategory === "All Categories"
         ? editableProducts
         : editableProducts.filter((product) => product.category === selectedCategory);
+
+    if (loading) return <Loading />
 
     return (
         <div className="p-4 bg-black/20 shadow-2xl shadow-black min-h-screen text-white rounded-lg">

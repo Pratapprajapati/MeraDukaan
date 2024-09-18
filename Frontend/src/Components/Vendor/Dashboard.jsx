@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { orderData } from '../Listings/sampleData'
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Loading from '../AppPages/Loading';
 
 const CustomButton = ({ children, onClick, variant = 'primary' }) => (
     <button
@@ -52,11 +55,17 @@ const UserProfileDashboard = () => {
         confirmPassword: ''
     });
 
-    // State for tracking the selected time period
     const [timePeriod, setTimePeriod] = useState('7 days');
-
-    // Extracting relevant data for the selected time period
     const selectedData = orderData[timePeriod];
+
+    const vendor = useOutletContext()
+    const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        vendor.userType != "vendor" ? navigate(-1) : null
+        setLoading(false)
+    })
 
     const handleInputChange = (e) => {
         setProfileData({ ...profileData, [e.target.name]: e.target.value });
@@ -78,6 +87,8 @@ const UserProfileDashboard = () => {
         { category: "Home Essentials", itemCount: 90 },
         { category: "Household Items", itemCount: 110 }
     ];
+    
+    if (loading) return <Loading />
 
     return (
         <div className="max-w-7xl mx-auto bg-black/30 text-white p-6 rounded-lg shadow-lg">

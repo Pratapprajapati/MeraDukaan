@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Plus, ArrowRight } from 'lucide-react';
-import img from "../../Profiles/img1.webp"
+import img from "../../assets/img1.webp"
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Loading from "../../AppPages/Loading"
 
 // Custom Card component
 const Card = ({ children, className }) => (
@@ -34,6 +37,15 @@ export default function ProductList() {
     const [selectedSubCategory, setSelectedSubCategory] = useState('All Categories');
     const [searchTerm, setSearchTerm] = useState('');
     const [products, setProducts] = useState([]);
+
+    const vendor = useOutletContext()
+    const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        vendor.userType != "vendor" ? navigate(-1) : null
+        setLoading(false)
+    })
 
     useEffect(() => {
         // Simulated product data - replace with actual API call
@@ -86,6 +98,8 @@ export default function ProductList() {
             </Button>
         </Card>
     );
+
+    if (loading) return <Loading />
 
     return (
         <div className="p-4 bg-black/20 shadow-2xl shadow-black min-h-screen text-white rounded-lg">

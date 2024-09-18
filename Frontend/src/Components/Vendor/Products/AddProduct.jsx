@@ -1,10 +1,24 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Toggle from 'react-toggle'
 import "react-toggle/style.css";
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Loading from '../../AppPages/Loading';
 
 export default function AddProduct() {
 
     const [stock, setStock] = useState(true)
+    
+    const vendor = useOutletContext()
+    const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        vendor.userType != "vendor" ? navigate(-1) : null
+        setLoading(false)
+    })
+
+    if (loading) return <Loading />;
 
     return (
         <section className="overflow-hidden">

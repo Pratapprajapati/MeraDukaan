@@ -1,7 +1,9 @@
 import { Ban, Clock, PackageCheck, Truck } from 'lucide-react';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { orders } from '../Listings/sampleData';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Loading from '../AppPages/Loading';
 
 const orderIcons = {
     "Pending": <Clock className='inline-flex ms-2 my-1' />,
@@ -12,13 +14,22 @@ const orderIcons = {
 
 export default function Overview() {
     const [selectedStatus, setSelectedStatus] = useState('Pending');
-    const navigate = useNavigate(); // To navigate programmatically
-
     const filteredOrders = orders.filter(order => order.status === selectedStatus);
+
+    const vendor = useOutletContext()
+    const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        vendor.userType != "vendor" ? navigate(-1) : null
+        setLoading(false)
+    })
 
     const handleCardClick = (orderId) => {
         navigate(`/vendor/order/`);
     };
+
+    if (loading) return <Loading />
 
     return (
         <div className="bg-black/30 text-white p-4 rounded-md flex flex-col h-full">

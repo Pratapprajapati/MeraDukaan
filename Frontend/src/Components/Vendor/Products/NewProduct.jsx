@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Toggle from 'react-toggle';
 import "react-toggle/style.css";
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Loading from '../../AppPages/Loading';
 
 export default function NewProduct() {
     const [thumbnail, setThumbnail] = useState(null);
@@ -12,6 +15,15 @@ export default function NewProduct() {
         description: "",
         inStock: true,
     });
+
+    const vendor = useOutletContext()
+    const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        vendor.userType != "vendor" ? navigate(-1) : null
+        setLoading(false)
+    })
 
     const handleThumbnailChange = (e) => {
         const file = e.target.files[0];
@@ -39,6 +51,8 @@ export default function NewProduct() {
             inStock: !content.inStock
         });
     };
+
+    if (loading) return <Loading />
 
     return (
         <section className="overflow-hidden">

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Info, Plus, Minus, Store, MapPin, MoveRight, ArrowRightLeft } from 'lucide-react';
-import img from "../Profiles/img1.webp"
+import img from "../assets/img1.webp"
 import { products } from './sampleData';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import axios from 'axios';

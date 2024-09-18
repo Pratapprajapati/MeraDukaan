@@ -41,7 +41,7 @@ export default function AccessBar() {
                     <div>
                         <div className="flex justify-center mb-10">
                             <NavLink to={"/"} className={({isActive}) => isActive? "home" : null}>
-                                <img src={logo} className="h-24 w-24" alt="Logo" />
+                                <img src={logo} className="h-24 w-24 logo" alt="Logo" />
                             </NavLink>
                         </div>
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MoveLeft, MoveRight } from 'lucide-react';
+import { MoveLeft, MoveRight, PenBox } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { cartItems } from '../Listings/sampleData';
 import Cart, { Total } from './Cart';
@@ -70,7 +70,10 @@ export default function Order() {
                                         <h1 className="mt-1 text-lg text-gray-200 bg-transparent">{shopDetails.shopName}</h1>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-400">Delivery Address</label>
+                                        <div className='flex justify-between'>
+                                            <label className="block text-sm font-medium text-gray-400">Delivery Address</label>
+                                            <PenBox className='inline-flex text-teal-300 cursor-pointer' onClick={() => navigate("/customer")}/>
+                                        </div>
                                         <h1 className="mt-1 text-gray-200 bg-transparent line-clamp-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo esse molestiae voluptatem optio perferendis quas, quae fugit reiciendis doloremque porro, sequi repellendus modi nostrum ex explicabo ea? Architecto, totam sit.</h1>
                                     </div>
                                     <div>

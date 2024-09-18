@@ -51,7 +51,7 @@ export default function Cart() {
     };
 
     return (
-        <div className="mx-auto my-4 max-w-6xl px-2 md:my-6 md:px-0">
+        <div className="mx-auto my-4 max-w-7xl p-4 md:my-6 rounded-lg bg-black/20 shadow-lg shadow-black/50">
             <h2 className="text-3xl font-bold text-teal-500 flex items-end">
                 <ShoppingCart className="inline-flex w-10 h-10 me-2 items-start" />Your Cart
             </h2>

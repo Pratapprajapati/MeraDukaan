@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { MapPin, Phone, Clock, Truck, CreditCard, RefreshCw, Info, Edit, Save, Store } from 'lucide-react';
 import img from '../assets/Mcd.webp';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Loading from '../AppPages/Loading';
 
 const ShopDetailsPage = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [vendor, setVendor] = useState({
+  const [vendorDetails, setVendorDetails] = useState({
     shopName: "McDonald's",
     shopImage: img,
     location: {
@@ -28,14 +31,24 @@ const ShopDetailsPage = () => {
     onlinePayment: true,
     description: "Welcome to McDonald's, home of the world's best burgers, fries, and shakes."
   });
+  
+  const vendor = useOutletContext()
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+      vendor.userType != "vendor" ? navigate(-1) : null
+      setLoading(false)
+  })
+  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     const keys = name.split('.');
 
-    setVendor(prevState => {
-      const updatedVendor = { ...prevState };
-      let current = updatedVendor;
+    setVendorDetails(prevState => {
+      const updatedVendorDetails = { ...prevState };
+      let current = updatedVendorDetails;
 
       keys.forEach((key, index) => {
         if (index === keys.length - 1) {
@@ -45,7 +58,7 @@ const ShopDetailsPage = () => {
         }
       });
 
-      return updatedVendor;
+      return updatedVendorDetails;
     });
   };
 
@@ -67,6 +80,8 @@ const ShopDetailsPage = () => {
     );
   };
 
+  if (loading) return <Loading />
+
   return (
     <div className="min-h-screen flex items-center justify-center ">
       <div className="max-w-5xl w-full bg-black/20 shadow-2xl shadow-black/60 rounded-lg border border-black/20 overflow-hidden">
@@ -74,26 +89,26 @@ const ShopDetailsPage = () => {
           <div className="md:flex-shrink-0 p-4">
             <img
               className="h-64 w-full rounded-md object-cover md:w-96"
-              src={vendor.shopImage}
-              alt={vendor.shopName}
+              src={vendorDetails.shopImage}
+              alt={vendorDetails.shopName}
             />
           </div>
           <div className="p-8 pl-4">
             <div className="uppercase tracking-wide text-sm text-white font-semibold">
-              <EditableField name="shopType" value={vendor.shopType} />
+              <EditableField name="shopType" value={vendorDetails.shopType} />
             </div>
             <h1 className="mt-1 text-3xl font-bold text-yellow-400 leading-tight">
-              <EditableField name="shopName" value={vendor.shopName} />
+              <EditableField name="shopName" value={vendorDetails.shopName} />
             </h1>
             <div className="mt-2 text-gray-300 flex flex-col">
               <div className='flex'>
                 <MapPin className="h-5 w-5 mr-2 flex-shrink-0" />
                 <div>
-                  <EditableField name="location.address" value={vendor.location.address} />
+                  <EditableField name="location.address" value={vendorDetails.location.address} />
                   <div className="mt-2">
-                    <EditableField name="location.city" value={vendor.location.city} />
+                    <EditableField name="location.city" value={vendorDetails.location.city} />
                     {' - '}
-                    <EditableField name="location.pincode" value={vendor.location.pincode} />
+                    <EditableField name="location.pincode" value={vendorDetails.location.pincode} />
                   </div>
                 </div>
               </div>
@@ -103,10 +118,10 @@ const ShopDetailsPage = () => {
                   <Store className="h-7 w-7 mr-2 flex-shrink-0" />
                   <div className='text-lg'>
                     Shop Status:
-                    <button onClick={() => setVendor({ ...vendor, isOpen: !vendor.isOpen })}
-                      className={`${vendor.isOpen ? "bg-green-600 text-black" : "bg-red-600 text-white"} rounded-lg ml-2 px-3`}
+                    <button onClick={() => setVendorDetails({ ...vendorDetails, isOpen: !vendorDetails.isOpen })}
+                      className={`${vendorDetails.isOpen ? "bg-green-600 text-black" : "bg-red-600 text-white"} rounded-lg ml-2 px-3`}
                     >
-                      {vendor.isOpen ? "Online" : "Offline"}
+                      {vendorDetails.isOpen ? "Online" : "Offline"}
                     </button>
                   </div>
 
@@ -131,11 +146,11 @@ const ShopDetailsPage = () => {
                 Contact
               </dt>
               <dd className="mt-1 text-lg text-gray-300 sm:mt-0 sm:col-span-2">
-                <EditableField name="contact.primary" value={vendor.contact.primary} />
-                {vendor.contact.secondary && (
+                <EditableField name="contact.primary" value={vendorDetails.contact.primary} />
+                {vendorDetails.contact.secondary && (
                   <>
                     {' / '}
-                    <EditableField name="contact.secondary" value={vendor.contact.secondary} />
+                    <EditableField name="contact.secondary" value={vendorDetails.contact.secondary} />
                   </>
                 )}
               </dd>
@@ -146,9 +161,9 @@ const ShopDetailsPage = () => {
                 Hours
               </dt>
               <dd className="mt-1 text-lg text-gray-300 sm:mt-0 sm:col-span-2">
-                <EditableField name="shopTimings.start" value={vendor.shopTimings.start} />
+                <EditableField name="shopTimings.start" value={vendorDetails.shopTimings.start} />
                 {' - '}
-                <EditableField name="shopTimings.end" value={vendor.shopTimings.end} />
+                <EditableField name="shopTimings.end" value={vendorDetails.shopTimings.end} />
               </dd>
             </div>
             <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -160,7 +175,7 @@ const ShopDetailsPage = () => {
                 {isEditing ? (
                   <select
                     name="delivery"
-                    value={vendor.delivery ? 'Available' : 'Not available'}
+                    value={vendorDetails.delivery ? 'Available' : 'Not available'}
                     onChange={(e) => handleInputChange({
                       target: {
                         name: 'delivery',
@@ -173,7 +188,7 @@ const ShopDetailsPage = () => {
                     <option>Not available</option>
                   </select>
                 ) : (
-                  <span>{vendor.delivery ? 'Available' : 'Not available'}</span>
+                  <span>{vendorDetails.delivery ? 'Available' : 'Not available'}</span>
                 )}
               </dd>
             </div>
@@ -186,7 +201,7 @@ const ShopDetailsPage = () => {
                 {isEditing ? (
                   <select
                     name="refundExchange"
-                    value={vendor.refundExchange ? 'Available' : 'Not available'}
+                    value={vendorDetails.refundExchange ? 'Available' : 'Not available'}
                     onChange={(e) => handleInputChange({
                       target: {
                         name: 'refundExchange',
@@ -199,7 +214,7 @@ const ShopDetailsPage = () => {
                     <option>Not available</option>
                   </select>
                 ) : (
-                  <span>{vendor.refundExchange ? 'Available' : 'Not available'}</span>
+                  <span>{vendorDetails.refundExchange ? 'Available' : 'Not available'}</span>
                 )}
               </dd>
             </div>
@@ -212,7 +227,7 @@ const ShopDetailsPage = () => {
                 {isEditing ? (
                   <select
                     name="onlinePayment"
-                    value={vendor.onlinePayment ? 'Online payment available' : 'Cash only'}
+                    value={vendorDetails.onlinePayment ? 'Online payment available' : 'Cash only'}
                     onChange={(e) => handleInputChange({
                       target: {
                         name: 'onlinePayment',
@@ -225,7 +240,7 @@ const ShopDetailsPage = () => {
                     <option>Cash only</option>
                   </select>
                 ) : (
-                  <span>{vendor.onlinePayment ? 'Online payment available' : 'Cash only'}</span>
+                  <span>{vendorDetails.onlinePayment ? 'Online payment available' : 'Cash only'}</span>
                 )}
               </dd>
             </div>
@@ -238,13 +253,13 @@ const ShopDetailsPage = () => {
                 {isEditing ? (
                   <textarea
                     name="description"
-                    value={vendor.description}
+                    value={vendorDetails.description}
                     onChange={handleInputChange}
                     className="bg-gray-700 border border-gray-500 text-white py-1 px-2 rounded w-full"
                     rows={3}
                   />
                 ) : (
-                  <span>{vendor.description}</span>
+                  <span>{vendorDetails.description}</span>
                 )}
               </dd>
             </div>

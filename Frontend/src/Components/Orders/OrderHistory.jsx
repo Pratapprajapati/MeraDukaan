@@ -1,17 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Clock, PackageCheck, Truck, XCircle, AlertTriangle, CheckCircle, Filter } from 'lucide-react';
 import { sampleOrders } from '../Listings/sampleData';
-
-const orderStatuses = {
-    "Pending": { icon: <Clock className="h-5 w-5" />, color: "text-yellow-500" },
-    "Cancelled": { icon: <XCircle className="h-5 w-5" />, color: "text-red-500" },
-    "Accepted": { icon: <CheckCircle className="h-5 w-5" />, color: "text-green-500" },
-    "Rejected": { icon: <XCircle className="h-5 w-5" />, color: "text-red-500" },
-    "Incomplete": { icon: <AlertTriangle className="h-5 w-5" />, color: "text-orange-500" },
-    "Delivered": { icon: <PackageCheck className="h-5 w-5" />, color: "text-green-500" },
-    "Failed": { icon: <XCircle className="h-5 w-5" />, color: "text-red-500" },
-    "Processing": { icon: <Truck className="h-5 w-5" />, color: "text-blue-500" },
-};
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Loading from '../AppPages/Loading';
+import { orderStatuses } from './ViewOrder';
 
 const dateRanges = [
     { label: "Today", days: 1 },
@@ -21,10 +14,18 @@ const dateRanges = [
 ];
 
 export default function OrderHistory() {
-    const [selectedRange, setSelectedRange] = useState(dateRanges[1].label);
+    const [selectedRange, setSelectedRange] = useState(dateRanges[3].label);
     const [selectedStatus, setSelectedStatus] = useState("All orders");
     const [filteredOrders, setFilteredOrders] = useState([]);
     const [groupedOrders, setGroupedOrders] = useState([]);
+
+    const customer = useOutletContext()
+    const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        setLoading(false)
+    })
 
     const filterOrders = (orders) => {
         let filtered = orders;
@@ -62,6 +63,8 @@ export default function OrderHistory() {
         setGroupedOrders(groupOrdersByDate(filtered));
     }, [selectedRange, selectedStatus]);
 
+    if (loading) return <Loading />;
+    
     return (
         <div className="bg-gray-900 text-white p-4 sm:p-6 rounded-lg flex flex-col min-h-full">
             <div className='flex max-md:flex-col justify-between'>
@@ -95,7 +98,6 @@ export default function OrderHistory() {
                 </div>
             </div>
 
-
             <div className="flex-grow">
                 {filteredOrders.length === 0 ? (
                     <div className="flex items-center justify-center h-full">
@@ -116,7 +118,7 @@ export default function OrderHistory() {
                                             <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
                                                 <span className="text-sm">{order.items} product{order.items > 1 ? 's' : ''}</span>
                                                 <span className="font-semibold">{order.total}</span>
-                                                <div className={`flex items-center ${orderStatuses[order.status].color}`}>
+                                                <div className={`flex items-center capitalize text-${orderStatuses[order.status].color}`}>
                                                     {orderStatuses[order.status].icon}
                                                     <span className="ml-1 text-sm">{order.status}</span>
                                                 </div>

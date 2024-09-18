@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 import Cart, { Total } from './Cart';
 import { cartItems } from '../Listings/sampleData';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Loading from '../AppPages/Loading';
 
 const Modal = ({ isOpen, title, children }) => {
     if (!isOpen) return null;
@@ -30,6 +33,15 @@ export default function Order() {
     const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
     const [acceptNote, setAcceptNote] = useState('');
     const [rejectNote, setRejectNote] = useState('');
+
+    const vendor = useOutletContext()
+    const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        vendor.userType != "vendor" ? navigate(-1) : null
+        setLoading(false)
+    })
 
     const handleAccept = () => {
         Swal.fire({
@@ -77,6 +89,8 @@ export default function Order() {
         });
     };
 
+    if (loading) return <Loading />
+
     return (
         <div className="container mx-auto h-screen p-2">
             <h1 className="text-2xl font-bold text-white mb-6">Order Number:&nbsp;
@@ -119,7 +133,7 @@ export default function Order() {
                     </div>
 
                     <div>
-                        <Total products={customerDetails.totalItems} bill={customerDetails.totalPrice}/>
+                        <Total products={customerDetails.totalItems} bill={customerDetails.totalPrice} />
                         {
                             customerDetails.orderStatus == "pending" ? (
                                 <div className='flex justify-between mt-6 max-sm:space-x-4'>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { PenBox, Save, ShoppingCart } from 'lucide-react';
+import { ArrowLeftCircle, PenBox, Save, ShoppingCart } from 'lucide-react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Loading from '../AppPages/Loading';
@@ -48,7 +48,10 @@ export default function Customer() {
     return (
         <div className="container mx-auto p-4 sm:p-6 max-w-3xl">
             <div className="bg-black/30 text-gray-900 p-4 sm:p-6 rounded-lg shadow-md">
-                <h2 className="text-xl sm:text-2xl font-bold text-teal-500 mb-4 sm:mb-6">Personal Details</h2>
+                <div className='flex justify-between border-b border-b-gray-600 mb-4'>
+                    <h2 className="text-xl sm:text-2xl font-bold text-teal-500 mb-4 sm:mb-6">Personal Details</h2>
+                    <ShoppingCart className="m-2 h-7 w-7 cursor-pointer text-yellow-500 inline-flex transform hover:scale-125" onClick={() => navigate("/cart")} />
+                </div>
                 <div className="space-y-6">
                     <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
                         <div className="w-full sm:w-1/2">
@@ -156,20 +159,20 @@ export default function Customer() {
 
                 <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row text-black font-semibold justify-between items-center space-y-4 sm:space-y-0">
                     <button
+                        className="w-full sm:w-auto px-6 py-2 bg-gray-400 rounded hover:bg-gray-500 transition duration-300 flex items-center justify-center"
+                        onClick={() => navigate(-1)}
+                    >
+                        <ArrowLeftCircle className="mr-2" />Go Back
+                    </button>
+                    <button
                         className="w-full sm:w-auto px-4 py-2 bg-teal-500 rounded hover:bg-teal-600 transition duration-300"
                         onClick={() => setIsEditing(!isEditing)}
                     >
                         {isEditing ? (
-                            <div><Save className='inline-flex'/> Save Changes</div>
+                            <div><Save className='inline-flex' /> Save Changes</div>
                         ) : (
-                            <div><PenBox className='inline-flex'/> Edit Changes</div>
+                            <div><PenBox className='inline-flex' /> Edit Profile</div>
                         )}
-                    </button>
-                    <button
-                        className="w-full sm:w-auto px-6 py-2 bg-yellow-600 rounded hover:bg-yellow-600 transition duration-300 flex items-center justify-center"
-                        onClick={() => navigate("/cart")}
-                    >
-                        <ShoppingCart className="mr-2" /> Go to Cart
                     </button>
                 </div>
             </div>

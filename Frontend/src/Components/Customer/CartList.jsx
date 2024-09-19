@@ -47,7 +47,7 @@ export default function Cart() {
     if (loading) return <Loading />;
 
     const handleCardClick = (id) => {
-        console.log(`Clicked on vendor ${id}`);
+        navigate("/order/place")
     };
 
     return (

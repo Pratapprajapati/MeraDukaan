@@ -39,6 +39,7 @@ const vendorSchema = new Schema({
     },
     location: {
         city: { type: String, required: true },
+        area: { type: String, required: true },
         address: { type: String, required: true },
         pincode: { type: Number, required: true },
     },

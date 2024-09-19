@@ -306,7 +306,6 @@ const getCart = async (req, res) => {
     }
 };
 
-
 // ADD REVIEW
 const addReview = async (req, res) => {
     const { orderId } = req.params

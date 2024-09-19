@@ -22,7 +22,7 @@ export default function RecentOrders() {
     : recentOrders.filter(order => order.status === selectedStatus);
     
     const handleCardClick = (orderId) => {
-        console.log('Clicked order:', orderId);
+        navigate("/order/details")
         // Implement your order details logic here
     };
     

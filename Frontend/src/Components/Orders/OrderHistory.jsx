@@ -64,7 +64,7 @@ export default function OrderHistory() {
     }, [selectedRange, selectedStatus]);
 
     if (loading) return <Loading />;
-    
+
     return (
         <div className="bg-gray-900 text-white p-4 sm:p-6 rounded-lg flex flex-col min-h-full">
             <div className='flex max-md:flex-col justify-between'>
@@ -110,7 +110,9 @@ export default function OrderHistory() {
                                 <h3 className="text-lg font-semibold mb-2">{new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</h3>
                                 <div className="space-y-2">
                                     {orders.map((order) => (
-                                        <div key={order.id} className="bg-gray-800 p-4 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
+                                        <div key={order.id} onClick={() => navigate("/order/details")}
+                                            className="bg-gray-800 p-4 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 cursor-pointer hover:border "
+                                        >
                                             <div className="flex flex-col">
                                                 <span className="text-lg font-semibold">{order.id}</span>
                                                 <span className="text-sm text-gray-400">{order.customerName}</span>

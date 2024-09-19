@@ -1,6 +1,6 @@
-import Vendor from "../models/vendor.model.js"; // Adjust the path as necessary
-import ApiResponse from "../utils/ApiResponse.js"; // Adjust the path as necessary
-import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
+import Vendor from "../models/vendor.model.js"
+import ApiResponse from "../utils/ApiResponse.js"
+import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js"
 import CryptoJS from 'crypto-js'
 
 const registerVendor = async (req, res) => {
@@ -8,7 +8,7 @@ const registerVendor = async (req, res) => {
     const {
         username, email, password,
         shopName, registrationNumber, shopType, delivery, returnPol,
-        city, address, pincode,
+        city, area, address, pincode,
         primary, secondary,
         start, end, shopOpen
     } = req.body;
@@ -40,7 +40,7 @@ const registerVendor = async (req, res) => {
         shopOpen,
         returnPol,
         registrationNumber,
-        location: { city, address, pincode },
+        location: { city, address: address + " @ " + area, pincode },
         contact: { primary, secondary },
         shopImage: shopImageCloud.secure_url,
         qrCodeImage: qrCodeImageCloud.secure_url,
@@ -69,22 +69,18 @@ const generateAccessAndRefreshTokens = async (vendorId) => {
     }
 }
 
-// Cookies cannot be accessed by client-side scriptsand are sent by HTTPS only 
 const options = { httpOnly: true, secure: true }
 
 // LOGIN
 const login = async (req, res) => {
-    // Fetch username or email and password
     const { username, email, password } = req.body
     if (!username && !email) new ApiResponse(400, null, "Username or Email is required!!")
 
-    // Search for user
     const user = await Vendor.findOne({
         $or: [{ username }, { email }]
     })
     if (!user) return res.status(400).json(new ApiResponse(400, null, "Incorrect username or email"))
 
-    // Check for password
     const validPassword = await user.isPasswordCorrect(password)
     if (!validPassword) return res.status(400).json(new ApiResponse(400, null, "Password incorrect"))
 
@@ -100,7 +96,7 @@ const login = async (req, res) => {
         .cookie("refreshToken", refreshToken, options)
         .cookie("user", vendorData)
         .json(
-            new ApiResponse(200, vendor,"Vendor logged in successfully!!")
+            new ApiResponse(200, vendor, "Vendor logged in successfully!!")
         )
 }
 
@@ -123,7 +119,7 @@ const updateVendor = async (req, res) => {
     const {
         email, returnPol,
         shopName, shopType, delivery,
-        city, address, pincode,
+        city, address, pincode, area,
         primary, secondary,
         start, end, shopOpen
     } = req.body;
@@ -140,6 +136,7 @@ const updateVendor = async (req, res) => {
 
     if (address) user.location.address = address
     if (city) user.location.city = city
+    if (area) user.location.area = area
     if (pincode) user.location.pincode = pincode
     if (returnPol) user.location.returnPol = returnPol
 
@@ -192,30 +189,46 @@ const changeShopImage = async (req, res) => {
     return res.status(200).json(new ApiResponse(200, updatedDetail, "Shop image changed"))
 }
 
-const changeQrCodeImage = async (req, res) => {
-    const qrCodeImagePath = req.file?.path
-    if (!qrCodeImagePath) return res.status(404).json(new ApiResponse(404, null, "qrCode image missing"))
+const nearbyVendors = async (req, res) => {
+    const { distance } = req.params
+    const location = req.user.location
 
-    const qrCodeImageCloud = await uploadOnCloudinary(qrCodeImagePath)
-    if (!qrCodeImageCloud) return res.status(404).json(new ApiResponse(404, null, "qrCode image not found"))
+    let vendors = []
+    if (distance == "pincode") {
+        const query = location.pincode
+        vendors = await Vendor.find({ "location.pincode": query }).select(" shopName shopType isOpen location ")
+    }
 
-    const updatedDetail = await Vendor.findByIdAndUpdate(
-        req.user?._id,
-        { $set: { qrCodeImage: qrCodeImageCloud.secure_url } },
-        { new: true }
-    ).select("-password -refreshToken")
+    if (distance == "area") {
+        function escapeRegex(input) {
+            return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape special characters for regex
+        }
 
-    const deleteOnCloud = await deleteFromCloudinary(req.user?.qrCodeImage)
-    if (deleteOnCloud) console.log("Deleted old qrCode image")
+        function buildRegexPattern(input) {
+            const sanitizedInput = escapeRegex(input.trim()); // Remove leading/trailing spaces and escape special characters
+            return sanitizedInput.replace(/\s+/g, '.*'); // Replace spaces with '.*' to allow for flexible matching
+        }
 
-    return res.status(200).json(new ApiResponse(200, updatedDetail, "qrCode image changed"))
+        const query = location.area
+        const regexPattern = buildRegexPattern(query);
+        vendors = await Vendor.find({ "location.area": { $regex: regexPattern, $options: "i" } }).select(" shopName shopType isOpen location ")
+    }
+
+    if (distance == "city") {
+        const query = location.city
+        vendors = await Vendor.find({ "location.city": query }).select(" shopName shopType isOpen location ")
+    }
+
+    if (vendors.length === 0) return res.status(200).json(new ApiResponse(200, null, "No vendors found"));
+
+    return res.status(200).json(new ApiResponse(200, vendors, "Vendors fetched"))
 }
-
 
 // VENDOR DETAILS
 const getCurrentUser = async (req, res) => {
     return res.status(200).json(new ApiResponse(200, req.user, "Details fetched"))
 }
+
 export {
     registerVendor,
     login,
@@ -224,5 +237,5 @@ export {
     changePassword,
     getCurrentUser,
     changeShopImage,
-    changeQrCodeImage,
+    nearbyVendors,
 }

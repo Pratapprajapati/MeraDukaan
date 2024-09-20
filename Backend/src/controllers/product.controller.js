@@ -119,11 +119,75 @@ const searchProduct = async (req, res) => {
     }
 };
 
-const allProducts = async(req, res) => {
-    const products = await Product.find({category: "Daily Needs"}).select("name subCategory")
+const allProducts = async (req, res) => {
+    const products = await Product.find({ category: "Daily Needs" }).select("name subCategory")
 
     return res.status(200).json(new ApiResponse(200, products, "Fetched products"));
 }
+
+const specificProducts = async (req, res) => {
+    const { subCategory, page } = req.params
+
+    const pageNumber = parseInt(page, 10) || 1; // Default to 1 if page is not provided
+    if (!subCategory || pageNumber < 1) {
+        return res.status(400).json({ status: 400, message: 'Invalid subCategory or page number' });
+    }
+
+    const totalProducts = await Product.countDocuments({ subCategory: subCategory });
+    if (totalProducts === 0) return res.status(200).json(new ApiResponse(200, null, "No products in this sub category"));
+
+    const products = await Product.find({ subCategory: subCategory })
+        .select("name price image subCategory")
+        .limit(32).skip(32 * (page - 1))
+        .sort({ createdAt: -1 })
+
+    return res.status(200).json(new ApiResponse(200, { totalProducts, products }, "Fetched products"));
+}
+
+const getSampleProductsFromEachCategory = async (req, res) => {
+    try {
+        const sampleProducts = await Product.aggregate([
+            {
+                $group: {
+                    _id: {
+                        category: "$category",      // Group by both category
+                        subCategory: "$subCategory" // and subcategory
+                    },
+                    count: { $sum: 1 } // Count total products in each subcategory
+                }
+            },
+            {
+                $lookup: {
+                    from: "products", // Replace with your actual collection name
+                    let: { category: "$_id.category", subCategory: "$_id.subCategory" },
+                    pipeline: [
+                        { 
+                            $match: { 
+                                $expr: { 
+                                    $and: [
+                                        { $eq: ["$category", "$$category"] },
+                                        { $eq: ["$subCategory", "$$subCategory"] }
+                                    ]
+                                }
+                            }
+                        },
+                        { $sample: { size: 6 } }, // Sample 6 products from each subcategory
+                        { $project: { name: 1, price: 1, image: 1, subCategory: 1, category: 1 } } // Project required fields
+                    ],
+                    as: "products"
+                }
+            },
+            { $unwind: "$products" }, // Flatten the results
+            { $sort: { "_id.category": 1, "_id.subCategory": 1 } } // Sort by category and subCategory
+        ]);
+
+        res.status(200).json(new ApiResponse(200, sampleProducts, "Fetched sample products from each subcategory"));
+    } catch (error) {
+        console.error(error);
+        res.status(500).json(new ApiResponse(500, null, "An error occurred while fetching sample products"));
+    }
+};
+
 
 export {
     addProduct,
@@ -131,4 +195,6 @@ export {
     updateProduct,
     searchProduct,
     allProducts,
+    specificProducts,
+    getSampleProductsFromEachCategory,
 }

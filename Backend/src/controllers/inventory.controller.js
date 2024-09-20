@@ -20,6 +20,7 @@ const createInventory = async (req, res) => {
     return res.status(201).json(new ApiResponse(201, inventory, "Inventory created"))
 }
 
+// ADD SINGLE PRODUCT
 const addProduct = async (req, res) => {
 
     const { product, price, stock, description } = req.body
@@ -48,6 +49,42 @@ const addProduct = async (req, res) => {
     return res.status(200).json(new ApiResponse(200, updatedList, "Added"))
 }
 
+
+// ADD MULTIPLE PRODUCTS
+const addMultipleProducts = async (req, res) => {
+    const { productList } = req.body;
+
+    const inventory = await Inventory.findById(req.user._id);
+    if (!inventory) return res.status(404).json(new ApiResponse(404, null, "Inventory not found"));
+
+    let newItems = [];
+    for (let product of productList) {
+        const productExists = await Product.findById(product._id);
+        if (!productExists) return res.status(404).json(new ApiResponse(404, null, "Product not found"));
+
+        const duplicate = inventory.productList.find(prod => prod.product.toString() === product._id.toString());
+        if (duplicate) return res.status(400).json(new ApiResponse(400, null, `Product ${product._id} already exists in inventory`));
+
+        let newProduct = {
+            product: product._id,
+            stock: product.stock,
+        };
+        if (product.price) newProduct["price"] = product.price;
+        if (product.description) newProduct["description"] = product.description;
+
+        newItems.push(newProduct);
+    }
+
+    inventory.productList.push(...newItems);
+
+    const updatedList = await inventory.save({ validateBeforeSave: false });
+    if (!updatedList) return res.status(500).json(new ApiResponse(500, null, "Something went wrong while saving inventory"));
+
+    return res.status(200).json(new ApiResponse(200, updatedList, "Products added to inventory"));
+};
+
+
+// UPDATE PRODUCT
 const updateProduct = async (req, res) => {
     const { productId } = req.params
     if (!productId || !isValidObjectId(productId)) return res.status(400).json(new ApiResponse(400, "", "Product Id missing"))
@@ -69,6 +106,8 @@ const updateProduct = async (req, res) => {
     return res.status(200).json(new ApiResponse(200, updatedProduct, "Product updated successfully"))
 }
 
+
+// DELETE PRODUCT
 const removeProduct = async (req, res) => {
     const { productId } = req.params
     if (!productId || !isValidObjectId(productId)) return res.status(400).json(new ApiResponse(400, "", "Product Id missing"))
@@ -86,6 +125,8 @@ const removeProduct = async (req, res) => {
     return res.status(200).json(new ApiResponse(200, updatedProduct, "Product updated successfully"))
 }
 
+
+// GET INVENTORY
 const getInventory = async (req, res) => {
     const { vendorId } = req.params
     if (!vendorId || !isValidObjectId(vendorId)) return res.status(400).json(new ApiResponse(400, "", "Vendor Id missing"))
@@ -208,6 +249,7 @@ const inventoryOverview = async (req, res) => {
 export {
     createInventory,
     addProduct,
+    addMultipleProducts,
     updateProduct,
     removeProduct,
     getInventory,

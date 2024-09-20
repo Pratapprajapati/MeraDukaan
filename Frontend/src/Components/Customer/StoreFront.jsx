@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Search, Info, Plus, Minus, Store, MapPin, MoveRight, ArrowRightLeft } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Info, Plus, Minus, MapPin, ArrowRightLeft, Truck } from 'lucide-react';
 import img from "../assets/img1.webp"
-import { products } from './sampleData';
+import { products } from '../Listings/sampleData';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Loading from '../AppPages/Loading';
@@ -23,7 +23,7 @@ export default function Inventory() {
         newQuantities[index] += 1;
         setQuantities(newQuantities);
     };
-    
+
     const handleDecrease = (index) => {
         if (quantities[index] > 0) {
             const newQuantities = [...quantities];
@@ -31,22 +31,18 @@ export default function Inventory() {
             setQuantities(newQuantities);
         }
     };
-    
+
     if (loading) return <Loading />;
 
     return (
-        <div className="container mx-auto mt-8">
+        <div className="p-4 bg-black/20 shadow-2xl shadow-black/60 min-h-screen text-white rounded-lg">
             <div className="flex flex-col xl:flex-row xl:justify-between items-start pb-4 mx-2 border-b border-b-gray-600 max-xl:space-y-5">
-                <div>
-                    <h3 className="sm:text-4xl text-2xl font-bold text-yellow-500 mb-3 line-clamp-1 max-sm:line-clamp-2">
+                <div className='hover:bg-gray-700 cursor-pointer rounded-lg p-1'>
+                    <h3 className="sm:text-2xl text-2xl font-bold text-yellow-500 mb-3 line-clamp-1 max-sm:line-clamp-2">
                         Shop Name: Horse Riding Company Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia illum dolorum, aspernatur distinctio iste exercitationem reiciendis laudantium consequuntur minima dolores nisi provident laborum vitae eum aliquam quidem fugit magni natus?
                     </h3>
-                    <div className="flex max-sm:flex-col max-sm:space-y-3 sm:justify-between text-gray-400 font-semibold">
+                    <div className="flex max-sm:flex-col max-sm:space-y-3 sm:justify-between text-gray-400 text-sm font-semibold">
                         <div className='flex max-sm:flex-col max-sm:space-y-2 sm:space-x-5'>
-                            <span>
-                                <Store size={20} className='inline-flex me-2' />
-                                Store Type: General
-                            </span>
                             <span>
                                 <MapPin size={20} className='inline-flex me-2' />
                                 Location: Main Street
@@ -55,14 +51,23 @@ export default function Inventory() {
                                 <ArrowRightLeft size={20} className='inline-flex me-2' />
                                 Refund available
                             </span>
+                            <span>
+                                <Truck size={20} className='inline-flex me-2' />
+                                Delivery available
+                            </span>
                         </div>
-                        <p className='font-semibold me-8 hover:text-teal-600 text-teal-500 w-fit cursor-pointer'>
-                            View shop details <MoveRight className='inline-flex ms-2 items-start' />
-                        </p>
+                        <button
+                                className={`
+                                        border rounded-md sm:w-20 text-center p-1.5 m-1 -mt-2
+                                        ${true ? 'bg-green-600 text-black' : 'bg-red-600 text-white'}
+                                    `}
+                            >
+                                {true ? "OPEN" : "CLOSED"}
+                            </button>
                     </div>
                 </div>
                 <div className=" mx-1 w-full xl:border-l xl:ps-2 xl:border-l-gray-600">
-                    <div className='flex items-center space-x-2'>
+                    <div className='flex items-center space-x-2 max-sm:flex-col max-sm:space-y-2'>
                         <div className="flex items-center bg-gray-900 rounded-lg ps-2 pe-1 py-1 w-full xl:w-96">
                             <input
                                 type="text"
@@ -83,7 +88,7 @@ export default function Inventory() {
                                 <Search size={20} className="text-white" />
                             </button>
                         </div>
-                        <select className="flex items-center text-md rounded-lg font-medium cursor-pointer bg-gray-800 text-white py-3 border border-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 transform hover:scale-105 transition-transform">
+                        <select className="flex items-center max-sm:w-full text-md rounded-lg font-medium cursor-pointer bg-gray-800 text-white py-3 border border-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 transform hover:scale-105 transition-transform">
                             <option value="near">All Categories</option>
                             <option value="fav">Favourites</option>
                             <option value="all">All Shops</option>
@@ -94,14 +99,14 @@ export default function Inventory() {
                     </div>
                 </div>
             </div>
-            <div className="pb-4 mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="pb-4 mt-4 grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
                 {products.map((product, index) => (
                     <div
                         key={product.id}
-                        className="flex flex-row bg-gray-800 shadow-md rounded-lg overflow-hidden border border-black/20 hover:border-white mx-2 p-4 "
+                        className="flex flex-col md:flex-row bg-gray-800 shadow-md rounded-lg overflow-hidden border border-black/20 hover:border-white mx-2 p-4 "
                     >
-                        <div className='me-2 pe-2'>
-                            <img src={img} className='h-32 w-auto rounded-md' />
+                        <div className='md:me-2 md:pe-2'>
+                            <img src={img} className='h-32 w-full rounded-md obje' alt={product.name} />
                         </div>
 
                         <div className='flex flex-col w-full'>

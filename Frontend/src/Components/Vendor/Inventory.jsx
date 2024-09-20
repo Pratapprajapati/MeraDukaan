@@ -86,7 +86,7 @@ export default function Inventory() {
     if (loading) return <Loading />
 
     return (
-        <div className="p-4 bg-black/20 shadow-2xl shadow-black min-h-screen text-white rounded-lg">
+        <div className="p-4 bg-black/20 shadow-2xl shadow-black/60 min-h-screen text-white rounded-lg">
             <h1 className='text-3xl font-semibold mb-6'>Inventory</h1>
             <div className=" mx-1 w-full ">
                 <div className='flex max-sm:flex-col max-sm:space-y-2 items-center md:space-x-2 mb-6'>
@@ -114,14 +114,14 @@ export default function Inventory() {
                     </select>
                 </div>
             </div>
-            <div className="pb-4 mt-4 grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div className="pb-4 mt-4 grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
                 {filteredProducts.map((product) => (
                     <div
                         key={product.id}
-                        className="flex flex-row bg-gray-800 shadow-md rounded-lg overflow-hidden border border-black/20 hover:border-white mx-2 p-4 "
+                        className="flex flex-col md:flex-row bg-gray-800 shadow-md rounded-lg overflow-hidden border border-black/20 hover:border-white mx-2 p-4 "
                     >
-                        <div className='me-2 pe-2'>
-                            <img src={img} className='h-32 w-auto rounded-md' alt={product.name} />
+                        <div className='md:me-2 md:pe-2'>
+                            <img src={img} className='h-32 w-full rounded-md obje' alt={product.name} />
                         </div>
 
                         <div className='flex flex-col w-full'>
@@ -143,7 +143,7 @@ export default function Inventory() {
                                     </div>
 
                                 ) : (
-                                    <div className="relative bottom-4 ms-1">
+                                    <div className="relative bottom-2 ms-1">
                                         <Info
                                             size={20}
                                             className="text-teal-500 cursor-pointer"

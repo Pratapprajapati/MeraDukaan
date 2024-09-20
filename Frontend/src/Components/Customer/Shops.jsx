@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, MapPin, Tag } from 'lucide-react';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 
 const shops = [
     { id: 1, name: "Shop 1", image: "https://via.placeholder.com/150", area: "Downtown", pincode: "123456", isOpen: true, category: "Grocery" },
@@ -18,7 +19,18 @@ export default function Shops() {
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [selectedLocation, setSelectedLocation] = useState("All");
 
-    const filteredShops = shops.filter(shop => 
+
+    const customer = useOutletContext()
+    const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        customer.userType != "customer" ? navigate(-1) : null
+        setLoading(false)
+    })
+
+
+    const filteredShops = shops.filter(shop =>
         shop.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (selectedCategory === "All" || shop.category === selectedCategory) &&
         (selectedLocation === "All" || (selectedLocation === "My Area" ? shop.area === "Downtown" : true))
@@ -30,7 +42,7 @@ export default function Shops() {
                 Shops near you
                 <span className="text-gray-400 text-base ms-2">(Shops registered with MeraDukaan are only displayed here)</span>
             </h3>
-            
+
             <div className="flex flex-wrap gap-4 mb-6 w-full">
                 <div className="flex-grow relative w-3/6">
                     <input
@@ -65,7 +77,7 @@ export default function Shops() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-4">
                 {filteredShops.map((shop) => (
                     <div
-                        key={shop.id}
+                        key={shop.id} onClick={() => navigate("shop")}
                         className="bg-gray-800 text-white shadow-md rounded-lg overflow-hidden hover:ring-2 hover:ring-teal-500 transition-all duration-300"
                     >
                         <img src={shop.image} alt={shop.name} className="w-full h-48 object-cover" />

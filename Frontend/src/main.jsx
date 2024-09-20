@@ -8,12 +8,12 @@ import VendorRegister from "./Components/AppPages/VendorRegister.jsx"
 import Home from './Components/Home.jsx'
 import About from './Components/About.jsx'
 import Categories from './Components/Listings/Categories.jsx'
-import Shops from './Components/Listings/Shops.jsx'
+import Shops from './Components/Customer/Shops.jsx'
 import Customer from './Components/Customer/Customer.jsx'
 import Vendor from './Components/Vendor/Vendor.jsx'
 import Cart from './Components/Customer/CartList.jsx'
 import PlaceOrder from './Components/Orders/PlaceOrder.jsx'
-import StoreFront from './Components/Listings/Inventory.jsx'
+import StoreFront from './Components/Customer/StoreFront.jsx'
 import Inventory from './Components/Vendor/Inventory.jsx'
 import OrderDetails from './Components/Orders/OrderDetail.jsx'
 import OrdersPage from "./Components/Orders/OrdersPage.jsx"
@@ -50,6 +50,7 @@ const router = createBrowserRouter(
 
             <Route path='/categories' element={<Categories />} />
             <Route path='/shops' element={<Shops />} />
+            <Route path='/shops/shop' element={<Vendor />} />
             <Route path='/about' element={<About />} />
             <Route path='/customer' element={<Customer />} />
             <Route path='/cart' element={<Cart />} />

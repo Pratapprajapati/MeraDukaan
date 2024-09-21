@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import Cart, { Total } from './Cart';
-import { cartItems } from '../Listings/sampleData';
-import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useOutletContext, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Loading from '../AppPages/Loading';
 
@@ -19,86 +18,89 @@ const Modal = ({ isOpen, title, children }) => {
     );
 };
 
-export default function Order() {
-    const [customerDetails, setCustomerDetails] = useState({
-        customerName: "John Doe",
-        totalItems: 5,
-        totalPrice: "₹7,850",
-        orderStatus: "pending",
-        orderNumber: "ORD12345",
-        note: "Please deliver between 2-4 PM."
+const handleAccept = () => {
+    Swal.fire({
+        title: 'Order Accepted!',
+        text: 'You have accepted the order.',
+        icon: 'success',
+        color: 'white',
+        background: '#1a1a2e',
     });
+    setIsAcceptModalOpen(false);
+};
 
+const handleReject = () => {
+    if (!rejectNote) {
+        Swal.fire({
+            title: 'Error!',
+            text: 'Please provide a reason for rejection.',
+            icon: 'error',
+            color: 'white',
+            background: '#1a1a2e',
+        });
+        return;
+    }
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to reject this order?',
+        icon: 'warning',
+        color: 'white',
+        background: '#1a1a2e',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Reject!',
+        cancelButtonText: 'No, cancel',
+        reverseButtons: true,
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Order Rejected!',
+                text: 'You have rejected the order.',
+                icon: 'error',
+                color: 'white',
+                background: '#1a1a2e',
+            });
+            setIsRejectModalOpen(false);
+        }
+    });
+};
+
+export default function Order() {
+    const [orderDetails, setOrderDetails] = useState(null);
     const [isAcceptModalOpen, setIsAcceptModalOpen] = useState(false);
     const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
     const [acceptNote, setAcceptNote] = useState('');
     const [rejectNote, setRejectNote] = useState('');
 
-    const vendor = useOutletContext()
-    const navigate = useNavigate()
-    const [loading, setLoading] = useState(true)
+    const params = useParams()
+    const vendor = useOutletContext();
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        vendor.userType != "vendor" ? navigate(-1) : null
-        setLoading(false)
-    })
+        if (vendor.userType !== "vendor") navigate(-1);
+        
+        axios.get(`/api/order/view/${params.orderId}`)
+            .then(res => {
+                setOrderDetails(res.data.data);
+            })
+            .catch(e => console.error(e.response.data))
+            .finally(() => setLoading(false));
+    }, [vendor.userType, navigate]);
 
-    const handleAccept = () => {
-        Swal.fire({
-            title: 'Order Accepted!',
-            text: 'You have accepted the order.',
-            icon: 'success',
-            color: 'white',
-            background: '#1a1a2e',
-        });
-        setIsAcceptModalOpen(false);
-    };
+    if (loading) return <Loading />;
+    if (!orderDetails) return null;
 
-    const handleReject = () => {
-        if (!rejectNote) {
-            Swal.fire({
-                title: 'Error!',
-                text: 'Please provide a reason for rejection.',
-                icon: 'error',
-                color: 'white',
-                background: '#1a1a2e',
-            });
-            return;
-        }
-        Swal.fire({
-            title: 'Are you sure?',
-            text: 'Do you want to reject this order?',
-            icon: 'warning',
-            color: 'white',
-            background: '#1a1a2e',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, Reject!',
-            cancelButtonText: 'No, cancel',
-            reverseButtons: true,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'Order Rejected!',
-                    text: 'You have rejected the order.',
-                    icon: 'error',
-                    color: 'white',
-                    background: '#1a1a2e',
-                });
-                setIsRejectModalOpen(false);
-            }
-        });
-    };
-
-    if (loading) return <Loading />
+    const { customer, orderItems, bill, orderStatus, description } = orderDetails;
+    const customerNote = description.customer || '';
 
     return (
         <div className="container mx-auto h-screen p-2">
             <h1 className="text-2xl font-bold text-white mb-6">Order Number:&nbsp;
-                <span className='text-yellow-500'>{customerDetails.orderNumber}</span>
+                <span className='text-yellow-500'>{params.orderId.slice(18)}</span>
             </h1>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Cart Items Section */}
-                <Cart cartItems={cartItems} />
+                <Cart orderItems={orderItems} />
 
                 {/* Customer Details Section */}
                 <div className="bg-black/20 text-gray-900 p-6 rounded-lg shadow-md flex flex-col justify-between h-full">
@@ -108,24 +110,24 @@ export default function Order() {
                             <div className='space-y-4'>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400">Customer Name:</label>
-                                    <h1 className="mt-1 text-lg text-gray-200 bg-transparent">{customerDetails.customerName}</h1>
+                                    <h1 className="mt-1 text-lg text-gray-200 bg-transparent">{customer.username}</h1>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400">Order Status:</label>
-                                    <h1 className="mt-1 text-lg text-gray-200 bg-transparent">{customerDetails.orderStatus}</h1>
+                                    <h1 className="mt-1 text-lg text-gray-200 bg-transparent">{orderStatus}</h1>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400">Delivery Address:</label>
-                                    <h1 className="mt-1 text-gray-200 bg-transparent line-clamp-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo esse molestiae voluptatem optio perferendis quas, quae fugit reiciendis doloremque porro, sequi repellendus modi nostrum ex explicabo ea? Architecto, totam sit.</h1>
+                                    <h1 className="mt-1 text-gray-200 bg-transparent line-clamp-2">{customer.location.address}, {customer.location.city}, {customer.location.pincode}</h1>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400">Contact:</label>
-                                    <h1 className="mt-1 text-lg text-gray-200 bg-transparent">98762154145</h1>
+                                    <h1 className="mt-1 text-lg text-gray-200 bg-transparent">{customer.contact}</h1>
                                 </div>
-                                {customerDetails.note && (
+                                {customerNote && (
                                     <div>
                                         <label className="block text-sm font-medium text-gray-400">Note:</label>
-                                        <h1 className="mt-1 text-gray-200 bg-transparent line-clamp-2">{customerDetails.note}</h1>
+                                        <h1 className="mt-1 text-gray-200 bg-transparent line-clamp-2">{customerNote}</h1>
                                     </div>
                                 )}
                             </div>
@@ -133,9 +135,9 @@ export default function Order() {
                     </div>
 
                     <div>
-                        <Total products={customerDetails.totalItems} bill={customerDetails.totalPrice} />
+                        <Total products={orderItems.length} bill={`₹${bill}`} />
                         {
-                            customerDetails.orderStatus == "pending" ? (
+                            orderStatus === "pending" ? (
                                 <div className='flex justify-between mt-6 max-sm:space-x-4'>
                                     <button
                                         className="px-4 py-2 bg-red-500 hover:bg-red-600 text-gray-950 text-2xl font-semibold rounded transform hover:scale-90 transition-transform"
@@ -152,17 +154,16 @@ export default function Order() {
                                 </div>
                             ) : (
                                 <div className='w-full mt-2 bg-teal-800 p-2 rounded-lg text-3xl capitalize text-white font-semibold text-center'>
-                                    -- {customerDetails.orderStatus} --
+                                    -- {orderStatus} --
                                 </div>
                             )
                         }
                     </div>
                 </div>
-
             </div>
 
             {/* Accept Modal */}
-            <Modal isOpen={isAcceptModalOpen} onClose={() => setIsAcceptModalOpen(false)} title="Accept Order">
+            <Modal isOpen={isAcceptModalOpen} title="Accept Order">
                 <textarea
                     className="w-full p-2 text-white border rounded mb-4 resize-none"
                     rows={4}
@@ -187,7 +188,7 @@ export default function Order() {
             </Modal>
 
             {/* Reject Modal */}
-            <Modal isOpen={isRejectModalOpen} onClose={() => setIsRejectModalOpen(false)} title="Reject Order">
+            <Modal isOpen={isRejectModalOpen} title="Reject Order">
                 <textarea
                     className="w-full p-2 text-white border rounded mb-4 resize-none"
                     rows={4}
@@ -213,3 +214,4 @@ export default function Order() {
         </div>
     );
 }
+

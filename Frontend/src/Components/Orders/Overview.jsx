@@ -22,6 +22,9 @@ export default function Overview() {
 
     useEffect(() => {
         vendor.userType != "vendor" ? navigate(-1) : null
+        axios.get("/api/order/today")
+            .then(res => console.log(res.data.data))
+            .catch(e => console.error(e.response.data))
         setLoading(false)
     })
 

@@ -55,8 +55,67 @@ const UserProfileDashboard = () => {
         confirmPassword: ''
     });
 
+    const [orders, setOrders] = useState([]);
+    const [total, setTotal] = useState([]);
+    const [orderOverviews, setOrderOverviews] = useState({
+        "Total Orders": 0,
+        "Delivered Orders": 0,
+        "Rejected Orders": 0,
+        "Incomplete Orders": 0,
+        "Failed Orders": 0,
+    });
+
+    useEffect(() => {
+        const overview = orders.reduce((acc, order) => {
+            acc["Total Orders"] += 1;
+
+            switch (order.orderStatus) {
+                case "delivered":
+                    acc["Delivered Orders"] += 1;
+                    break;
+                case "rejected":
+                    acc["Rejected Orders"] += 1;
+                    break;
+                case "incomplete":
+                    acc["Incomplete Orders"] += 1;
+                    break;
+                case "failed":
+                    acc["Failed Orders"] += 1;
+                    break;
+                default:
+                    break;
+            }
+            return acc;
+        }, {
+            "Total Orders": 0,
+            "Delivered Orders": 0,
+            "Rejected Orders": 0,
+            "Incomplete Orders": 0,
+            "Failed Orders": 0,
+        });
+
+        setOrderOverviews(overview);
+    }, [orders]);
+
+
+    const [inventory, setInventory] = useState({
+        "Packaged Food": 0,
+        "Dairy Products": 0,
+        "Beverages": 0,
+        "Personal Care": 0,
+        "Home Essentials": 0,
+    })
+
+    const categories = ["Packaged Food", "Dairy Products", "Beverages", "Personal Care", "Home Essentials"]
+    const [totalProd, setTotalProd] = useState(0)
+
+    
     const [timePeriod, setTimePeriod] = useState('7 days');
-    const selectedData = orderData[timePeriod];
+    const duration = {
+        "7 days": "week",
+        "30 days": "month",
+        "1 year": "year",
+    }
 
     const vendor = useOutletContext()
     const navigate = useNavigate()
@@ -64,30 +123,40 @@ const UserProfileDashboard = () => {
 
     useEffect(() => {
         vendor.userType != "vendor" ? navigate(-1) : null
+
+        axios.get(`/api/order/overview/${duration[timePeriod]}`)
+            .then(res => {
+                const data = res.data.data;
+                // console.log(data);
+                setOrders(data.overview)
+                setTotal(data.total)
+            })
+            .catch(e => console.error(e.response.data));
+
+        axios.get(`/api/inventory/overview`)
+            .then(res => {
+                const data = res.data.data;
+
+                let updatedInventory = { ...inventory }
+                let total = 0
+                for (let i in data) {
+                    if (inventory.hasOwnProperty(i)) {
+                        updatedInventory[i] = data[i];
+                        total += data[i]
+                    }
+                }
+                setInventory(updatedInventory)
+                setTotalProd(total)
+            })
+            .catch(e => console.error(e.response));
+
         setLoading(false)
-    })
+    }, [vendor.userType, timePeriod])
 
     const handleInputChange = (e) => {
         setProfileData({ ...profileData, [e.target.name]: e.target.value });
     };
 
-    const orderOverviews = {
-        "Total Orders": orderData[timePeriod].totalOrders,
-        "Delivered Orders": orderData[timePeriod].deliveredOrders,
-        "Rejected Orders": orderData[timePeriod].rejectedOrders,
-        "Incomplete Orders": orderData[timePeriod].incompleteOrders,
-        "Failed Orders": orderData[timePeriod].failedOrders,
-    }
-
-    const inventoryCategories = [
-        { category: "Packaged Food", itemCount: 150 },
-        { category: "Dairy Products", itemCount: 80 },
-        { category: "Beverages", itemCount: 200 },
-        { category: "Personal Care", itemCount: 120 },
-        { category: "Home Essentials", itemCount: 90 },
-        { category: "Household Items", itemCount: 110 }
-    ];
-    
     if (loading) return <Loading />
 
     return (
@@ -113,7 +182,7 @@ const UserProfileDashboard = () => {
 
                         {/* Time Period Selection */}
                         <div className="flex space-x-4 pb-4 border-b border-b-gray-700">
-                            {['7 days', '30 days', '1 year', 'All-time'].map((period) => (
+                            {['7 days', '30 days', '1 year'].map((period) => (
                                 <button
                                     key={period}
                                     className={`text-gray-200 p-1 hover:text-teal-400 md:w-full bg-gray-900/40 rounded-lg ${timePeriod === period ? 'text-teal-500 font-semibold' : ''
@@ -140,12 +209,12 @@ const UserProfileDashboard = () => {
                         {/* Total Revenue */}
                         <div className="mt-4 py-2">
                             <p className="text-xl">
-                                Total Revenue = <span className=' font-semibold text-yellow-400'>₹{orderData[timePeriod].revenue}</span>
+                                Total Revenue = <span className=' font-semibold text-yellow-400'>₹{total}</span>
                             </p>
                         </div>
                     </div>
                 </div>
-                
+
                 {/* Divider */}
                 <div className='md:border-r max-md:border-b border-gray-700'></div>
 
@@ -160,9 +229,14 @@ const UserProfileDashboard = () => {
                         </div>
                         {/* Inventory items */}
                         <div className="p-4 space-y-1">
-                            {inventoryCategories.map((item, index) => (
-                                <InventoryItem key={index} category={item.category} itemCount={item.itemCount} />
+                            {categories.map((item, index) => (
+                                <InventoryItem key={index} category={item} itemCount={inventory[item]} />
                             ))}
+                        </div>
+                        <div className="-mt-4 p-5">
+                            <p className="text-xl">
+                                Total Products = <span className=' font-semibold text-yellow-400'>{totalProd}</span>
+                            </p>
                         </div>
                     </div>
                 </div>

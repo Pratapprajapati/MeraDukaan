@@ -28,6 +28,7 @@ const inventorySchema = new Schema({
             type: Number,
             default: 0
         },
+        _id: false,
     }]
 }, {
     timestamps: true

@@ -1,46 +1,48 @@
 import { useState, useEffect } from 'react';
 import { Clock, PackageCheck, Truck, XCircle, AlertTriangle, CheckCircle, Filter } from 'lucide-react';
-import { sampleOrders } from '../Listings/sampleData';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Loading from '../AppPages/Loading';
 import { orderStatuses } from './ViewOrder';
 
 const dateRanges = [
-    { label: "Today", days: 1 },
     { label: "Last 7 days", days: 7 },
     { label: "Last 30 days", days: 30 },
     { label: "Last year", days: 365 },
 ];
 
 export default function OrderHistory() {
-    const [selectedRange, setSelectedRange] = useState(dateRanges[3].label);
+    const [orders, setOrders] = useState([]);
+    const [selectedRange, setSelectedRange] = useState(dateRanges[2].label);
+    const duration = {
+        "Last 7 days": "week",
+        "Last 30 days": "month",
+        "Last year": "year",
+    };
     const [selectedStatus, setSelectedStatus] = useState("All orders");
     const [filteredOrders, setFilteredOrders] = useState([]);
     const [groupedOrders, setGroupedOrders] = useState([]);
 
-    const customer = useOutletContext()
-    const navigate = useNavigate()
-    const [loading, setLoading] = useState(true)
+    const user = useOutletContext();
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        setLoading(false)
-    })
+        axios.get(`/api/order/history/${duration[selectedRange]}`)
+            .then(res => {
+                const data = res.data.data;
+                setOrders(data);
+                setLoading(false);
+            })
+            .catch(e => console.error(e.response.data));
+    }, [selectedRange]);
 
     const filterOrders = (orders) => {
         let filtered = orders;
 
-        // Date filter
-        const range = dateRanges.find(range => range.label === selectedRange);
-        if (range) {
-            const cutoffDate = new Date();
-            cutoffDate.setDate(cutoffDate.getDate() - range.days);
-            filtered = filtered.filter(order => new Date(order.date) >= cutoffDate);
-        }
-
         // Status filter
         if (selectedStatus !== "All orders") {
-            filtered = filtered.filter(order => order.status === selectedStatus);
+            filtered = filtered.filter(order => order.orderStatus === selectedStatus);
         }
 
         return filtered;
@@ -49,19 +51,20 @@ export default function OrderHistory() {
     const groupOrdersByDate = (orders) => {
         const grouped = {};
         orders.forEach(order => {
-            if (!grouped[order.date]) {
-                grouped[order.date] = [];
+            const date = new Date(order.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            if (!grouped[date]) {
+                grouped[date] = [];
             }
-            grouped[order.date].push(order);
+            grouped[date].push(order);
         });
         return Object.entries(grouped).sort(([a], [b]) => new Date(b) - new Date(a));
     };
 
     useEffect(() => {
-        const filtered = filterOrders(sampleOrders);
+        const filtered = filterOrders(orders);
         setFilteredOrders(filtered);
         setGroupedOrders(groupOrdersByDate(filtered));
-    }, [selectedRange, selectedStatus]);
+    }, [selectedRange, selectedStatus, orders]);
 
     if (loading) return <Loading />;
 
@@ -107,22 +110,22 @@ export default function OrderHistory() {
                     <div className="space-y-6">
                         {groupedOrders.map(([date, orders]) => (
                             <div key={date}>
-                                <h3 className="text-lg font-semibold mb-2">{new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</h3>
+                                <h3 className="text-lg font-semibold mb-2">{date}</h3>
                                 <div className="space-y-2">
                                     {orders.map((order) => (
-                                        <div key={order.id} onClick={() => navigate("/order/details")}
+                                        <div key={order._id} onClick={() => navigate(user.userType == "customer" ? `/order/details/` : `/vendor/order/${order._id}`)}
                                             className="bg-gray-800 p-4 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 cursor-pointer hover:border "
                                         >
                                             <div className="flex flex-col">
-                                                <span className="text-lg font-semibold">{order.id}</span>
-                                                <span className="text-sm text-gray-400">{order.customerName}</span>
+                                                <span className="text-lg font-semibold">Order Id: {order._id.slice(18)}</span>
+                                                <span className="text-sm text-gray-400">{order.customer?.username || 'Unknown Customer'}</span>
                                             </div>
                                             <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                                                <span className="text-sm">{order.items} product{order.items > 1 ? 's' : ''}</span>
-                                                <span className="font-semibold">{order.total}</span>
-                                                <div className={`flex items-center capitalize text-${orderStatuses[order.status].color}`}>
-                                                    {orderStatuses[order.status].icon}
-                                                    <span className="ml-1 text-sm">{order.status}</span>
+                                                <span className="text-sm">{order.orderItems} product{order.orderItems > 1 ? 's' : ''}</span>
+                                                <span className="font-semibold">${order.bill}</span>
+                                                <div className={`flex items-center capitalize text-${orderStatuses[order.orderStatus].color}`}>
+                                                    {orderStatuses[order.orderStatus].icon}
+                                                    <span className="ml-1 text-sm">{order.orderStatus}</span>
                                                 </div>
                                             </div>
                                         </div>

@@ -128,8 +128,10 @@ const removeProduct = async (req, res) => {
 
 // GET INVENTORY
 const getInventory = async (req, res) => {
-    const { vendorId } = req.params
-    if (!vendorId || !isValidObjectId(vendorId)) return res.status(400).json(new ApiResponse(400, "", "Vendor Id missing"))
+    const { vendorId } = req.params;
+    if (!vendorId || !isValidObjectId(vendorId)) {
+        return res.status(400).json(new ApiResponse(400, "", "Vendor Id missing"));
+    }
 
     const inventory = await Inventory.aggregate([
         {
@@ -138,7 +140,7 @@ const getInventory = async (req, res) => {
             }
         },
         {
-            $unwind: "$productList"  // Deconstruct the productList array
+            $unwind: "$productList" // Deconstruct the productList array
         },
         {
             $lookup: {
@@ -149,35 +151,42 @@ const getInventory = async (req, res) => {
             }
         },
         {
-            $unwind: "$productDetails"  // Deconstruct the productDetails array
+            $unwind: "$productDetails" // Deconstruct the productDetails array
         },
         {
             $project: {
-                "productDetails.createdAt": 0,  // Exclude createdAt
-                "productDetails.updatedAt": 0,  // Exclude updatedAt
+                "productList": 1,                // Include the entire productList field
+                "productDetails._id": 1,         // Include only specific fields from productDetails
+                "productDetails.name": 1,
+                "productDetails.category": 1,
+                "productDetails.subCategory": 1
             }
         },
         {
             $addFields: {
-                "productList.product": "$productDetails"  // Replace the product field in productList with the full product details
+                "productList.product": "$productDetails" // Replace the product field in productList with the full product details
             }
         },
         {
             $group: {
                 _id: "$_id",
-                productList: { $push: "$productList" },  // Reconstruct the productList array
+                productList: { $push: "$productList" } // Reconstruct the productList array
             }
         }
-    ])
+    ]);
 
-    return res.status(200).json(new ApiResponse(200, inventory, "Inventory fetched"))
-}
+    return res.status(200).json(new ApiResponse(200, inventory, "Inventory fetched"));
+};
+
 
 const inventoryOverview = async (req, res) => {
+    const userId = req.user._id;
+
+    // First, retrieve the inventory and find products that no longer exist
     const inventoryData = await Inventory.aggregate([
         {
             $match: {
-                _id: new mongoose.Types.ObjectId(req.user._id)
+                _id: new mongoose.Types.ObjectId(userId)
             }
         },
         {
@@ -192,23 +201,17 @@ const inventoryOverview = async (req, res) => {
             }
         },
         {
-            $unwind: "$productDetails"
+            $unwind: {
+                path: "$productDetails",
+                preserveNullAndEmptyArrays: true // Keep the product even if it doesn't exist
+            }
         },
         {
             $project: {
+                "productList.product": 1,  // Keep the original product reference
+                "productDetails._id": 1,   // Check if the product exists in the Products collection
                 "productDetails.category": 1,
-                "productDetails.subCategory": 1,
-            }
-        },
-        {
-            $addFields: {
-                "productList.product": "$productDetails"  // Replace the product field in productList with the full product details
-            }
-        },
-        {
-            $group: {
-                _id: "$_id",
-                productList: { $push: "$productList" },  // Reconstruct the productList array
+                "productDetails.subCategory": 1
             }
         }
     ]);
@@ -218,31 +221,41 @@ const inventoryOverview = async (req, res) => {
         return res.status(400).json(new ApiResponse(400, null, "Couldn't fetch inventory"));
     }
 
-    // Assuming you expect only one inventory record for the user
-    const inventory = inventoryData[0];
+    // List of product IDs that are missing in the Products collection
+    const missingProductIds = inventoryData
+        .filter(item => !item.productDetails)  // If productDetails is missing, product doesn't exist
+        .map(item => item.productList.product);  // Get the product IDs
 
+    // If there are missing products, remove them from the inventory
+    if (missingProductIds.length > 0) {
+        await Inventory.updateOne(
+            { _id: userId },
+            { $pull: { productList: { product: { $in: missingProductIds } } } }
+        );
+    }
+
+    // Create the category count
     const categoryCount = {};
+    inventoryData.forEach(item => {
+        if (item.productDetails) {
+            const { category, subCategory } = item.productDetails;
 
-    inventory.productList.forEach(({ product }) => {
-        const { category, subCategory } = product;
+            // If the category doesn't exist, initialize it
+            if (!categoryCount[category]) {
+                categoryCount[category] = {};
+            }
 
-        // If the category doesn't exist, initialize it
-        if (!categoryCount[category]) {
-            categoryCount[category] = {};
+            // If the subCategory doesn't exist within the category, initialize it
+            if (!categoryCount[category][subCategory]) {
+                categoryCount[category][subCategory] = 0;
+            }
+
+            // Increment the count of subCategory
+            categoryCount[category][subCategory]++;
         }
-
-        // If the subCategory doesn't exist within the category, initialize it
-        if (!categoryCount[category][subCategory]) {
-            categoryCount[category][subCategory] = 0;
-        }
-
-        // Increment the count of subCategory
-        categoryCount[category][subCategory]++;
     });
 
-    console.log(categoryCount);
-
-    return res.status(200).json(new ApiResponse(200, categoryCount, "Inventory overview fetched"));
+    return res.status(200).json(new ApiResponse(200, categoryCount["Daily Needs"], "Inventory overview fetched and missing products removed"));
 };
 
 

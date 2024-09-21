@@ -1,6 +1,6 @@
 import ApiResponse from "../utils/ApiResponse.js";
 import Order from "../models/order.model.js"
-import { isValidObjectId } from "mongoose";
+import mongoose, { isValidObjectId } from "mongoose";
 import Product from "../models/product.model.js";
 
 const placeOrder = async (req, res) => {
@@ -81,17 +81,112 @@ const manageOrder = async (req, res) => {
 
 // ORDER BY ID
 const getOrderById = async (req, res) => {
-    const { orderId } = req.params
-    if (!orderId) return res.status(400).json(new ApiResponse(400, null, "Order Id missing."))
+    const { orderId } = req.params;
+    if (!orderId) return res.status(400).json(new ApiResponse(400, null, "Order Id missing."));
 
-    const order = await Order.findById(orderId)
-    if (!order) return res.status(400).json(new ApiResponse(400, null, "Order not found."))
+    const order = await Order.aggregate([
+        { $match: { _id: new mongoose.Types.ObjectId(orderId) } },
+        {
+            $lookup: {
+                from: "customers",
+                localField: "customer",
+                foreignField: "_id",
+                as: "customerDetails"
+            }
+        },
+        {
+            $lookup: {
+                from: "vendors",
+                localField: "vendor",
+                foreignField: "_id",
+                as: "vendorDetails"
+            }
+        },
+        { $unwind: "$customerDetails" },
+        { $unwind: "$vendorDetails" },
+        {
+            $lookup: {
+                from: "products",
+                localField: "orderItems.product",
+                foreignField: "_id",
+                as: "productDetails",
+                pipeline: [
+                    {
+                        $project: {
+                            name: 1, image: 1, subCategory: 1, 
+                        }
+                    }
+                ]
 
-    return res.status(200).json(new ApiResponse(200, order, "Order fetched."))
-}
+            }
+        },
+        {
+            $unwind: {
+                path: "$productDetails",
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $group: {
+                _id: "$_id",
+                bill: { $first: "$bill" },
+                orderStatus: { $first: "$orderStatus" },
+                paymentMethod: { $first: "$paymentMethod" },
+                createdAt: { $first: "$createdAt" },
+                updatedAt: { $first: "$updatedAt" },
+                customer: { $first: "$customerDetails" },
+                vendor: { $first: "$vendorDetails" },
+                orderItems: {
+                    $push: {
+                        product: {
+                            _id: "$productDetails._id",
+                            name: "$productDetails.name",
+                            subCategory: "$productDetails.subCategory",
+                            image: "$productDetails.image"
+                        },
+                        count: { $arrayElemAt: ["$orderItems.count", { $indexOfArray: ["$orderItems.product", "$productDetails._id"] }] },
+                        total: { $arrayElemAt: ["$orderItems.total", { $indexOfArray: ["$orderItems.product", "$productDetails._id"] }] }
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                description: { customer: "$customer.instructions", vendor: "$vendorDetails.instructions" },
+                _id: 1,
+                customer: {
+                    _id: "$customer._id",
+                    username: "$customer.username",
+                    contact: "$customer.contact.primary",
+                    location: "$customer.location"
+                },
+                vendor: {
+                    _id: "$vendor._id",
+                    shopName: "$vendor.shopName",
+                    contact: "$vendor.contact.primary",
+                    location: "$vendor.location",
+                    delivery: "$vendor.delivery",
+                    isOpen: "$vendor.isOpen"
+                },
+                orderItems: 1,
+                bill: 1,
+                orderStatus: 1,
+                paymentMethod: 1,
+                createdAt: 1,
+                updatedAt: 1
+            }
+        }
+    ]);
+
+    if (!order || order.length === 0) return res.status(404).json(new ApiResponse(404, null, "Order not found."));
+
+    return res.status(200).json(new ApiResponse(200, order[0], "Order fetched."));
+};
+
 
 // TODAY'S ORDERS
 const getTodaysOrders = async (req, res) => {
+    const { status } = req.params
     const startOfDay = new Date()
     startOfDay.setHours(0, 0, 0, 0)
 
@@ -99,7 +194,7 @@ const getTodaysOrders = async (req, res) => {
 
     const todaysOrder = await Order.find({
         vendor: req.user._id,
-        orderStatus: { $in: ["pending", "accepted", "rejected", "delivered"] },
+        orderStatus: status,
         createdAt: { $gte: startOfDay }
     })
         .sort({ createdAt: -1 })
@@ -174,20 +269,20 @@ const orderOverview = async (req, res) => {
     const userId = req.user._id
 
     const { duration } = req.params
-    if (!duration) return res.status(200).json(new ApiResponse(200, history, "Duration required"))
+    if (!duration) return res.status(400).json(new ApiResponse(400, history, "Duration required"))
 
     const overview = await Order.find({
         createdAt: { $gte: limit[duration] },
-        vendor: userId
+        vendor: userId,
+        orderStatus: {$in: ["delivered", "incomplete", "rejected", "failed"]}
     })
         .select("bill orderStatus")
 
     const total = overview.reduce((sum, curr) => {
         return sum + curr.bill
     }, 0)
-    overview.push({ total })
 
-    return res.status(200).json(new ApiResponse(200, overview, "Order overview fetched"))
+    return res.status(200).json(new ApiResponse(200, { overview, total }, "Order overview fetched"))
 }
 
 export {

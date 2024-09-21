@@ -16,7 +16,7 @@ import PlaceOrder from './Components/Orders/PlaceOrder.jsx'
 import StoreFront from './Components/Customer/StoreFront.jsx'
 import Inventory from './Components/Vendor/Inventory.jsx'
 import OrderDetails from './Components/Orders/OrderDetail.jsx'
-import OrdersPage from "./Components/Orders/OrdersPage.jsx"
+import OrdersPage from "./Components/Orders/Overview.jsx"
 import Error from './Components/AppPages/ErrorPage.jsx'
 import Product from './Components/Vendor/Products/ProductList.jsx'
 import AddProduct from './Components/Vendor/Products/AddProduct.jsx'
@@ -38,7 +38,7 @@ const router = createBrowserRouter(
             <Route path='/register/customer' element={<CustomerRegister />} />
 
             <Route path='/vendor/overview' element={<OrdersPage />} />
-            <Route path='vendor/order' element={<OrderDetails />} />
+            <Route path='vendor/order/:orderId' element={<OrderDetails />} />
             <Route path='vendor/history' element={<OrderHistory />} />
             <Route path='vendor/dashboard' element={<Dashboard />} />
             <Route path='vendor/inventory' element={<Inventory />} />

@@ -10,9 +10,9 @@ router.post("/", verifyJWT("customer"), placeOrder)
 
 router.get("/history/:duration", verifyJWT("both"), getOrderHistory)
 
-router.get("/today", verifyJWT("vendor"), getTodaysOrders)
+router.get("/today:status", verifyJWT("vendor"), getTodaysOrders)
 
-router.get("/:orderId", verifyJWT("both"), getOrderById)
+router.get("/view/:orderId", verifyJWT("both"), getOrderById)
 
 router.patch("/manage/:orderId",verifyJWT("both"), manageOrder)
 

@@ -16,6 +16,8 @@ router.post("/multiple", verifyJWT("vendor"), addMultipleProducts)
 
 router.get("/overview", verifyJWT("vendor"), inventoryOverview)
 
-router.route("/product/:productId", verifyJWT("vendor")).patch(updateProduct).delete(removeProduct)
+router.patch("/product/:productId", verifyJWT("vendor"), updateProduct)
+
+router.delete("/product/:productId", verifyJWT("vendor"), removeProduct)
 
 export default router

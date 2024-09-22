@@ -158,7 +158,7 @@ const getInventory = async (req, res) => {
                 "productList": 1,                // Include the entire productList field
                 "productDetails._id": 1,         // Include only specific fields from productDetails
                 "productDetails.name": 1,
-                "productDetails.category": 1,
+                "productDetails.image": 1,
                 "productDetails.subCategory": 1
             }
         },
@@ -175,7 +175,7 @@ const getInventory = async (req, res) => {
         }
     ]);
 
-    return res.status(200).json(new ApiResponse(200, inventory, "Inventory fetched"));
+    return res.status(200).json(new ApiResponse(200, inventory[0], "Inventory fetched"));
 };
 
 

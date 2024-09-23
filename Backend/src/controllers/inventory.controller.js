@@ -149,7 +149,7 @@ const getInventory = async (req, res) => {
             }
         },
         {
-            $unwind: "$productList" // Deconstruct the productList array
+            $unwind: "$productList"
         },
         {
             $lookup: {
@@ -160,26 +160,29 @@ const getInventory = async (req, res) => {
             }
         },
         {
-            $unwind: "$productDetails" // Deconstruct the productDetails array
-        },
-        {
-            $project: {
-                "productList": 1,                // Include the entire productList field
-                "productDetails._id": 1,         // Include only specific fields from productDetails
-                "productDetails.name": 1,
-                "productDetails.image": 1,
-                "productDetails.subCategory": 1
-            }
+            $unwind: "$productDetails"
         },
         {
             $addFields: {
-                "productList.product": "$productDetails" // Replace the product field in productList with the full product details
+                "productList.price": {
+                    $cond: {
+                        if: { $ifNull: ["$productList.price", false] },
+                        then: "$productList.price",
+                        else: "$productDetails.price"
+                    }
+                },
+                "productList.product": {
+                    _id: "$productDetails._id",
+                    name: "$productDetails.name",
+                    image: "$productDetails.image",
+                    subCategory: "$productDetails.subCategory"
+                }
             }
         },
         {
             $group: {
                 _id: "$_id",
-                productList: { $push: "$productList" } // Reconstruct the productList array
+                productList: { $push: "$productList" }
             }
         }
     ]);

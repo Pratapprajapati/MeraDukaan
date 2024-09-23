@@ -3,10 +3,11 @@ import Toggle from 'react-toggle';
 import "react-toggle/style.css";
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Swal from 'sweetalert2'
 import Loading from '../../AppPages/Loading';
 
 export default function NewProduct() {
-    const [thumbnail, setThumbnail] = useState(null);
+    const [image, setimage] = useState(null);
     const [content, setContent] = useState({
         name: "",
         category: "dailyNeeds",
@@ -23,18 +24,18 @@ export default function NewProduct() {
     useEffect(() => {
         vendor.userType != "vendor" ? navigate(-1) : null
         setLoading(false)
-    })
+    }, [])
 
-    const handleThumbnailChange = (e) => {
+    const handleimageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setThumbnail(reader.result);
+                setimage(reader.result);
             };
             reader.readAsDataURL(file);
         }
-        setContent({ ...content, thumbnail: file });
+        setContent({ ...content, image: file });
     };
 
     const handleInputChange = (e) => {
@@ -45,12 +46,65 @@ export default function NewProduct() {
         });
     };
 
-    const handleToggleChange = () => {
-        setContent({
-            ...content,
-            inStock: !content.inStock
-        });
+    const handleAddToInventory = async () => {
+        setLoading(true);
+
+        try {
+            // First Axios call with FormData
+            const formData = new FormData();
+            formData.append('name', content.name);
+            formData.append('category', content.category);
+            formData.append('subCategory', content.subCategory);
+            formData.append('price', content.price);
+            formData.append('image', content.image);
+
+            const productResponse = await axios.post('/api/product/add', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            // Check if the response contains the expected data
+            if (!productResponse.data || !productResponse.data.data || !productResponse.data.data._id) {
+                throw new Error('Invalid response from product creation');
+            }
+
+            const productId = productResponse.data.data._id;
+
+            // Second Axios call to add to inventory
+            await axios.post(`/api/inventory/add`, {
+                product: productId,
+                stock: content.inStock,
+                description: content.description
+            });
+
+            Swal.fire({
+                title: "Product successfully added to your inventory",
+                timer: 1200,
+                icon: 'success',
+                background: '#1a1a2e',
+                width: '400px',
+                heightAuto: false,
+                color: "white"
+            });
+
+            navigate(-1);
+        } catch (error) {
+            console.error('Error adding product:', error);
+            Swal.fire({
+                title: "Error",
+                text: error.response?.data?.message || "An error occurred while adding the product",
+                icon: 'error',
+                background: '#1a1a2e',
+                width: '400px',
+                heightAuto: false,
+                color: "white"
+            });
+        } finally {
+            setLoading(false);
+        }
     };
+
 
     if (loading) return <Loading />
 
@@ -62,10 +116,10 @@ export default function NewProduct() {
                     <div className="flex flex-col items-center lg:w-1/2">
                         {/* Image Upload Section */}
                         <div className="relative">
-                            {thumbnail ? (
+                            {image ? (
                                 <img
-                                    src={thumbnail}
-                                    alt="Thumbnail"
+                                    src={image}
+                                    alt="image"
                                     className="h-full w-full max-h-96 max-w-96 rounded-lg border border-gray-600 object-cover my-auto"
                                 />
                             ) : (
@@ -75,7 +129,7 @@ export default function NewProduct() {
                                         type="file"
                                         accept="image/*"
                                         className="hidden"
-                                        onChange={handleThumbnailChange}
+                                        onChange={handleimageChange}
                                     />
                                 </label>
                             )}
@@ -150,7 +204,13 @@ export default function NewProduct() {
                                 <div className='w-[50%]'>
                                     <label className="block text-sm font-medium text-gray-400 mb-2">Price:</label>
                                     <span className="title-font text-xl font-bold text-gray-300">
-                                        ₹<input type="number" className='w-24 ml-1 bg-transparent border border-gray-950/50 rounded-md px-1 focus:outline-none focus:border-b focus:border-b-white focus:rounded-none' />
+                                        ₹<input
+                                            type="number"
+                                            name="price"
+                                            value={content.price}
+                                            onChange={handleInputChange}
+                                            className='w-24 ml-1 bg-transparent border border-gray-950/50 rounded-md px-1 focus:outline-none focus:border-b focus:border-b-white focus:rounded-none'
+                                        />
                                     </span>
                                 </div>
                                 <div className='w-[50%]'>
@@ -159,7 +219,7 @@ export default function NewProduct() {
                                         id="stock"
                                         name="stock"
                                         checked={content.inStock}
-                                        onChange={() => setContent({...content, inStock: !content.inStock})}
+                                        onChange={() => setContent({ ...content, inStock: !content.inStock })}
                                         className="align-middle"
                                     />
                                     <span className="ml-2 text-sm text-gray-300">
@@ -173,6 +233,7 @@ export default function NewProduct() {
                         <div className="w-full">
                             <button
                                 type="button"
+                                onClick={handleAddToInventory}
                                 className="rounded-md w-full bg-teal-500 px-3 py-2 text-sm font-semibold text-black shadow-sm hover:bg-teal-500/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
                             >
                                 Add to Inventory

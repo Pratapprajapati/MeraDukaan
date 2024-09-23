@@ -170,7 +170,7 @@ export default function Inventory() {
             <div className="pb-4 mt-4 grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
                 {filteredProducts.map((prod) => (
                     <div
-                        key={prod.product._id}
+                        key={prod._id || prod.product._id}
                         className="flex flex-col md:flex-row bg-gray-800 shadow-md rounded-lg overflow-hidden border border-black/20 hover:border-white mx-2 p-4 "
                     >
                         <div className='md:me-2 md:pe-2'>

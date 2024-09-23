@@ -186,37 +186,70 @@ const getOrderById = async (req, res) => {
 
 // TODAY'S ORDERS
 const getTodaysOrders = async (req, res) => {
-    const { status } = req.params
-    const startOfDay = new Date()
-    startOfDay.setHours(0, 0, 0, 0)
+    const { status } = req.params;
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
 
-    const endOfDay = new Date()
+    try {
+        const todaysOrders = await Order.aggregate([
+            {
+                $match: {
+                    vendor: req.user._id,
+                    orderStatus: status,
+                    createdAt: { $gte: startOfDay }
+                }
+            },
+            { $sort: { createdAt: -1 } },
+            {
+                $lookup: {
+                    from: 'customers',                // Replace 'customers' with the actual customer collection name
+                    localField: 'customer',
+                    foreignField: '_id',
+                    as: 'customer'
+                }
+            },
+            {
+                $unwind: '$customer'
+            },
+            {
+                $lookup: {
+                    from: 'products',                 // Replace 'products' with the actual product collection name
+                    localField: 'orderItems.product',
+                    foreignField: '_id',
+                    as: 'productDetails'
+                }
+            },
+            {
+                $project: {
+                    createdAt: 1,
+                    customer: { username: 1, location: 1 },
+                    orderItems: 1,
+                    orderStatus: 1,
+                    bill: 1,
+                    products: { $size: "$orderItems" },    // Add number of products
+                    productDetails: { $slice: ["$productDetails", 2] }  // Limit products to first 2
+                }
+            }
+        ]);
 
-    const todaysOrder = await Order.find({
-        vendor: req.user._id,
-        orderStatus: status,
-        createdAt: { $gte: startOfDay }
-    })
-        .sort({ createdAt: -1 })
-        .select("createdAt customer bill orderItems orderStatus")
-        .populate({
-            path: "customer",                   // Populate the customer field
-            select: "username location"         // Only fetch username and location fields
-        })
-        .lean();  // Optional: use .lean() if you only need plain JavaScript objects, not Mongoose documents
+        if (!todaysOrders || todaysOrders.length === 0) {
+            return res.status(400).json(new ApiResponse(400, null, "No orders found for today."));
+        }
 
-    // Modify the data after fetching it
-    const modifiedOrders = todaysOrder.map(order => ({
-        ...order,
-        products: order.orderItems.length,
-        orderItems: order.orderItems.slice(0, 2)  // Limit orderItems to the first 2 items
-    }));
+        // Modify the data as needed for the response
+        const modifiedOrders = todaysOrders.map(order => ({
+            ...order,
+            orderItems: order.orderItems.map((item, index) => ({
+                ...item,
+                productName: order.productDetails[index] ? order.productDetails[index].name : "Unknown"  // Attach product name to each item
+            }))
+        }));
 
-
-    if (!todaysOrder) return res.status(400).json(new ApiResponse(400, null, "Orders unable to fetch."))
-
-    return res.status(200).json(new ApiResponse(200, modifiedOrders, "Order fetched."))
-}
+        return res.status(200).json(new ApiResponse(200, modifiedOrders, "Orders fetched."));
+    } catch (err) {
+        return res.status(500).json(new ApiResponse(500, null, "Server error while fetching orders."));
+    }
+};
 
 
 // TIME PERIODS 

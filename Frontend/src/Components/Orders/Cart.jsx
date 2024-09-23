@@ -38,10 +38,10 @@ export default function Cart({ orderItems = [] }) { // Default to an empty array
                                             {item.product.name}
                                         </h3>
                                         <p className="text-lg text-yellow-400 font-medium">
-                                            Total: {item.total}
+                                            Total: ₹{item.total}
                                         </p>
                                     </div>
-                                    <h1 className='text-gray-400 text-sm mb-2'>Category: {item.product.subCategory}</h1>
+                                    <h1 className='text-gray-400 text-sm mb-1'>Category: {item.product.subCategory}</h1>
                                     {
                                         place ? (
                                             <div className="mt-2 flex">
@@ -62,7 +62,7 @@ export default function Cart({ orderItems = [] }) { // Default to an empty array
                                                 </div>
                                             </div>
                                         ) : (
-                                            <h1 className='text-gray-400 text-sm'>Quantity: {item.count}</h1>
+                                            <h1 className='text-gray-400 text-sm'>Quantity: <span className='text-lg text-white'>{item.count}</span></h1>
                                         )
                                     }
                                 </div>

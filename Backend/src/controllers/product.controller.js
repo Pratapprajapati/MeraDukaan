@@ -97,8 +97,10 @@ const searchProduct = async (req, res) => {
                 product: {
                     id: product._id,
                     name: product.name,
+                    price: product.price,
                     category: product.category,
-                    subCategory: product.subCategory
+                    subCategory: product.subCategory,
+                    image: product.image
                 },
                 vendors: inventories
                     .filter(inv => inv.productList.some(p => p.product.toString() === product._id.toString()))
@@ -172,13 +174,19 @@ const getSampleProductsFromEachCategory = async (req, res) => {
                             }
                         },
                         { $sample: { size: 6 } }, // Sample 6 products from each subcategory
-                        { $project: { name: 1, price: 1, image: 1, subCategory: 1, category: 1 } } // Project required fields
+                        { $project: { _id: 1, name: 1, price: 1, image: 1, subCategory: 1, category: 1 } } // Project required fields
                     ],
                     as: "products"
                 }
             },
             { $unwind: "$products" }, // Flatten the results
-            { $sort: { "_id.category": 1, "_id.subCategory": 1 } } // Sort by category and subCategory
+            { $sort: { "products.category": 1, "products.subCategory": 1 } }, // Sort by category and subCategory
+            {
+                $project: {
+                    _id: 0,  // Remove the _id field with category and subCategory
+                    count: 0,  // Remove the count field
+                }
+            }
         ]);
 
         res.status(200).json(new ApiResponse(200, sampleProducts, "Fetched sample products from each subcategory"));
@@ -187,7 +195,6 @@ const getSampleProductsFromEachCategory = async (req, res) => {
         res.status(500).json(new ApiResponse(500, null, "An error occurred while fetching sample products"));
     }
 };
-
 
 export {
     addProduct,

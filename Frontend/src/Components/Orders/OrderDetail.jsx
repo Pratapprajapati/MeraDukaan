@@ -83,7 +83,10 @@ export default function Order() {
             .then(res => {
                 setOrderDetails(res.data.data);
             })
-            .catch(e => console.error(e.response.data))
+            .catch(e => {
+                console.error(e.response.data.message)
+                navigate(-1)
+            })
             .finally(() => setLoading(false));
     }, [vendor.userType, navigate]);
 

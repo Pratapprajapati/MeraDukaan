@@ -125,6 +125,15 @@ const removeProduct = async (req, res) => {
     return res.status(200).json(new ApiResponse(200, updatedProduct, "Product updated successfully"))
 }
 
+const inventoryProds = async (req, res) => {
+    const inventory = await Inventory.findById(req.user._id).select("productList.product");
+
+    // Extract just the product IDs from the productList array
+    const productIds = inventory.productList.map(item => item.product);
+
+    // Respond with the product IDs only
+    return res.status(200).json(new ApiResponse(200, productIds, "Found"));
+}
 
 // GET INVENTORY
 const getInventory = async (req, res) => {
@@ -265,6 +274,7 @@ export {
     addMultipleProducts,
     updateProduct,
     removeProduct,
+    inventoryProds,
     getInventory,
     inventoryOverview,
 }

@@ -18,50 +18,14 @@ const Modal = ({ isOpen, title, children }) => {
     );
 };
 
-const handleAccept = () => {
-    Swal.fire({
-        title: 'Order Accepted!',
-        text: 'You have accepted the order.',
-        icon: 'success',
-        color: 'white',
-        background: '#1a1a2e',
-    });
-    setIsAcceptModalOpen(false);
-};
-
-const handleReject = () => {
-    if (!rejectNote) {
-        Swal.fire({
-            title: 'Error!',
-            text: 'Please provide a reason for rejection.',
-            icon: 'error',
-            color: 'white',
-            background: '#1a1a2e',
-        });
-        return;
-    }
-    Swal.fire({
-        title: 'Are you sure?',
-        text: 'Do you want to reject this order?',
-        icon: 'warning',
-        color: 'white',
-        background: '#1a1a2e',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, Reject!',
-        cancelButtonText: 'No, cancel',
-        reverseButtons: true,
-    }).then((result) => {
-        if (result.isConfirmed) {
-            Swal.fire({
-                title: 'Order Rejected!',
-                text: 'You have rejected the order.',
-                icon: 'error',
-                color: 'white',
-                background: '#1a1a2e',
-            });
-            setIsRejectModalOpen(false);
-        }
-    });
+export const orderStatuses = {
+    "pending": "yellow-500",
+    "cancelled": "red-500",
+    "accepted": "green-500",
+    "rejected":  "red-500",
+    "incomplete": "orange-500",
+    "delivered":  "green-500",
+    "failed": "red-500",
 };
 
 export default function Order() {
@@ -78,7 +42,7 @@ export default function Order() {
 
     useEffect(() => {
         if (vendor.userType !== "vendor") navigate(-1);
-        
+
         axios.get(`/api/order/view/${params.orderId}`)
             .then(res => {
                 setOrderDetails(res.data.data);
@@ -89,6 +53,74 @@ export default function Order() {
             })
             .finally(() => setLoading(false));
     }, [vendor.userType, navigate]);
+
+    const handleAccept = () => {
+        const data = {
+            orderStatus: "accepted",
+            description: acceptNote
+        }
+        axios.patch(`/api/order/manage/${params.orderId}`, data)
+            .then(res => {
+                setOrderDetails({...orderDetails, orderStatus: "accepted"})
+            })
+            .catch(e => console.error(e.response.data.message));
+
+        Swal.fire({
+            title: 'Order Accepted!',
+            text: 'You have accepted the order.',
+            icon: 'success',
+            color: 'white',
+            background: '#1a1a2e',
+        });
+        setIsAcceptModalOpen(false);
+    };
+
+    const handleReject = () => {
+        if (!rejectNote) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Please provide a reason for rejection.',
+                icon: 'error',
+                color: 'white',
+                background: '#1a1a2e',
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you want to reject this order?',
+            icon: 'warning',
+            color: 'white',
+            background: '#1a1a2e',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Reject!',
+            cancelButtonText: 'No, cancel',
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const data = {
+                    orderStatus: "rejected",
+                    description: rejectNote
+                }
+
+                axios.patch(`/api/order/manage/${params.orderId}`, data)
+                    .then(res => {
+                        setOrderDetails({...orderDetails, orderStatus: "rejected"})
+                    })
+                    .catch(e => console.error(e.response.data.message));
+
+                Swal.fire({
+                    title: 'Order Rejected!',
+                    text: 'You have rejected the order.',
+                    icon: 'error',
+                    color: 'white',
+                    background: '#1a1a2e',
+                });
+                setIsRejectModalOpen(false);
+            }
+        });
+    };
 
     if (loading) return <Loading />;
     if (!orderDetails) return null;
@@ -156,7 +188,7 @@ export default function Order() {
                                     </button>
                                 </div>
                             ) : (
-                                <div className='w-full mt-2 bg-teal-800 p-2 rounded-lg text-3xl capitalize text-white font-semibold text-center'>
+                                <div className={`w-full mt-2 bg-${orderStatuses[orderStatus]} text-black p-2 rounded-lg text-3xl capitalize font-semibold text-center`}>
                                     -- {orderStatus} --
                                 </div>
                             )

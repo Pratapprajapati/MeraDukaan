@@ -37,10 +37,10 @@ export default function SignIn() {
         }
         else {
             axios.post("/api/customer/login", formData)
-            .then(res => {
-                navigate("/")
-            })
-            .catch(e => setErrorMessage(e.response.data.message))
+                .then(res => {
+                    navigate("/")
+                })
+                .catch(e => setErrorMessage(e.response.data.message))
         }
     }
 
@@ -211,7 +211,7 @@ export default function SignIn() {
 
                                     {userType === 'customer' && (
                                         <Link
-                                            to={""}
+                                            to={"/register/customer"}
                                             className="font-semibold text-teal-500 transition-all duration-200 hover:underline"
                                         >
                                             Create a free account as Customer

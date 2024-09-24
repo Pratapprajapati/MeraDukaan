@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { orderData } from '../Listings/sampleData'
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Loading from '../AppPages/Loading';
@@ -16,29 +15,6 @@ const CustomButton = ({ children, onClick, variant = 'primary' }) => (
     </button>
 );
 
-const CustomInput = ({ name, type = 'text', placeholder, value, onChange }) => (
-    <input
-        name={name}
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-    />
-);
-
-const Modal = ({ isOpen, onClose, children }) => {
-    if (!isOpen) return null;
-
-    return (
-        <div className="fixed inset-0 bg-black bg-opacity-85 flex justify-center items-center">
-            <div className="bg-gray-800 p-6 rounded-lg w-96">
-                {children}
-            </div>
-        </div>
-    );
-};
-
 const InventoryItem = ({ category, itemCount }) => (
     <div className="flex justify-between items-center py-3 border-b border-gray-700">
         <div className="flex-1 text-white">{category}</div>
@@ -47,13 +23,9 @@ const InventoryItem = ({ category, itemCount }) => (
 );
 
 const UserProfileDashboard = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [profileData, setProfileData] = useState({
-        fullName: 'Rebecca Nicholas',
-        email: '',
-        password: '',
-        confirmPassword: ''
-    });
+    const vendor = useOutletContext();
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
 
     const [orders, setOrders] = useState([]);
     const [total, setTotal] = useState([]);
@@ -97,39 +69,32 @@ const UserProfileDashboard = () => {
         setOrderOverviews(overview);
     }, [orders]);
 
-
     const [inventory, setInventory] = useState({
         "Packaged Food": 0,
         "Dairy Products": 0,
         "Beverages": 0,
         "Personal Care": 0,
         "Home Essentials": 0,
-    })
+    });
 
-    const categories = ["Packaged Food", "Dairy Products", "Beverages", "Personal Care", "Home Essentials"]
-    const [totalProd, setTotalProd] = useState(0)
+    const categories = ["Packaged Food", "Dairy Products", "Beverages", "Personal Care", "Home Essentials"];
+    const [totalProd, setTotalProd] = useState(0);
 
-    
     const [timePeriod, setTimePeriod] = useState('7 days');
     const duration = {
         "7 days": "week",
         "30 days": "month",
         "1 year": "year",
-    }
-
-    const vendor = useOutletContext()
-    const navigate = useNavigate()
-    const [loading, setLoading] = useState(true)
+    };
 
     useEffect(() => {
-        vendor.userType != "vendor" ? navigate(-1) : null
+        vendor.userType !== "vendor" ? navigate(-1) : null;
 
         axios.get(`/api/order/overview/${duration[timePeriod]}`)
             .then(res => {
                 const data = res.data.data;
-                // console.log(data);
-                setOrders(data.overview)
-                setTotal(data.total)
+                setOrders(data.overview);
+                setTotal(data.total);
             })
             .catch(e => console.error(e.response.data));
 
@@ -137,39 +102,35 @@ const UserProfileDashboard = () => {
             .then(res => {
                 const data = res.data.data;
 
-                let updatedInventory = { ...inventory }
-                let total = 0
+                let updatedInventory = { ...inventory };
+                let total = 0;
                 for (let i in data) {
                     if (inventory.hasOwnProperty(i)) {
                         updatedInventory[i] = data[i];
-                        total += data[i]
+                        total += data[i];
                     }
                 }
-                setInventory(updatedInventory)
-                setTotalProd(total)
+                setInventory(updatedInventory);
+                setTotalProd(total);
             })
             .catch(e => console.error(e.response));
 
-        setLoading(false)
-    }, [vendor.userType, timePeriod])
+        setLoading(false);
+    }, [timePeriod]);
 
-    const handleInputChange = (e) => {
-        setProfileData({ ...profileData, [e.target.name]: e.target.value });
-    };
-
-    if (loading) return <Loading />
+    if (loading) return <Loading />;
 
     return (
         <div className="max-w-7xl mx-auto bg-black/30 text-white p-6 rounded-lg shadow-lg">
             <div className="flex justify-between items-center mb-4 border-b border-b-gray-700 pb-4">
                 <div className="">
                     <div className="text-sm text-gray-400">Welcome back,</div>
-                    <div className="text-3xl font-bold text-yellow-400">{profileData.fullName}</div>
+                    <div className="text-3xl font-bold text-yellow-400">{vendor.shopName}</div>
                     <div className="text-sm text-gray-400">
-                        Shop Registration ID: <span>MH54r6e4f54</span>
+                        Shop Registration ID: <span>{vendor.registrationNumber}</span>
                     </div>
                 </div>
-                <CustomButton onClick={() => setIsModalOpen(true)}>Edit profile</CustomButton>
+                <CustomButton onClick={() => navigate('/vendor/shop')}>View Shop</CustomButton>
             </div>
 
             {/* Main Content */}
@@ -241,42 +202,7 @@ const UserProfileDashboard = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Edit Profile Modal */}
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-                <h2 className="text-2xl font-bold text-white mb-4">Edit Profile</h2>
-                <div className="space-y-4">
-                    <CustomInput
-                        name="email"
-                        type="email"
-                        placeholder="Email"
-                        value={profileData.email}
-                        onChange={handleInputChange}
-                    />
-                    <CustomInput
-                        name="password"
-                        type="password"
-                        placeholder="Password"
-                        value={profileData.password}
-                        onChange={handleInputChange}
-                    />
-                    <CustomInput
-                        name="confirmPassword"
-                        type="password"
-                        placeholder="Confirm Password"
-                        value={profileData.confirmPassword}
-                        onChange={handleInputChange}
-                    />
-                </div>
-                <div className="mt-6 flex justify-between space-x-4">
-                    <CustomButton variant="secondary" onClick={() => setIsModalOpen(false)}>
-                        Back
-                    </CustomButton>
-                    <CustomButton onClick={() => console.log('Edit profile')}>Edit Profile</CustomButton>
-                </div>
-            </Modal>
         </div>
-
     );
 };
 

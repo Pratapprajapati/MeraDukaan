@@ -4,9 +4,7 @@ import mongoose, { isValidObjectId } from "mongoose";
 import Product from "../models/product.model.js";
 
 const placeOrder = async (req, res) => {
-    const { vendor, cart, paymentMethod, paymentImg, description } = req.body
-
-    if ((paymentMethod !== "cash") && !paymentImg) return res.status(404).json(new ApiResponse(404, null, "Payment img required"))
+    const { vendor, cart, description } = req.body
 
     if (!isValidObjectId(vendor)) return res.status(400).json(new ApiResponse(400, "", "Vendor not vendorId"))
 
@@ -20,8 +18,6 @@ const placeOrder = async (req, res) => {
         customer: req.user._id,
         vendor,
         orderItems: cart,
-        paymentMethod,
-        paymentImg,
         description: { customer: description }
     })
     if (!order) return res.status(500).json(new ApiResponse(500, null, "Something went wrong while placing the order"))
@@ -37,7 +33,7 @@ const manageOrder = async (req, res) => {
     const { orderStatus, description, code } = req.body
     if (!orderStatus) return res.status(400).json(new ApiResponse(400, null, "Order status missing"))
 
-    const statuses = ["pending", "accepted", "incomplete", "undelivered", "delivered", "failed", "cancelled"]
+    const statuses = ["pending", "accepted", "rejected", "incomplete", "undelivered", "delivered", "failed", "cancelled"]
     if (!statuses.includes(orderStatus)) {
         return res.status(400).json(new ApiResponse(400, null, "Order status invalid."))
     }

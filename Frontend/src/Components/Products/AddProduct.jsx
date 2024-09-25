@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import Toggle from 'react-toggle'
 import "react-toggle/style.css";
 import { useOutletContext, useNavigate, useLocation } from 'react-router-dom';
-import Loading from '../../AppPages/Loading';
+import Loading from '../AppPages/Loading';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 

@@ -4,7 +4,7 @@ import "react-toggle/style.css";
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2'
-import Loading from '../../AppPages/Loading';
+import Loading from '../AppPages/Loading';
 
 export default function NewProduct() {
     const [image, setimage] = useState(null);

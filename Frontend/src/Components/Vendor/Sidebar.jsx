@@ -12,6 +12,7 @@ export default function Sidebar() {
     const signedIn = Cookies.get("user")
     let user = signedIn ? decrypt() : null
     const navigate = useNavigate()
+    const open = user.isOpen
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
@@ -40,7 +41,7 @@ export default function Sidebar() {
                 <div className=" flex flex-col justify-between h-full">
                     <div>
                         <div className='flex justify-center mb-10'>
-                            <img src={logo} className={`h-24 w-24 shopOpen`} alt="Logo"
+                            <img src={logo} className={`h-24 w-24 ${open ? "shopOpen" : "shopClosed"}`} alt="Logo"
                                 onMouseEnter={(e) => {
                                     const tooltip = e.currentTarget.nextSibling;
                                     tooltip.classList.remove('hidden');
@@ -51,7 +52,7 @@ export default function Sidebar() {
                                 }}
                             />
                             <div className="absolute hidden w-fit p-2 text-xs text-white bg-gray-950 rounded-lg shadow-lg top-32 max-lg:top-36 z-10">
-                                Shop is open for business
+                                {open ? "Shop is open for business" : "Shop is closed"}
                             </div>
                         </div>
                         <nav className="-mx-3 space-y-6 mt-6">
@@ -167,7 +168,7 @@ export default function Sidebar() {
 
                 {/* Main Content Area */}
                 <div className="flex-1 overflow-y-auto sm:p-4">
-                    <Outlet context={user}/>
+                    <Outlet context={user} />
                 </div>
             </div>
         </div>

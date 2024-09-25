@@ -48,11 +48,36 @@ const updateProduct = async (req, res) => {
     return res.status(200).json(new ApiResponse(200, updatedProduct, "Product updated successfully"))
 }
 
+
+const allProducts = async (req, res) => {
+    const products = await Product.find({ category: "Daily Needs" }).select("name subCategory")
+
+    return res.status(200).json(new ApiResponse(200, products, "Fetched products"));
+}
+
+// Function to retrieve vendor IDs for given product IDs
+const getVendorsForProducts = async (productIds) => {
+    try {
+        const inventories = await Inventory.aggregate([
+            { $match: { 'productList.product': { $in: productIds } } },
+            {
+                $group: {
+                    _id: null,
+                    vendorIds: { $addToSet: '$_id' } // Collecting unique vendor IDs
+                }
+            }
+        ]);
+        return inventories.length > 0 ? inventories[0].vendorIds : [];
+    } catch (error) {
+        console.error("Error fetching vendor IDs:", error);
+        throw new Error("Failed to fetch vendor information");
+    }
+};
+
+// Function to search for products based on a search term
 const searchProduct = async (req, res) => {
     try {
         const { searchTerm } = req.query;
-
-        // Step 1: Search for the product in the Product collection
         const products = await Product.find({
             $or: [
                 { name: { $regex: searchTerm, $options: 'i' } },
@@ -65,54 +90,20 @@ const searchProduct = async (req, res) => {
             return res.status(404).json(new ApiResponse(404, null, "No products found"));
         }
 
-        // Step 2: Search for inventories that sell these products
         const productIds = products.map(p => p._id);
-        const inventories = await Inventory.aggregate([
-            { $match: { 'productList.product': { $in: productIds } } },
-            {
-                $lookup: {
-                    from: 'vendors', // Assuming 'vendors' collection stores vendor details
-                    localField: '_id', // inventory ID is the same as vendor ID
-                    foreignField: '_id',
-                    as: 'vendorDetails'
-                }
-            },
-            { $unwind: '$vendorDetails' },
-            {
-                $project: {
-                    _id: 0,
-                    vendorName: '$vendorDetails.shopName',
-                    address: '$vendorDetails.location',
-                    isOpen: '$vendorDetails.isOpen',
-                    'productList.product': 1,
-                    'productList.price': 1,
-                    'productList.stock': 1
-                }
-            }
-        ]);
+        const vendors = await getVendorsForProducts(productIds);
 
-        // Step 3: Format the response
-        let result = products.map(product => {
-            return {
-                product: {
-                    id: product._id,
-                    name: product.name,
-                    price: product.price,
-                    category: product.category,
-                    subCategory: product.subCategory,
-                    image: product.image
-                },
-                vendors: inventories
-                    .filter(inv => inv.productList.some(p => p.product.toString() === product._id.toString()))
-                    .map(inv => ({
-                        vendorName: inv.vendorName,
-                        address: inv.address,
-                        isOpen: inv.isOpen,
-                        price: inv.productList.find(p => p.product.toString() === product._id.toString()).price,
-                        stock: inv.productList.find(p => p.product.toString() === product._id.toString()).stock
-                    }))
-            };
-        });
+        const result = products.map(product => ({
+            product: {
+                id: product._id,
+                name: product.name,
+                price: product.price,
+                category: product.category,
+                subCategory: product.subCategory,
+                image: product.image,
+                vendors: vendors
+            },
+        }));
 
         return res.status(200).json(new ApiResponse(200, result, "Search results"));
     } catch (error) {
@@ -121,46 +112,63 @@ const searchProduct = async (req, res) => {
     }
 };
 
-const allProducts = async (req, res) => {
-    const products = await Product.find({ category: "Daily Needs" }).select("name subCategory")
-
-    return res.status(200).json(new ApiResponse(200, products, "Fetched products"));
-}
-
+// Function to fetch specific products based on subcategory and page number
 const specificProducts = async (req, res) => {
-    const { subCategory, page } = req.params
+    const { subCategory, page } = req.params;
+    const pageNumber = parseInt(page, 10) || 1;
 
-    const pageNumber = parseInt(page, 10) || 1; // Default to 1 if page is not provided
     if (!subCategory || pageNumber < 1) {
-        return res.status(400).json({ status: 400, message: 'Invalid subCategory or page number' });
+        return res.status(400).json({ 
+            status: 400, 
+            message: 'Invalid subCategory or page number' 
+        });
     }
 
-    const totalProducts = await Product.countDocuments({ subCategory: subCategory });
-    if (totalProducts === 0) return res.status(200).json(new ApiResponse(200, null, "No products in this sub category"));
+    try {
+        const totalProducts = await Product.countDocuments({ subCategory });
+        if (totalProducts === 0) 
+            return res.status(200).json(new ApiResponse(200, null, "No products in this subcategory"));
 
-    const products = await Product.find({ subCategory: subCategory })
-        .select("name price image subCategory")
-        .limit(32).skip(32 * (page - 1))
-        .sort({ createdAt: -1 })
+        const products = await Product.find({ subCategory })
+            .select("name price image subCategory")
+            .limit(32).skip(32 * (pageNumber - 1))
+            .sort({ createdAt: -1 });
 
-    return res.status(200).json(new ApiResponse(200, { totalProducts, products }, "Fetched products"));
-}
+        const productIds = products.map(p => p._id);
+        const vendors = await getVendorsForProducts(productIds);
 
+        const result = products.map(({ _id, name, price, subCategory, image }) => ({
+            id: _id,
+            name,
+            price,
+            subCategory,
+            image,
+            vendors,
+        }));
+
+        return res.status(200).json(new ApiResponse(200, { totalProducts, products: result }, "Fetched products"));
+    } catch (error) {
+        console.error("Error fetching specific products:", error);
+        return res.status(500).json(new ApiResponse(500, null, "Failed to fetch specific products"));
+    }
+};
+
+// Function to get a sample of products from each category
 const getSampleProductsFromEachCategory = async (req, res) => {
     try {
         const sampleProducts = await Product.aggregate([
             {
                 $group: {
                     _id: {
-                        category: "$category",      // Group by both category
-                        subCategory: "$subCategory" // and subcategory
+                        category: "$category",
+                        subCategory: "$subCategory"
                     },
-                    count: { $sum: 1 } // Count total products in each subcategory
+                    count: { $sum: 1 }
                 }
             },
             {
                 $lookup: {
-                    from: "products", // Replace with your actual collection name
+                    from: "products",
                     let: { category: "$_id.category", subCategory: "$_id.subCategory" },
                     pipeline: [
                         { 
@@ -173,28 +181,44 @@ const getSampleProductsFromEachCategory = async (req, res) => {
                                 }
                             }
                         },
-                        { $sample: { size: 6 } }, // Sample 6 products from each subcategory
-                        { $project: { _id: 1, name: 1, price: 1, image: 1, subCategory: 1, category: 1 } } // Project required fields
+                        { $sample: { size: 6 } },
+                        { $project: { _id: 1, name: 1, price: 1, image: 1, subCategory: 1, category: 1 } }
                     ],
                     as: "products"
                 }
             },
-            { $unwind: "$products" }, // Flatten the results
-            { $sort: { "products.category": 1, "products.subCategory": 1 } }, // Sort by category and subCategory
+            { $unwind: "$products" },
+            { $sort: { "products.category": 1, "products.subCategory": 1 } },
             {
                 $project: {
-                    _id: 0,  // Remove the _id field with category and subCategory
-                    count: 0,  // Remove the count field
+                    _id: 0,
+                    count: 0,
                 }
             }
         ]);
 
-        res.status(200).json(new ApiResponse(200, sampleProducts, "Fetched sample products from each subcategory"));
+        const productIds = sampleProducts.map(p => p.products._id);
+        const vendors = await getVendorsForProducts(productIds);
+
+        const result = sampleProducts.map(item => ({
+            products: {
+                id: item.products._id,
+                name: item.products.name,
+                price: item.products.price,
+                category: item.products.category,
+                subCategory: item.products.subCategory,
+                image: item.products.image,
+                vendors: vendors
+            },
+        }));
+
+        res.status(200).json(new ApiResponse(200, result, "Fetched sample products from each subcategory with vendor information"));
     } catch (error) {
         console.error(error);
         res.status(500).json(new ApiResponse(500, null, "An error occurred while fetching sample products"));
     }
 };
+
 
 export {
     addProduct,

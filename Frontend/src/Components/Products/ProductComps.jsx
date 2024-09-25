@@ -24,7 +24,7 @@ const ProductCard = ({ product, handleAddToInventory, inventory, }) => {
     const user = useOutletContext();
     const userType = user.userType
     const navigate = useNavigate();
-    const exists = inventory.includes(product._id)
+    const exists = inventory.includes(product.id)
 
     return (
         <div className="bg-gray-800 w-72 rounded-lg overflow-hidden shadow-lg shadow-black/30 flex-shrink-0 border border-black/40 hover:border-gray-400">

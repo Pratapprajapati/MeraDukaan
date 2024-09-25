@@ -27,7 +27,7 @@ export default function AddProduct() {
 
     const addToInventory = () => {
 
-        let final = {product: product._id}
+        let final = {product: product.id}
         if (formData.price !== product.price) final["price"] = formData.price
         if (formData.stock !== true) final["stock"] = formData.stock
         if (formData.description && formData.description.trim()) final["description"] = formData.description;

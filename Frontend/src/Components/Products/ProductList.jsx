@@ -63,7 +63,7 @@ export default function ProductList() {
 
     const handleSearch = () => {
         setSearchResults([])
-        axios.get(`/api//product/search?searchTerm=${searchTerm}`)
+        axios.get(`/api/product/search?searchTerm=${searchTerm}`)
             .then(res => {
                 const data = res.data.data;
                 setSearchResults(data);

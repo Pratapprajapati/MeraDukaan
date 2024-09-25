@@ -64,7 +64,7 @@ const router = createBrowserRouter(
             <Route path='/accessbar' element={<AccessBar />} />
             <Route path='/categories' element={<Categories />} />
             <Route path='/shops' element={<Shops />} />
-            <Route path='/shops/shop' element={<Vendor />} />
+            <Route path='/shops/vendor/:vendorId' element={<Vendor />} />
             <Route path='/about' element={<About />} />
             <Route path='/customer' element={<Customer />} />
             <Route path='/cart' element={<Cart />} />

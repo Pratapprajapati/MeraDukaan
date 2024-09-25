@@ -12,3 +12,12 @@ export function decrypt() {
         return null
     }
 }
+
+export function convertToAmPm(time) {
+    const [hour, minute] = time.split(':').map(Number);
+
+    let ampm = hour >= 12 ? 'PM' : 'AM';
+    let formattedHour = hour % 12 || 12; // Convert 0 hour to 12 for AM/PM display
+
+    return `${formattedHour}:${minute.toString().padStart(2, '0')} ${ampm}`;
+}

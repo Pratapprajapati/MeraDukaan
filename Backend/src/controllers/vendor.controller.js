@@ -59,7 +59,8 @@ const generateAccessAndRefreshTokens = async (vendorId) => {
         const accessToken = vendor.generateAccessToken()
         const refreshToken = vendor.generateRefreshToken()
 
-        vendor.refreshToken = refreshToken                // save the refreshToken in vendor's db
+        vendor.refreshToken = refreshToken
+        vendor.isOpen = true
         await vendor.save({ validateBeforeSave: false })
 
         return { accessToken, refreshToken }
@@ -104,7 +105,7 @@ const login = async (req, res) => {
 const logout = async (req, res) => {
     await Vendor.findByIdAndUpdate(
         req.user?._id,
-        { $unset: { refreshToken: 1 } }
+        { $unset: { refreshToken: 1 }, $set: { isOpen: false } }
     )
 
     return res.status(200)
@@ -170,6 +171,7 @@ const changePassword = async (req, res) => {
     return res.status(200).json(new ApiResponse(200, "", "Password changed."))
 }
 
+// CHANGE SHOP NAME
 const changeShopImage = async (req, res) => {
     const shopImagePath = req.file?.path
     if (!shopImagePath) return res.status(404).json(new ApiResponse(404, null, "Shop image missing"))
@@ -189,44 +191,75 @@ const changeShopImage = async (req, res) => {
     return res.status(200).json(new ApiResponse(200, updatedDetail, "Shop image changed"))
 }
 
+// VENDORS NEAR YOU
 const nearbyVendors = async (req, res) => {
     const { distance } = req.params
     const location = req.user.location
 
-    let vendors = []
+    let proximity = {}
     if (distance == "pincode") {
         const query = location.pincode
-        vendors = await Vendor.find({ "location.pincode": query }).select(" shopName shopType isOpen location ")
+        proximity = { "location.pincode": query }
     }
 
     if (distance == "area") {
         function escapeRegex(input) {
-            return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape special characters for regex
+            return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         }
 
         function buildRegexPattern(input) {
-            const sanitizedInput = escapeRegex(input.trim()); // Remove leading/trailing spaces and escape special characters
-            return sanitizedInput.replace(/\s+/g, '.*'); // Replace spaces with '.*' to allow for flexible matching
+            const sanitizedInput = escapeRegex(input.trim().toLowerCase());
+            // Replace common separators with a flexible pattern
+            const flexiblePattern = sanitizedInput.replace(/[-\s]+/g, '[-\\s]*');
+            // Add optional variations for directions
+            const directionVariations = {
+                'e': '(e(ast)?)?',
+                'w': '(w(est)?)?',
+                'n': '(n(orth)?)?',
+                's': '(s(outh)?)?'
+            };
+            let patternWithDirections = flexiblePattern;
+            Object.entries(directionVariations).forEach(([abbr, variation]) => {
+                patternWithDirections = patternWithDirections.replace(
+                    new RegExp(`\\b${abbr}\\b`, 'g'), 
+                    variation
+                );
+            });
+            return `.*${patternWithDirections}.*`;
         }
 
         const query = location.area
         const regexPattern = buildRegexPattern(query);
-        vendors = await Vendor.find({ "location.area": { $regex: regexPattern, $options: "i" } }).select(" shopName shopType isOpen location ")
+        proximity = { "location.area": { $regex: regexPattern, $options: "i" } }
     }
 
     if (distance == "city") {
         const query = location.city
-        vendors = await Vendor.find({ "location.city": query }).select(" shopName shopType isOpen location ")
+        proximity = { "location.city": { $regex: query, $options: "i" } }
     }
+
+    const vendors = await Vendor.find(proximity).select(" shopName shopType isOpen location shopImage ")
 
     if (vendors.length === 0) return res.status(200).json(new ApiResponse(200, null, "No vendors found"));
 
     return res.status(200).json(new ApiResponse(200, vendors, "Vendors fetched"))
 }
 
+// SEARCH BY SHOP NAME
+const searchVendor = async (req, res) => {
+    const { searchTerm } = req.query
+
+    const vendors = await Vendor.find({ "shopName": { $regex: searchTerm, $options: "i" } }).select(" shopName shopType isOpen location shopImage ")
+
+    return res.status(200).json(new ApiResponse(200, vendors, "Vendors found"));
+}
+
 // VENDOR DETAILS
-const getCurrentUser = async (req, res) => {
-    return res.status(200).json(new ApiResponse(200, req.user, "Details fetched"))
+const getVendor = async (req, res) => {
+    const {vendorId} = req.params
+
+    const vendor = await Vendor.findById(vendorId)
+    return res.status(200).json(new ApiResponse(200, vendor, "Details fetched"))
 }
 
 export {
@@ -235,7 +268,8 @@ export {
     logout,
     updateVendor,
     changePassword,
-    getCurrentUser,
+    getVendor,
     changeShopImage,
     nearbyVendors,
+    searchVendor,
 }

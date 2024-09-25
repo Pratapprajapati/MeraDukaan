@@ -52,7 +52,7 @@ export default function Order() {
                 navigate(-1)
             })
             .finally(() => setLoading(false));
-    }, [vendor.userType, navigate]);
+    }, []);
 
     const handleAccept = () => {
         const data = {

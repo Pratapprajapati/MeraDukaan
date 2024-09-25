@@ -30,7 +30,7 @@ const manageOrder = async (req, res) => {
     const { orderId } = req.params
     if (!orderId || !isValidObjectId(orderId)) return res.status(400).json(new ApiResponse(400, null, "OrderId missing"))
 
-    const { orderStatus, description, code } = req.body
+    const { orderStatus, description } = req.body
     if (!orderStatus) return res.status(400).json(new ApiResponse(400, null, "Order status missing"))
 
     const statuses = ["pending", "accepted", "rejected", "incomplete", "undelivered", "delivered", "failed", "cancelled"]
@@ -109,7 +109,7 @@ const getOrderById = async (req, res) => {
                 pipeline: [
                     {
                         $project: {
-                            name: 1, image: 1, subCategory: 1, 
+                            name: 1, image: 1, subCategory: 1,
                         }
                     }
                 ]
@@ -127,7 +127,8 @@ const getOrderById = async (req, res) => {
                 _id: "$_id",
                 bill: { $first: "$bill" },
                 orderStatus: { $first: "$orderStatus" },
-                paymentMethod: { $first: "$paymentMethod" },
+                description: { $first: "$description" },
+                code: { $first: "$code" },
                 createdAt: { $first: "$createdAt" },
                 updatedAt: { $first: "$updatedAt" },
                 customer: { $first: "$customerDetails" },
@@ -148,7 +149,6 @@ const getOrderById = async (req, res) => {
         },
         {
             $project: {
-                description: { customer: "$customer.instructions", vendor: "$vendorDetails.instructions" },
                 _id: 1,
                 customer: {
                     _id: "$customer._id",
@@ -167,9 +167,10 @@ const getOrderById = async (req, res) => {
                 orderItems: 1,
                 bill: 1,
                 orderStatus: 1,
-                paymentMethod: 1,
+                code: 1,
                 createdAt: 1,
-                updatedAt: 1
+                updatedAt: 1,
+                description: 1,
             }
         }
     ]);
@@ -181,70 +182,98 @@ const getOrderById = async (req, res) => {
 
 
 // TODAY'S ORDERS
-const getTodaysOrders = async (req, res) => {
+const getOrders = async (req, res) => {
     const { status } = req.params;
+
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
 
-    try {
-        const todaysOrders = await Order.aggregate([
-            {
-                $match: {
-                    vendor: req.user._id,
-                    orderStatus: status,
-                    createdAt: { $gte: startOfDay }
-                }
-            },
-            { $sort: { createdAt: -1 } },
-            {
-                $lookup: {
-                    from: 'customers',                // Replace 'customers' with the actual customer collection name
-                    localField: 'customer',
-                    foreignField: '_id',
-                    as: 'customer'
-                }
-            },
-            {
-                $unwind: '$customer'
-            },
-            {
-                $lookup: {
-                    from: 'products',                 // Replace 'products' with the actual product collection name
-                    localField: 'orderItems.product',
-                    foreignField: '_id',
-                    as: 'productDetails'
-                }
-            },
-            {
-                $project: {
-                    createdAt: 1,
-                    customer: { username: 1, location: 1 },
-                    orderItems: 1,
-                    orderStatus: 1,
-                    bill: 1,
-                    products: { $size: "$orderItems" },    // Add number of products
-                    productDetails: { $slice: ["$productDetails", 2] }  // Limit products to first 2
-                }
+    const yesterdayStart = new Date(startOfDay);
+    yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+
+    const duration = req.user?.userType == "vendor" ? startOfDay : yesterdayStart
+    const searchIn = req.user?.userType == "vendor" ? { vendor: req.user._id } : { customer: req.user._id }
+
+    const matchConditions = {
+        ...searchIn,
+        createdAt: { $gte: duration }
+    };
+    
+    if (status !== "all") matchConditions.orderStatus = status;
+
+    const orders = await Order.aggregate([
+        {
+            $match: matchConditions
+        },
+        { $sort: { createdAt: -1 } },
+        {
+            $lookup: {
+                from: 'customers',
+                localField: 'customer',
+                foreignField: '_id',
+                as: 'customer'
             }
-        ]);
-
-        if (!todaysOrders || todaysOrders.length === 0) {
-            return res.status(400).json(new ApiResponse(400, null, "No orders found for today."));
+        },
+        {
+            $unwind: '$customer'
+        },
+        {
+            $lookup: {
+                from: 'vendors',
+                localField: 'vendor',
+                foreignField: '_id',
+                as: 'vendor',
+                pipeline: [
+                    {
+                       $project: {shopName: 1, location: 1, isOpen: 1}
+                    }
+                ]
+            }
+        },
+        {
+            $unwind: '$vendor'
+        },
+        {
+            $lookup: {
+                from: 'products',                 // Replace 'products' with the actual product collection name
+                localField: 'orderItems.product',
+                foreignField: '_id',
+                as: 'productDetails',
+                pipeline: [{
+                    $project: {
+                        name: 1, subCategory: 1,
+                    }
+                }]
+            }
+        },
+        {
+            $project: {
+                createdAt: 1, 
+                vendor:1,
+                customer: { username: 1, location: 1 },
+                orderItems: 1,
+                orderStatus: 1,
+                bill: 1,
+                products: { $size: "$orderItems" },    // Add number of products
+                productDetails: { $slice: ["$productDetails", 2] }  // Limit products to first 2
+            }
         }
+    ]);
 
-        // Modify the data as needed for the response
-        const modifiedOrders = todaysOrders.map(order => ({
-            ...order,
-            orderItems: order.orderItems.map((item, index) => ({
-                ...item,
-                productName: order.productDetails[index] ? order.productDetails[index].name : "Unknown"  // Attach product name to each item
-            }))
-        }));
-
-        return res.status(200).json(new ApiResponse(200, modifiedOrders, "Orders fetched."));
-    } catch (err) {
-        return res.status(500).json(new ApiResponse(500, null, "Server error while fetching orders."));
+    if (!orders || orders.length === 0) {
+        return res.status(400).json(new ApiResponse(400, null, "No orders found for today."));
     }
+
+    // Modify the data as needed for the response
+    const modifiedOrders = orders.map(order => ({
+        ...order,
+        orderItems: order.orderItems.map((item, index) => ({
+            ...item,
+            productName: order.productDetails[index] ? order.productDetails[index].name : "Unknown"  // Attach product name to each item
+        }))
+    }));
+
+    return res.status(200).json(new ApiResponse(200, modifiedOrders, "Orders fetched."));
 };
 
 
@@ -282,6 +311,9 @@ const getOrderHistory = async (req, res) => {
         .populate({
             path: "customer", select: "username"
         })
+        .populate({
+            path: "vendor", select: "shopName location contact"
+        })
         .lean()
 
     const modifiedHistory = history.map(order => ({
@@ -303,7 +335,7 @@ const orderOverview = async (req, res) => {
     const overview = await Order.find({
         createdAt: { $gte: limit[duration] },
         vendor: userId,
-        orderStatus: {$in: ["delivered", "incomplete", "rejected", "failed"]}
+        orderStatus: { $in: ["delivered", "incomplete", "rejected", "failed"] }
     })
         .select("bill orderStatus")
 
@@ -319,6 +351,6 @@ export {
     manageOrder,
     getOrderById,
     getOrderHistory,
-    getTodaysOrders,
+    getOrders,
     orderOverview,
 }

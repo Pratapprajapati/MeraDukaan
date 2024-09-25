@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Clock, PackageCheck, Truck, XCircle, AlertTriangle, CheckCircle, Filter } from 'lucide-react';
+import { CalendarClock, Filter } from 'lucide-react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Loading from '../AppPages/Loading';
@@ -74,7 +74,7 @@ export default function OrderHistory() {
                 <h2 className="text-2xl font-bold mb-4">Order History</h2>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0 sm:space-x-4">
                     <div className="flex items-center space-x-2 w-full sm:w-auto">
-                        <Filter className="h-5 w-5 text-gray-400" />
+                        <CalendarClock className="h-5 w-5 text-gray-400" />
                         <select
                             className="bg-gray-800 text-white rounded-md px-3 py-2 w-full sm:w-auto"
                             value={selectedRange}
@@ -113,12 +113,14 @@ export default function OrderHistory() {
                                 <h3 className="text-lg font-semibold mb-2">{date}</h3>
                                 <div className="space-y-2">
                                     {orders.map((order) => (
-                                        <div key={order._id} onClick={() => navigate(user.userType == "customer" ? `/order/details/` : `/vendor/order/${order._id}`)}
+                                        <div key={order._id} onClick={() => navigate(user.userType == "customer" ? `/order/details/${order._id}` : `/vendor/order/${order._id}`)}
                                             className="bg-gray-800 p-4 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 cursor-pointer hover:border "
                                         >
                                             <div className="flex flex-col">
                                                 <span className="text-lg font-semibold">Order Id: {order._id.slice(18)}</span>
-                                                <span className="text-sm text-gray-400">{order.customer?.username || 'Unknown Customer'}</span>
+                                                <span className="text-sm text-gray-400">
+                                                    {user.userType === "vendor" ? order.customer?.username || 'Unknown Customer' : order.vendor.shopName || "Unknown Shop"}
+                                                </span>
                                             </div>
                                             <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
                                                 <span className="text-sm">{order.orderItems} product{order.orderItems > 1 ? 's' : ''}</span>

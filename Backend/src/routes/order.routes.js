@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-    placeOrder, manageOrder, getOrderHistory, getOrderById, getTodaysOrders, orderOverview
+    placeOrder, manageOrder, getOrderHistory, getOrderById, getOrders, orderOverview
 } from "../controllers/order.controller.js"
 import verifyJWT from "../middlewares/auth.middleware.js";
 
@@ -10,7 +10,7 @@ router.post("/", verifyJWT("customer"), placeOrder)
 
 router.get("/history/:duration", verifyJWT("both"), getOrderHistory)
 
-router.get("/today/:status", verifyJWT("vendor"), getTodaysOrders)
+router.get("/today/:status", verifyJWT("both"), getOrders)
 
 router.get("/view/:orderId", verifyJWT("both"), getOrderById)
 

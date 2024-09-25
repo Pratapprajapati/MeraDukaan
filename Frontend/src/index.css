@@ -74,7 +74,7 @@
 .shopClosed {
   will-change: filter;
   transition: filter 300ms;
-  filter: drop-shadow(0 0 1em #06f345);
+  filter: drop-shadow(0 0 1.5em #ff0000fd);
 }
 .home {
   will-change: filter;

@@ -55,7 +55,7 @@ const router = createBrowserRouter(
             <Route path='/customer' element={<Customer />} />
             <Route path='/cart' element={<Cart />} />
             <Route path='/order/place' element={<PlaceOrder />} />
-            <Route path='/order/details' element={<ViewOrder />} />
+            <Route path='/order/details/:orderId' element={<ViewOrder />} />
             <Route path='/order/recent' element={<RecentOrders />} />
             <Route path='/order/history' element={<OrderHistory />} />
             <Route path='/products' element={<Products />} />

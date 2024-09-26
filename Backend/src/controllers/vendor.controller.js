@@ -214,7 +214,7 @@ const nearbyVendors = async (req, res) => {
             let patternWithDirections = flexiblePattern;
             Object.entries(directionVariations).forEach(([abbr, variation]) => {
                 patternWithDirections = patternWithDirections.replace(
-                    new RegExp(`\\b${abbr}\\b`, 'g'), 
+                    new RegExp(`\\b${abbr}\\b`, 'g'),
                     variation
                 );
             });
@@ -249,11 +249,32 @@ const searchVendor = async (req, res) => {
 
 // VENDOR DETAILS
 const getVendor = async (req, res) => {
-    const {vendorId} = req.params
+    const { vendorId } = req.params
 
     const vendor = await Vendor.findById(vendorId)
     return res.status(200).json(new ApiResponse(200, vendor, "Details fetched"))
 }
+
+// PRODUCT BY VENDORS
+const getVendorDetails = async (req, res) => {
+    const { vendorsList } = req.body
+
+    const vendors = await Vendor.find({ _id: { $in: vendorsList } })
+        .select(" _id shopName location shopImage isOpen shopTimings"); // Only fetch necessary fields
+
+    // Return the formatted response
+    const vendorDetails = vendors.map(vendor => ({
+        _id: vendor._id,
+        shopName: vendor.shopName,
+        shopImage: vendor.shopImage,
+        location: vendor.location,
+        isOpen: vendor.isOpen,
+        shopTimings: vendor.shopTimings,
+    }));
+
+    return res.status(200).json(new ApiResponse(200, vendorDetails, "Details fetched"))
+};
+
 
 export {
     registerVendor,
@@ -265,4 +286,5 @@ export {
     changeShopImage,
     nearbyVendors,
     searchVendor,
+    getVendorDetails,
 }

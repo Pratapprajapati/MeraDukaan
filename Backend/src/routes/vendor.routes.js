@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-    registerVendor, login, logout, getVendor, updateVendor, changePassword, changeShopImage, nearbyVendors, searchVendor
+    registerVendor, login, logout, getVendor, updateVendor, changePassword, changeShopImage, nearbyVendors, searchVendor, getVendorDetails
 } from "../controllers/vendor.controller.js"
 import verifyJWT from "../middlewares/auth.middleware.js";
 import {upload} from "../middlewares/multer.middleware.js"
@@ -30,5 +30,7 @@ router.patch("/update/shopImage", verifyJWT("vendor"), upload.single("shopImage"
 router.get("/nearby/:distance", verifyJWT("customer"), nearbyVendors)
 
 router.get("/search", verifyJWT("customer"), searchVendor)
+
+router.post("/products", verifyJWT("customer"), getVendorDetails)
 
 export default router

@@ -32,6 +32,7 @@ import Dashboard from './Components/Vendor/Dashboard.jsx'
 import ProductList from './Components/Products/ProductList.jsx'
 import AddProduct from './Components/Products/AddProduct.jsx'
 import NewProduct from './Components/Products/NewProduct.jsx'
+import ProductShops from './Components/Products/ProductShops.jsx'
 
 // Orders Pages
 import PlaceOrder from './Components/Orders/PlaceOrder.jsx'
@@ -73,6 +74,7 @@ const router = createBrowserRouter(
             <Route path='/order/recent' element={<RecentOrders />} />
             <Route path='/order/history' element={<OrderHistory />} />
             <Route path='/products' element={<ProductList />} />
+            <Route path='/products/shops' element={<ProductShops />} />
             <Route path='/storefront' element={<StoreFront />} />
             
             {/* Fallback Route */}

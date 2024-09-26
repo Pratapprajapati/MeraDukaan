@@ -80,7 +80,7 @@ const ProductCard = ({ product, handleAddToInventory, inventory, }) => {
                         </div>
                     ) : (
                         <div>
-                            <Button className={`w-full mt-2 py-1.5 text-lg font-semibold`}>
+                            <Button className={`w-full mt-2 py-1.5 text-lg font-semibold`} onClick={() => navigate("shops", {state: product})}>
                                 Sold by {product.vendors.length} shops
                             </Button>
                         </div>

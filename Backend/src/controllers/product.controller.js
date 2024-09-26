@@ -59,15 +59,29 @@ const allProducts = async (req, res) => {
 const getVendorsForProducts = async (productIds) => {
     try {
         const inventories = await Inventory.aggregate([
-            { $match: { 'productList.product': { $in: productIds } } },
+            { 
+                $match: { 'productList.product': { $in: productIds } } 
+            },
+            { 
+                $unwind: "$productList" 
+            },
+            { 
+                $match: { 'productList.product': { $in: productIds } } 
+            },
             {
                 $group: {
-                    _id: null,
-                    vendorIds: { $addToSet: '$_id' } // Collecting unique vendor IDs
+                    _id: "$productList.product", // Group by product ID
+                    vendorIds: { $addToSet: "$_id" } // Collect unique vendor IDs per product
                 }
             }
         ]);
-        return inventories.length > 0 ? inventories[0].vendorIds : [];
+
+        const vendorMap = {};
+        inventories.forEach(item => {
+            vendorMap[item._id] = item.vendorIds;
+        });
+
+        return vendorMap;
     } catch (error) {
         console.error("Error fetching vendor IDs:", error);
         throw new Error("Failed to fetch vendor information");
@@ -91,7 +105,7 @@ const searchProduct = async (req, res) => {
         }
 
         const productIds = products.map(p => p._id);
-        const vendors = await getVendorsForProducts(productIds);
+        const vendorsMap = await getVendorsForProducts(productIds);
 
         const result = products.map(product => ({
             product: {
@@ -101,7 +115,7 @@ const searchProduct = async (req, res) => {
                 category: product.category,
                 subCategory: product.subCategory,
                 image: product.image,
-                vendors: vendors
+                vendors: vendorsMap[product._id] || [] // Get vendors for each product
             },
         }));
 
@@ -135,7 +149,7 @@ const specificProducts = async (req, res) => {
             .sort({ createdAt: -1 });
 
         const productIds = products.map(p => p._id);
-        const vendors = await getVendorsForProducts(productIds);
+        const vendorsMap = await getVendorsForProducts(productIds);
 
         const result = products.map(({ _id, name, price, subCategory, image }) => ({
             id: _id,
@@ -143,7 +157,7 @@ const specificProducts = async (req, res) => {
             price,
             subCategory,
             image,
-            vendors,
+            vendors: vendorsMap[_id] || [] // Get vendors for each product
         }));
 
         return res.status(200).json(new ApiResponse(200, { totalProducts, products: result }, "Fetched products"));
@@ -198,7 +212,7 @@ const getSampleProductsFromEachCategory = async (req, res) => {
         ]);
 
         const productIds = sampleProducts.map(p => p.products._id);
-        const vendors = await getVendorsForProducts(productIds);
+        const vendorsMap = await getVendorsForProducts(productIds);
 
         const result = sampleProducts.map(item => ({
             products: {
@@ -208,7 +222,7 @@ const getSampleProductsFromEachCategory = async (req, res) => {
                 category: item.products.category,
                 subCategory: item.products.subCategory,
                 image: item.products.image,
-                vendors: vendors
+                vendors: vendorsMap[item.products._id] || [] // Get vendors for each product
             },
         }));
 

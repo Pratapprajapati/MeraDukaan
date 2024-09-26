@@ -117,43 +117,36 @@ const logout = async (req, res) => {
 
 // UPDATE USER
 const updateVendor = async (req, res) => {
-    const {
-        email, returnPol,
-        shopName, shopType, delivery,
-        city, address, pincode, area,
-        primary, secondary,
-        start, end, shopOpen
-    } = req.body;
+    const body = req.body;
 
     const curUser = req.user._id
     if (!curUser) return res.status(400).json(new ApiResponse(400, "No user"))
 
     const user = await Vendor.findById(req.user._id)
 
-    if (email) user.email = email
+    if (body.email) user.email = body.email
+    if (body["contact.primary"]) user.contact.primary = body["contact.primary"]
+    if (body["contact.secondary"]) user.contact.secondary = body["contact.secondary"]
 
-    if (primary) user.contact.primary = primary
-    if (secondary) user.contact.secondary = secondary
+    if (body["location.address"]) user.location.address = body["location.address"]
+    if (body["location.area"]) user.location.area = body["location.area"]
+    if (body["location.city"]) user.location.city = body["location.city"]
+    if (body["location.pincode"]) user.location.pincode = body["location.pincode"]
+    if (body.returnPol) user.returnPol = body.returnPol
 
-    if (address) user.location.address = address
-    if (city) user.location.city = city
-    if (area) user.location.area = area
-    if (pincode) user.location.pincode = pincode
-    if (returnPol) user.location.returnPol = returnPol
+    if (body.shopName) user.shopName = body.shopName
+    if (body.shopType) user.shopType = body.shopType
+    if (body.shopOpen) user.shopOpen = body.shopOpen
+    if (body.delivery) user.delivery = body.delivery
 
-    if (shopName) user.shopName = shopName
-    if (shopType) user.shopType = shopType
-    if (shopOpen) user.shopOpen = shopOpen
-    if (delivery) user.delivery = delivery
-
-    if (start) user.start = start
-    if (end) user.end = end
+    if (body["shopTimings.start"]) user.shopTimings.start = body["shopTimings.start"]
+    if (body["shopTimings.end"]) user.shopTimings.end = body["shopTimings.end"]
 
     user.save({ validateBeforeSave: false })
 
     const vendor = await Vendor.findById(user?._id).select("-password -refreshToken")
 
-    return res.status(201).json(new ApiResponse(201, vendor, "Vendor updated!"))
+    return res.status(201).json(new ApiResponse(201, vendor, "Shop details updated!"))
 }
 
 // CHANGE PASSWORD
@@ -163,10 +156,10 @@ const changePassword = async (req, res) => {
     const user = await Vendor.findById(req.user._id).select("password")
 
     const verify = await user.isPasswordCorrect(oldPassword)
-    if (!verify) res.json(new ApiResponse(400, "", "Incorrect password"))
+    if (!verify) return res.status(400).json(new ApiResponse(400, "", "Incorrect password"))
 
     user.password = newPassword
-    user.save({ validateBeforeSave: false })
+    await user.save({ validateBeforeSave: false })
 
     return res.status(200).json(new ApiResponse(200, "", "Password changed."))
 }

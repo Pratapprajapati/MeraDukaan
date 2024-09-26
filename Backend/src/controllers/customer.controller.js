@@ -18,7 +18,7 @@ const register = async (req, res) => {
 
     const user = await Customer.create({
         username,
-        email, 
+        email,
         age,
         password,
         contact: { primary, secondary },
@@ -57,19 +57,16 @@ const login = async (req, res) => {
     const { username, email, password } = req.body
     if (!username && !email) new ApiResponse(400, null, "Username or Email is required!!")
 
-    // Search for user
     const user = await Customer.findOne({
         $or: [{ username }, { email }]
     })
     if (!user) return res.status(400).json(new ApiResponse(400, null, "Incorrect username or email"))
 
-    // Check for password
     const validPassword = await user.isPasswordCorrect(password)
     if (!validPassword) return res.status(400).json(new ApiResponse(400, null, "Password incorrect"))
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
 
-    // If everything checks out
     const customer = await Customer.findById(user?._id).select("-password -refreshToken")
 
     const customerData = CryptoJS.AES.encrypt(JSON.stringify(customer), "secretKey").toString()
@@ -97,7 +94,7 @@ const logout = async (req, res) => {
     )
 
     return res.status(200)
-        .clearCookie("accessToken")     // clears tokens from cookies
+        .clearCookie("accessToken")
         .clearCookie("refreshToken")
         .clearCookie("user")
         .json(new ApiResponse(200, {}, "User logged out successfully!!"))
@@ -105,23 +102,23 @@ const logout = async (req, res) => {
 
 // UPDATE USER
 const updateCustomer = async (req, res) => {
-    const { username, email, primary, secondary, address, city, pincode } = req.body
+    const body = req.body
 
     const curUser = req.user._id
     if (!curUser) return res.status(400).json(new ApiResponse(400, "No user"))
 
     const user = await Customer.findById(req.user._id)
 
-    if (username) user.username = username
-    if (email) user.email = email
-    if (primary) user.contact.primary = primary
-    if (secondary) user.contact.secondary = secondary
-    if (address) user.location.address = address
-    if (city) user.location.city = city
-    if (pincode) user.location.pincode = pincode
+    if (body.email) user.email = body.email
+    if (body["contact.primary"]) user.contact.primary = body["contact.primary"]
+    if (body["contact.secondary"]) user.contact.secondary = body["contact.secondary"]
+    if (body["location.address"]) user.location.address = body["location.address"]
+    if (body["location.area"]) user.location.area = body["location.area"]
+    if (body["location.city"]) user.location.city = body["location.city"]
+    if (body["location.pincode"]) user.location.pincode = body["location.pincode"]
     user.save({ validateBeforeSave: false })
 
-    const customer = await Customer.findById(user?._id).select("-password")
+    const customer = await Customer.findById(user?._id).select(" -cart -password -refreshToken ")
 
     return res.status(201).json(new ApiResponse(201, customer, "Customer updated!"))
 }
@@ -143,7 +140,8 @@ const changePassword = async (req, res) => {
 
 // CUSTOMER DETAILS
 const getCurrentUser = async (req, res) => {
-    return res.status(200).json(new ApiResponse(200, req.user, "Details fetched"))
+    const customer = await Customer.findById(req.user._id).select(" -cart -password -refreshToken")
+    return res.status(200).json(new ApiResponse(200, customer, "Details fetched"))
 }
 
 // ADD TO CART
@@ -255,11 +253,7 @@ const getCart = async (req, res) => {
                         subCategory: "$productDetails.subCategory",
                         price: "$productDetails.price"
                     },
-                    "cart.inventoryDetails": {
-                        stock: "$inventoryDetails.stock",
-                        description: "$inventoryDetails.description",
-                        discount: "$inventoryDetails.discount"
-                    },
+                    "cart.inventoryDetails": 1,
                     "cart.vendor": "$cart.vendor",
                     "cart.price": {
                         $cond: {

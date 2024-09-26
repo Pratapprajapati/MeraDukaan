@@ -209,7 +209,7 @@ const clearCart = async (req, res) => {
 
 const getCart = async (req, res) => {
     try {
-        // Aggregate customer cart with product and inventory details
+        // Aggregate customer cart with product, vendor, and inventory details
         const customerCart = await Customer.aggregate([
             {
                 $match: { _id: new mongoose.Types.ObjectId(req.user._id) } // Match the customer by ID
@@ -218,7 +218,6 @@ const getCart = async (req, res) => {
                 $unwind: "$cart" // Unwind the cart array to work on each cart item separately
             },
             {
-
                 $lookup: {
                     from: "products",
                     localField: "cart.product", // productId stored in the cart
@@ -231,16 +230,49 @@ const getCart = async (req, res) => {
             },
             {
                 $lookup: {
-                    from: "inventories",
-                    localField: "cart.vendor",
+                    from: "vendors",
+                    localField: "cart.vendor", // vendorId stored in the cart
                     foreignField: "_id",
+                    as: "vendorDetails"
+                }
+            },
+            {
+                $unwind: "$vendorDetails" // Unwind vendor details since lookup returns an array
+            },
+            {
+                $lookup: {
+                    from: "inventories",
+                    let: { vendorId: "$cart.vendor", productId: "$cart.product" }, // Match vendor and product IDs
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: ["$_id", "$$vendorId"] // Match inventory by vendor ID
+                                }
+                            }
+                        },
+                        {
+                            $project: {
+                                productDetails: {
+                                    $filter: {
+                                        input: "$productList",
+                                        as: "productItem",
+                                        cond: { $eq: ["$$productItem.product", "$$productId"] } // Match product within productList
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            $unwind: "$productDetails" // Unwind the product details from the inventory
+                        }
+                    ],
                     as: "inventoryDetails"
                 }
             },
             {
                 $unwind: {
-                    path: "$inventoryDetails",
-                    preserveNullAndEmptyArrays: true // Allow nulls in case no inventory details match
+                    path: "$inventoryDetails", // Unwind inventory details if available
+                    preserveNullAndEmptyArrays: true // Allow null inventory details if not found
                 }
             },
             {
@@ -251,16 +283,20 @@ const getCart = async (req, res) => {
                         name: "$productDetails.name",
                         category: "$productDetails.category",
                         subCategory: "$productDetails.subCategory",
-                        price: "$productDetails.price"
+                        price: "$productDetails.price",
                     },
-                    "cart.inventoryDetails": 1,
-                    "cart.vendor": "$cart.vendor",
-                    "cart.price": {
-                        $cond: {
-                            if: { $gt: ["$inventoryDetails.price", 0] },
-                            then: "$inventoryDetails.price",
-                            else: "$productDetails.price"
-                        } // If inventory has its own price, use it, else use product price
+                    "cart.inventoryDetails": {
+                        price: "$inventoryDetails.productDetails.price",
+                        stock: "$inventoryDetails.productDetails.stock",
+                        description: "$inventoryDetails.productDetails.description",
+                        discount: "$inventoryDetails.productDetails.discount"
+                    },
+                    "cart.vendor": {
+                        _id: "$vendorDetails._id",
+                        shopName: "$vendorDetails.shopName",
+                        isOpen: "$vendorDetails.isOpen",
+                        location: "$vendorDetails.location",
+                        shopTimings: "$vendorDetails.shopTimings"
                     },
                     "cart.count": "$cart.count", // Keep the count as it is
                 }
@@ -272,20 +308,25 @@ const getCart = async (req, res) => {
             return res.status(404).json(new ApiResponse(404, null, "Cart not found"));
         }
 
-        // Log the intermediate customerCart to check if inventory details were fetched
-        console.log("Customer Cart with Details:", customerCart);
-
         // Group cart items by vendorId
         let cartByVendor = {};
         customerCart.forEach(item => {
-            const vendorId = item.cart.vendor.toString();
+            const vendorId = item.cart.vendor._id.toString();
             if (!cartByVendor[vendorId]) {
-                cartByVendor[vendorId] = [];
+                cartByVendor[vendorId] = {
+                    vendorInfo: {
+                        shopName: item.cart.vendor.shopName,
+                        isOpen: item.cart.vendor.isOpen,
+                        location: item.cart.vendor.location,
+                        shopTimings: item.cart.vendor.shopTimings
+                    },
+                    products: []
+                };
             }
-            cartByVendor[vendorId].push({
+            cartByVendor[vendorId].products.push({
                 product: item.cart.product,
-                price: item.cart.price,
                 count: item.cart.count,
+                price: item.cart.inventoryDetails ? item.cart.inventoryDetails.price : null,
                 stock: item.cart.inventoryDetails ? item.cart.inventoryDetails.stock : null,
                 description: item.cart.inventoryDetails ? item.cart.inventoryDetails.description : null,
                 discount: item.cart.inventoryDetails ? item.cart.inventoryDetails.discount : null

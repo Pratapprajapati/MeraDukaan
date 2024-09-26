@@ -3,51 +3,50 @@ import { ShoppingCart, Clock } from "lucide-react";
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Loading from '../AppPages/Loading';
-
-const vendors = [
-    {
-        id: 1,
-        shopName: 'Local Shop 1',
-        shopAddress: '123 Market St, City, State',
-        isOpen: true,
-        products: [
-            { name: 'Nike Air Force 1 07 LV8', price: '₹61,999' },
-            { name: 'Nike Run Division, Airmax Pro Ultra Mens Runnig Shoes', price: '₹22,500' },
-            { name: 'Product 3', price: '₹9,999' },
-            { name: 'Product 4', price: '₹12,000' },
-            { name: 'Product 5', price: '₹3,000' },
-        ],
-        total: '₹1,09,498',
-    },
-    {
-        id: 2,
-        shopName: 'Local Shop 2',
-        shopAddress: '456 High St, City, State',
-        isOpen: false,
-        products: [
-            { name: 'Product 1', price: '₹12,000' },
-            { name: 'Product 2', price: '₹9,500' },
-            { name: 'Product 3', price: '₹3,999' },
-        ],
-        total: '₹25,499',
-    },
-];
+import { convertToAmPm } from '../utility';
 
 export default function Cart() {
-
-    const customer = useOutletContext()
-    const navigate = useNavigate()
-    const [loading, setLoading] = useState(true)
+    const customer = useOutletContext();
+    const [cart, setCart] = useState(null);
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        customer.userType != "customer" ? navigate(-1) : null
-        setLoading(false)
-    })
+        if (customer.userType !== "customer") {
+            navigate(-1);
+        } else {
+            axios.get(`/api/customer/cart`)
+                .then(res => {
+                    const data = res.data.data;
+                    const formattedCart = Object.entries(data).map(([id, cartData]) => {
+                        const { vendorInfo, products } = cartData;
+                        const total = products.reduce((sum, item) => sum + (item.price || item.product.price) * item.count, 0);
+
+                        return {
+                            id,
+                            shopName: vendorInfo.shopName,
+                            shopAddress: vendorInfo.location.address + ", " + vendorInfo.location.area || "No address available",
+                            shopTimings: vendorInfo.shopTimings,
+                            isOpen: vendorInfo.isOpen,
+                            products: products.map(p => ({
+                                name: p.product.name,
+                                price: p.price || p.product.price
+                            })),
+                            total: `₹${total}`,
+                        };
+                    });
+                    setCart(formattedCart);
+                })
+                .catch(e => console.error(e.response?.data?.message || e.message))
+                .finally(() => setLoading(false));
+        }
+    }, []);
 
     if (loading) return <Loading />;
 
     const handleCardClick = (id) => {
-        navigate("/order/place")
+        console.log(id)
+        navigate("/order/place", {state: id});
     };
 
     return (
@@ -56,10 +55,10 @@ export default function Cart() {
                 <ShoppingCart className="inline-flex w-10 h-10 me-2 items-start" />Your Cart
             </h2>
             <div className="mt-3 text-gray-300">
-                Your cart items are sorted according to their respective vendors
+                Your cart items are sorted according to their respective vendors.
             </div>
             <div className="mt-8 flex flex-col space-y-8">
-                {vendors.map((vendor) => (
+                {cart && cart.map((vendor) => (
                     <div
                         key={vendor.id}
                         onClick={() => handleCardClick(vendor.id)}
@@ -69,16 +68,22 @@ export default function Cart() {
                             <div className="flex flex-col space-y-1.5 -my-3">
                                 <div className="flex justify-between">
                                     <p className='text-2xl font-bold text-yellow-500'>{vendor.shopName}</p>
-                                    {vendor.isOpen ?
+                                    {vendor.isOpen ? 
                                         <span className="text-green-500 flex items-center"><Clock className="w-4 h-4 mr-1" /> Open</span> :
                                         <span className="text-red-500 flex items-center"><Clock className="w-4 h-4 mr-1" /> Closed</span>
                                     }
                                 </div>
-                                <p className="text-md text-gray-400 line-clamp-2"><span className="font-semibold">Address:</span> {vendor.shopAddress}</p>
+                                <p className="text-md text-gray-400 line-clamp-3">
+                                    <span className="font-semibold">Address:</span> {vendor.shopAddress}
+                                </p>
+                                <p className="text-md text-gray-400">
+                                    <span className="font-semibold">Shop Timings: </span> 
+                                    {convertToAmPm(vendor.shopTimings.start) + " - " + convertToAmPm(vendor.shopTimings.end)}
+                                </p>
                             </div>
                         </div>
                         <div className="w-full md:w-3/5 py-3 px-4 flex flex-col justify-between">
-                            <div className=''>
+                            <div>
                                 <h3 className="text-lg font-semibold mb-2">Cart Items</h3>
                                 <ul className="mt-4 text-sm font-medium text-gray-400 list-disc list-inside">
                                     {vendor.products.slice(0, 2).map((product, index) => (

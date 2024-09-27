@@ -366,15 +366,156 @@ const getCart = async (req, res) => {
 };
 
 
+// SPECIFIC VENDOR'S CART
+const vendorCart = async (req, res) => {
+    try {
+        const { vendorId } = req.params; // Get vendorId from the request parameters
+        const user = req.user
+
+        // Aggregate customer's cart for the specific vendor with product and inventory details
+        const customerCart = await Customer.aggregate([
+            {
+                $match: { _id: new mongoose.Types.ObjectId(req.user._id) } // Match the customer by ID
+            },
+            {
+                $unwind: "$cart" // Unwind the cart array to work on each cart item separately
+            },
+            {
+                $match: { "cart.vendor": new mongoose.Types.ObjectId(vendorId) } // Filter cart items for the specific vendor
+            },
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "cart.product", // productId stored in the cart
+                    foreignField: "_id",
+                    as: "productDetails"
+                }
+            },
+            {
+                $unwind: "$productDetails" // Unwind product details since lookup returns an array
+            },
+            {
+                $lookup: {
+                    from: "vendors",
+                    localField: "cart.vendor", // vendorId stored in the cart
+                    foreignField: "_id",
+                    as: "vendorDetails"
+                }
+            },
+            {
+                $unwind: "$vendorDetails" // Unwind vendor details since lookup returns an array
+            },
+            {
+                $lookup: {
+                    from: "inventories",
+                    let: { vendorId: "$cart.vendor", productId: "$cart.product" }, // Match vendor and product IDs
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: ["$_id", "$$vendorId"] // Match inventory by vendor ID
+                                }
+                            }
+                        },
+                        {
+                            $project: {
+                                productDetails: {
+                                    $filter: {
+                                        input: "$productList",
+                                        as: "productItem",
+                                        cond: { $eq: ["$$productItem.product", "$$productId"] } // Match product within productList
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            $unwind: "$productDetails" // Unwind the product details from the inventory
+                        }
+                    ],
+                    as: "inventoryDetails"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$inventoryDetails", // Unwind inventory details if available
+                    preserveNullAndEmptyArrays: true // Allow null inventory details if not found
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    "cart.product": {
+                        _id: "$productDetails._id",
+                        name: "$productDetails.name",
+                        image: "$productDetails.image",
+                        subCategory: "$productDetails.subCategory",
+                        price: "$productDetails.price", // Product price (fallback)
+                    },
+                    "cart.inventoryDetails": {
+                        price: {
+                            $ifNull: ["$inventoryDetails.productDetails.price", "$productDetails.price"] // Use inventory price, or fallback to product price
+                        },
+                        stock: "$inventoryDetails.productDetails.stock",
+                        description: "$inventoryDetails.productDetails.description",
+                        discount: "$inventoryDetails.productDetails.discount"
+                    },
+                    "cart.vendor": {
+                        _id: "$vendorDetails._id",
+                        shopName: "$vendorDetails.shopName",
+                        isOpen: "$vendorDetails.isOpen",
+                        location: "$vendorDetails.location",
+                        delivery: "$vendorDetails.delivery",
+                        shopTimings: "$vendorDetails.shopTimings"
+                    },
+                    "cart.count": "$cart.count", // Keep the count as it is
+                }
+            }
+        ]);
+
+        // If no cart found for the vendor, return an error
+        if (!customerCart.length) {
+            return res.status(404).json(new ApiResponse(404, null, "Cart not found for this vendor"));
+        }
+
+        // Group the products by the vendor (since there's only one vendor, no need to group by vendorId)
+        let vendorCart = {
+            customerInfo: {
+                address: user.location.address + ", " + user.location.area,
+                contact: user.contact.primary,
+            },
+            vendorInfo: {
+                _id: customerCart[0].cart.vendor._id,
+                shopName: customerCart[0].cart.vendor.shopName,
+                isOpen: customerCart[0].cart.vendor.isOpen,
+                location: customerCart[0].cart.vendor.location,
+                delivery: customerCart[0].cart.vendor.delivery,
+                shopTimings: customerCart[0].cart.vendor.shopTimings
+            },
+            products: customerCart.map(item => ({
+                product: item.cart.product,
+                count: item.cart.count,
+                price: item.cart.inventoryDetails ? item.cart.inventoryDetails.price : item.cart.product.price, // Fallback to product price
+                stock: item.cart.inventoryDetails ? item.cart.inventoryDetails.stock : null,
+                description: item.cart.inventoryDetails ? item.cart.inventoryDetails.description : null,
+                discount: item.cart.inventoryDetails ? item.cart.inventoryDetails.discount : null
+            }))
+        };
+
+        // Return the cart for the specific vendor
+        return res.status(200).json(new ApiResponse(200, vendorCart, "Vendor cart fetched successfully"));
+    } catch (error) {
+        console.error("Error fetching vendor cart:", error);
+        return res.status(500).json(new ApiResponse(500, null, "Failed to fetch vendor cart"));
+    }
+};
+
 
 // CART ITEMS OF SPECIFIC VENDOR (ONLY IDs)
 const getCartItemsByVendor = async (req, res) => {
     const { vendor } = req.params
+    const cart = req.user.cart
 
-    const cart = await Customer.findById(req.user._id).select(" cart -_id ")
-    // console.log(cart)
-
-    const vendorCart = cart.cart.filter(item =>
+    const vendorCart = cart.filter(item =>
         item.vendor.toString() === vendor
     );
 
@@ -383,6 +524,22 @@ const getCartItemsByVendor = async (req, res) => {
     }
 
     return res.status(200).json(new ApiResponse(200, vendorCart, "Cart items fetched"));
+};
+
+
+// REMOVE CART ITEMS OF SPECIFIC VENDOR
+const deleteCartItemsByVendor = async (req, res) => {
+    const { vendor } = req.params;
+    const cart = req.user.cart;
+
+    const updatedCart = cart.filter(item => item.vendor.toString() !== vendor);
+
+    if (cart.length === updatedCart.length) return res.status(404).json(new ApiResponse(404, null, "No cart items found for this vendor"));
+
+    req.user.cart = updatedCart;
+    await req.user.save();
+
+    return res.status(200).json(new ApiResponse(200, updatedCart, "Cart items deleted successfully"));
 };
 
 
@@ -424,5 +581,7 @@ export {
     clearCart,
     addReview,
     getCart,
+    vendorCart,
     getCartItemsByVendor,
+    deleteCartItemsByVendor,
 }

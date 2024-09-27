@@ -26,7 +26,8 @@ const orderSchema = new Schema({
                 type: Number,
                 required: true,
                 default: 0
-            }
+            },
+            _id: false
         }
     ],
     bill: {
@@ -61,10 +62,6 @@ const orderSchema = new Schema({
 
 // Pre-save middleware to calculate total for each item and the total bill amount
 orderSchema.pre("save", function(next) {
-    this.orderItems.forEach(item => {
-        item.total = item.count * item.product.price;  // Calculate total for each item
-    });
-
     this.bill = this.orderItems.reduce((acc, item) => acc + item.total, 0); // Calculate total bill
     next();
 });

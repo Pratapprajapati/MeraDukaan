@@ -170,7 +170,7 @@ export default function Order() {
                     </div>
 
                     <div>
-                        <Total products={orderItems.length} bill={`₹${bill}`} />
+                        <Total products={orderItems.length} bill={`${bill}`} />
                         {
                             orderStatus === "pending" ? (
                                 <div className='flex justify-between mt-6 max-sm:space-x-4'>

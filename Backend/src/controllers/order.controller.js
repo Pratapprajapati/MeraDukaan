@@ -2,22 +2,104 @@ import ApiResponse from "../utils/ApiResponse.js";
 import Order from "../models/order.model.js"
 import mongoose, { isValidObjectId } from "mongoose";
 import Product from "../models/product.model.js";
+import Customer from "../models/customer.model.js";
 
 const placeOrder = async (req, res) => {
-    const { vendor, cart, description } = req.body
-
+    const { vendor, description } = req.body
     if (!isValidObjectId(vendor)) return res.status(400).json(new ApiResponse(400, "", "Vendor not vendorId"))
 
-    for (let prod of cart) {
-        const product = await Product.findById(prod.product).select("name price")
-        if (!product) return res.status(400).json(new ApiResponse(400, null, "Product not found."))
-        prod.product = product
+    const customerCart = await Customer.aggregate([
+        {
+            $match: { _id: new mongoose.Types.ObjectId(req.user._id) } // Match the customer by ID
+        },
+        {
+            $unwind: "$cart" // Unwind the cart array to work on each cart item separately
+        },
+        {
+            $match: { "cart.vendor": new mongoose.Types.ObjectId(vendor) } // Filter cart items for the specific vendor
+        },
+        {
+            $lookup: {
+                from: "products",
+                localField: "cart.product", // productId stored in the cart
+                foreignField: "_id",
+                as: "productDetails"
+            }
+        },
+        {
+            $unwind: "$productDetails" // Unwind product details since lookup returns an array
+        },
+        {
+            $lookup: {
+                from: "inventories",
+                let: { vendorId: "$cart.vendor", productId: "$cart.product" }, // Match vendor and product IDs
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $eq: ["$_id", "$$vendorId"] // Match inventory by vendor ID
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            productDetails: {
+                                $filter: {
+                                    input: "$productList",
+                                    as: "productItem",
+                                    cond: { $eq: ["$$productItem.product", "$$productId"] } // Match product within productList
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $unwind: "$productDetails" // Unwind the product details from the inventory
+                    }
+                ],
+                as: "inventoryDetails"
+            }
+        },
+        {
+            $unwind: {
+                path: "$inventoryDetails", // Unwind inventory details if available
+                preserveNullAndEmptyArrays: true // Allow null inventory details if not found
+            }
+        },
+        {
+            $project: {
+                _id: 1,
+                "cart.product": {
+                    _id: "$productDetails._id",
+                    price: "$productDetails.price", // Product price (fallback)
+                },
+                "cart.inventoryDetails": {
+                    price: {
+                        $ifNull: ["$inventoryDetails.productDetails.price", "$productDetails.price"] // Use inventory price, or fallback to product price
+                    },
+                    stock: "$inventoryDetails.productDetails.stock" // Stock info from the inventory
+                },
+                "cart.count": "$cart.count", // Keep the count as it is
+            }
+        }
+    ]);
+
+    // If no cart found for the vendor, return an error
+    if (!customerCart.length) {
+        return res.status(404).json(new ApiResponse(404, null, "Cart not found for this vendor"));
     }
+
+    // Group the products for the specific vendor
+    let vendorCart = customerCart.map(item => ({
+        product: { _id: item.cart.product._id },
+        count: item.cart.count,
+        stock: item.cart.inventoryDetails ? item.cart.inventoryDetails.stock : null,
+        total: item.cart.count * (item.cart.inventoryDetails ? item.cart.inventoryDetails.price : item.cart.product.price)  // Calculate total here
+    }));
 
     const order = await Order.create({
         customer: req.user._id,
         vendor,
-        orderItems: cart,
+        orderItems: vendorCart,
         description: { customer: description }
     })
     if (!order) return res.status(500).json(new ApiResponse(500, null, "Something went wrong while placing the order"))
@@ -198,7 +280,7 @@ const getOrders = async (req, res) => {
         ...searchIn,
         createdAt: { $gte: duration }
     };
-    
+
     if (status !== "all") matchConditions.orderStatus = status;
 
     const orders = await Order.aggregate([
@@ -225,7 +307,7 @@ const getOrders = async (req, res) => {
                 as: 'vendor',
                 pipeline: [
                     {
-                       $project: {shopName: 1, location: 1, isOpen: 1}
+                        $project: { shopName: 1, location: 1, isOpen: 1 }
                     }
                 ]
             }
@@ -248,8 +330,8 @@ const getOrders = async (req, res) => {
         },
         {
             $project: {
-                createdAt: 1, 
-                vendor:1,
+                createdAt: 1,
+                vendor: 1,
                 customer: { username: 1, location: 1 },
                 orderItems: 1,
                 orderStatus: 1,

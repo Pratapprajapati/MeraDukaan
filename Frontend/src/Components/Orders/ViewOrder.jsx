@@ -138,7 +138,7 @@ export default function Order() {
                     </div>
 
                     <div className='space-y-3'>
-                        <Total products={orderItems.length} bill={`₹${bill}`} />
+                        <Total products={orderItems.length} bill={`${bill}`} />
                         {
                             orderStatus === "pending" && (
                                 <button

@@ -261,7 +261,7 @@ const getOrders = async (req, res) => {
     ]);
 
     if (!orders || orders.length === 0) {
-        return res.status(400).json(new ApiResponse(400, null, "No orders found for today."));
+        return res.status(200).json(new ApiResponse(200, [], "No orders found for today."));
     }
 
     // Modify the data as needed for the response

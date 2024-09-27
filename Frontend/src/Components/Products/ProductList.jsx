@@ -28,12 +28,14 @@ export default function ProductList() {
     useEffect(() => {
         setLoading(true)
         // Getting inventory products to check if prod exists
-        axios.get(`/api/inventory/products`)
-            .then(res => {
-                const data = res.data.data;
-                setInventory(data)
-            })
-            .catch(e => console.error(e.response.data.message));
+        if (user.userType == "vendor") {
+            axios.get(`/api/inventory/products`)
+                .then(res => {
+                    const data = res.data.data;
+                    setInventory(data)
+                })
+                .catch(e => console.error(e.response.data.message));
+        }
 
         // Getting ALl Category products or specific category products conditionally
         if (selectedSubCategory === "All Categories") {

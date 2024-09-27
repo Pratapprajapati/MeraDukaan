@@ -67,7 +67,7 @@ const login = async (req, res) => {
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
 
-    const customer = await Customer.findById(user?._id).select("-password -refreshToken")
+    const customer = await Customer.findById(user?._id).select(" _id userType userStatus")
 
     const customerData = CryptoJS.AES.encrypt(JSON.stringify(customer), "secretKey").toString()
 
@@ -179,7 +179,7 @@ const addToCart = async (req, res) => {
 
     if (cartItemIndex > -1) {
         // If the product is already in the cart, update the count
-        customer.cart[cartItemIndex].count += count;
+        customer.cart[cartItemIndex].count = count;
     } else {
         // Otherwise, add it to the cart
         customer.cart.push({
@@ -196,6 +196,31 @@ const addToCart = async (req, res) => {
 
 };
 
+
+//REMOVE FROM CART
+const removeFromCart = async (req, res) => {
+    const { product, vendor } = req.body
+    console.log(req.body)
+
+    const customer = await Customer.findById(req.user._id).select(" cart ")
+
+    if (!customer) return res.status(404).json(new ApiResponse(404, null, "Customer not found"));
+
+    const itemIndex = customer.cart.findIndex(
+        (item) =>
+            item.product.toString() === product &&
+            item.vendor.toString() === vendor
+    );
+    if (itemIndex === -1) return res.status(404).json(new ApiResponse(404, null, "Item not found in cart"));
+
+    customer.cart.splice(itemIndex, 1); // Remove 1 item at the found index
+
+    await customer.save();
+
+    return res.status(200).json(new ApiResponse(200, null, "Item removed from cart successfully"));
+};
+
+
 // CLEAR CART
 const clearCart = async (req, res) => {
     const customer = await Customer.findByIdAndUpdate(
@@ -207,6 +232,7 @@ const clearCart = async (req, res) => {
     return res.status(200).json(new ApiResponse(200, customer, "Cleared cart"))
 }
 
+// GET CART WITH PRODUCT, VENDOR AND INVENTORY DETAILS
 const getCart = async (req, res) => {
     try {
         // Aggregate customer cart with product, vendor, and inventory details
@@ -281,8 +307,6 @@ const getCart = async (req, res) => {
                     "cart.product": {
                         _id: "$productDetails._id",
                         name: "$productDetails.name",
-                        category: "$productDetails.category",
-                        subCategory: "$productDetails.subCategory",
                         price: "$productDetails.price",
                     },
                     "cart.inventoryDetails": {
@@ -341,6 +365,27 @@ const getCart = async (req, res) => {
     }
 };
 
+
+
+// CART ITEMS OF SPECIFIC VENDOR (ONLY IDs)
+const getCartItemsByVendor = async (req, res) => {
+    const { vendor } = req.params
+
+    const cart = await Customer.findById(req.user._id).select(" cart -_id ")
+    // console.log(cart)
+
+    const vendorCart = cart.cart.filter(item =>
+        item.vendor.toString() === vendor
+    );
+
+    if (!vendorCart) {
+        return res.status(404).json(new ApiResponse(404, null, "No cart items found for this vendor"));
+    }
+
+    return res.status(200).json(new ApiResponse(200, vendorCart, "Cart items fetched"));
+};
+
+
 // ADD REVIEW
 const addReview = async (req, res) => {
     const { orderId } = req.params
@@ -375,7 +420,9 @@ export {
     changePassword,
     getCurrentUser,
     addToCart,
+    removeFromCart,
     clearCart,
     addReview,
     getCart,
+    getCartItemsByVendor,
 }

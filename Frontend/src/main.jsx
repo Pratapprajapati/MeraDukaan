@@ -16,9 +16,9 @@ import CustomerRegister from './Components/AppPages/CustomerRegister.jsx'
 
 // Customer Pages
 import Categories from './Components/Listings/Categories.jsx'
-import Shops from './Components/Customer/Shops.jsx'
+import Shops from './Components/Customer/ShopPages/Shops.jsx'
 import Customer from './Components/Customer/Customer.jsx'
-import StoreFront from './Components/Customer/StoreFront.jsx'
+import StoreFront from './Components/Customer/ShopPages/StoreFront.jsx'
 import Cart from './Components/Customer/CartList.jsx'
 import Products from './Components/Customer/Products.jsx'
 import AccessBar from './Components/Customer/AccessBar.jsx'
@@ -66,6 +66,7 @@ const router = createBrowserRouter(
             <Route path='/categories' element={<Categories />} />
             <Route path='/shops' element={<Shops />} />
             <Route path='/shops/vendor/:vendorId' element={<Vendor />} />
+            <Route path='/shops/vendor/:vendorId/storefront' element={<StoreFront />} />
             <Route path='/about' element={<About />} />
             <Route path='/customer' element={<Customer />} />
             <Route path='/cart' element={<Cart />} />
@@ -75,7 +76,6 @@ const router = createBrowserRouter(
             <Route path='/order/history' element={<OrderHistory />} />
             <Route path='/products' element={<ProductList />} />
             <Route path='/products/shops' element={<ProductShops />} />
-            <Route path='/storefront' element={<StoreFront />} />
             
             {/* Fallback Route */}
             <Route path='/*' element={<Error />} />

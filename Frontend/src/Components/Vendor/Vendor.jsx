@@ -236,7 +236,7 @@ export default function ShopDetailsPage() {
                                     <ShoppingCart className="mr-2" /> Cart Items of this Vendor
                                 </button>
                                 <button
-                                    onClick={() => navigate("/storefront")}
+                                    onClick={() => navigate("storefront", {state: originalDetails})}
                                     className="flex items-center w-full bg-teal-500 hover:bg-teal-600 text-black font-bold py-4 px-4 rounded"
                                 >
                                     <Package className="mr-2" /> View Products

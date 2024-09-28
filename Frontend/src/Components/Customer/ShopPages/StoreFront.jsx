@@ -71,7 +71,7 @@ export default function StoreFront() {
             let filtered = products;
 
             if (searchTerm) {
-                filtered = filtered.filter(product => 
+                filtered = filtered.filter(product =>
                     product.product.name.toLowerCase().includes(searchTerm.toLowerCase())
                 );
             }
@@ -126,35 +126,32 @@ export default function StoreFront() {
                     </div>
                 </div>
                 <div className="mx-1 xl:w-3/6 w-full xl:border-l xl:ps-2 xl:border-l-gray-600">
-                <div className='flex items-center sm:space-x-2 max-sm:flex-col max-sm:space-y-2'>
-                    <div className="flex items-center bg-gray-900 border border-gray-800 rounded-lg ps-2 pe-1 py-1 w-full xl:w-96">
-                        <input
-                            type="text"
-                            className="flex-grow bg-transparent px-2 text-white outline-none placeholder-gray-500"
-                            placeholder="Search"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        <button
-                            title="Search"
-                            className="flex items-center justify-center h-10 w-10 bg-gray-800 rounded-full"
+                    <div className='flex items-center sm:space-x-2 max-sm:flex-col max-sm:space-y-2'>
+                        <div className="flex items-center bg-gray-900 border border-gray-800 rounded-lg ps-2 pe-1 py-1 w-full xl:w-96">
+                            <input
+                                type="text"
+                                className="flex-grow bg-transparent px-2 text-white outline-none placeholder-gray-500"
+                                placeholder="Search"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <button
+                                title="Search"
+                                className="flex items-center justify-center h-10 w-10 bg-gray-800 rounded-full"
+                            >
+                                <Search size={20} className="text-white" />
+                            </button>
+                        </div>
+                        <select
+                            className="flex items-center max-sm:w-full text-md rounded-lg font-medium cursor-pointer bg-gray-800 text-white p-3 border border-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                            value={selectedCategory}
+                            onChange={handleCategoryChange}
                         >
-                            <Search size={20} className="text-white" />
-                        </button>
-                    </div>
-                    <select
-                        className="flex items-center max-sm:w-full text-md rounded-lg font-medium cursor-pointer bg-gray-800 text-white p-3 border border-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                        value={selectedCategory}
-                        onChange={handleCategoryChange}
-                    >
-                        <option value="All Categories">All Categories</option>
-                        {categories.map(cat => (
-                            <option key={cat} value={cat}>{cat}</option>
-                        ))}
-                    </select>
-                </div>
-                    <div className='flex justify-center mt-2 -mb-2 text-teal-500 hover:text-teal-600 font-semibold cursor-pointer'>
-                        <p>Place custom order without any products</p>
+                            <option value="All Categories">All Categories</option>
+                            {categories.map(cat => (
+                                <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                        </select>
                     </div>
                 </div>
             </div>
@@ -190,7 +187,7 @@ export default function StoreFront() {
                                         }}
                                     />
                                     <div className="absolute hidden w-48 p-2 text-xs text-white bg-black rounded-lg shadow-lg -right-2 top-8 z-10">
-                                        {prod.description}
+                                        {prod.description || "No description"}
                                     </div>
                                 </div>
                             </div>

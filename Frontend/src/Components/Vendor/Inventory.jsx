@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search, Edit, Info, Check, X, Trash } from 'lucide-react';
 import Swal from 'sweetalert2';
-import img from "../assets/img1.webp";
-import { products } from '../Listings/sampleData';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Loading from '../AppPages/Loading';

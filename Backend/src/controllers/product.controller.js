@@ -100,10 +100,6 @@ const searchProduct = async (req, res) => {
             ]
         });
 
-        if (products.length === 0) {
-            return res.status(404).json(new ApiResponse(404, null, "No products found"));
-        }
-
         const productIds = products.map(p => p._id);
         const vendorsMap = await getVendorsForProducts(productIds);
 

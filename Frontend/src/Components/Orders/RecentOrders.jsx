@@ -44,8 +44,6 @@ export default function RecentOrders() {
         navigate(`/order/${orderId}`);
     };
 
-    if (loading) return <Loading />;
-
     return (
         <div className="p-4 bg-black/20 shadow-2xl shadow-black min-h-screen text-white rounded-lg">
             <div className='flex max-sm:flex-col sm:justify-between mb-6'>
@@ -69,7 +67,7 @@ export default function RecentOrders() {
             <div className="space-y-4">
                 {orders.length === 0 ? (
                     <div className='flex justify-center items-center mt-10 text-2xl'>
-                        You have no {selectedStatus.toLowerCase()} orders
+                        {loading ? <Loading/> :`You have no {selectedStatus.toLowerCase()} orders`}
                     </div>
                 ) : (
                     orders.map(order => (

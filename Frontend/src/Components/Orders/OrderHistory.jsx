@@ -66,7 +66,6 @@ export default function OrderHistory() {
         setGroupedOrders(groupOrdersByDate(filtered));
     }, [selectedRange, selectedStatus, orders]);
 
-    if (loading) return <Loading />;
 
     return (
         <div className="bg-gray-900 text-white p-4 sm:p-6 rounded-lg flex flex-col min-h-full">
@@ -104,7 +103,9 @@ export default function OrderHistory() {
             <div className="flex-grow">
                 {filteredOrders.length === 0 ? (
                     <div className="flex items-center justify-center h-full">
-                        <p className="text-xl text-gray-400">No orders found for the selected filters.</p>
+                        {loading ? <Loading /> : (
+                            <p className="text-xl text-gray-400">No orders found for the selected filters.</p>
+                        )}
                     </div>
                 ) : (
                     <div className="space-y-6">
@@ -114,7 +115,7 @@ export default function OrderHistory() {
                                 <div className="space-y-2">
                                     {orders.map((order) => (
                                         <div key={order._id} onClick={() => navigate(user.userType == "customer" ? `/order/details/${order._id}` : `/vendor/order/${order._id}`)}
-                                            className="bg-gray-800 p-4 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 cursor-pointer hover:border "
+                                            className="bg-gray-800 p-4 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 cursor-pointer hover:bg-gray-700 "
                                         >
                                             <div className="flex flex-col">
                                                 <span className="text-lg font-semibold">Order Id: {order._id.slice(18)}</span>

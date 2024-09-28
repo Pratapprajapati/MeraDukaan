@@ -38,41 +38,39 @@ export default function ProductList() {
         }
 
         // Getting ALl Category products or specific category products conditionally
-        if (selectedSubCategory === "All Categories") {
-            axios.get(`/api/product/sample`)
-                .then(res => {
-                    const data = res.data.data;
-                    setProducts(data);
-                    setSpecificProducts([]);
-                    setLoading(false);
-                })
-                .catch(e => {
-                    console.error(e.response?.data?.message);
-                });
+        if (!searchTerm) {
+            if (selectedSubCategory === "All Categories") {
+                axios.get(`/api/product/sample`)
+                    .then(res => {
+                        const data = res.data.data;
+                        setProducts(data);
+                        setSpecificProducts([]);
+                        setLoading(false);
+                    })
+                    .catch(e => {
+                        console.error(e.response?.data?.message);
+                    });
+            } else {
+                axios.get(`/api/product/specific/${selectedSubCategory}/${page}`)
+                    .then(res => {
+                        const data = res.data.data;
+                        setTotal(data?.totalProducts)
+                        setSpecificProducts(data?.products || [])
+                        setLoading(false);
+                    })
+                    .catch(e => console.error(e.response.data.message));
+            }
         } else {
-            axios.get(`/api/product/specific/${selectedSubCategory}/${page}`)
+            setSearchResults([])
+            axios.get(`/api/product/search?searchTerm=${searchTerm}`)
                 .then(res => {
                     const data = res.data.data;
-                    setTotal(data?.totalProducts)
-                    setSpecificProducts(data?.products || [])
-                    setLoading(false);
+                    setSearchResults(data);
+                    setSelectedSubCategory('Search Results');  // This will trigger the display of search results
+                    setLoading(false)
                 })
-                .catch(e => {
-                    console.error(e.response?.data?.message);
-                });
         }
-    }, [selectedSubCategory]);
-
-    const handleSearch = () => {
-        setSearchResults([])
-        axios.get(`/api/product/search?searchTerm=${searchTerm}`)
-            .then(res => {
-                const data = res.data.data;
-                setSearchResults(data);
-                setSelectedSubCategory('Search Results');  // This will trigger the display of search results
-            })
-            .catch(e => console.error(e.response.data.message));
-    };
+    }, [selectedSubCategory, searchTerm]);
 
     const handleAddToInventory = (id) => {
         axios.post(`/api/inventory/add`, { product: id })
@@ -92,8 +90,6 @@ export default function ProductList() {
             .catch(e => console.error(e.response.data.message));
     };
 
-    if (loading) return <Loading />;
-
     return (
         <div className="p-4 bg-black/20 shadow-2xl shadow-black min-h-screen text-white rounded-lg">
             <h1 className="text-3xl font-bold mb-6">
@@ -108,16 +104,10 @@ export default function ProductList() {
                         placeholder="Search"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                handleSearch();
-                            }
-                        }}
                     />
                     <button
                         title="Search"
                         className="flex items-center justify-center h-10 w-10 bg-gray-700 rounded-full"
-                        onClick={handleSearch}
                     >
                         <Search size={16} className="text-white" />
                     </button>
@@ -134,32 +124,39 @@ export default function ProductList() {
                 </select>
             </div>
 
-            {selectedSubCategory === "All Categories" ? (
-                <AllCategories
-                    products={products}
-                    handleAddToInventory={handleAddToInventory}
-                    inventory={inventory}
-                    setSelectedSubCategory={setSelectedSubCategory}
-                />
-            ) : selectedSubCategory === "Search Results" ? (
-                <SearchResults
-                    results={searchResults}
-                    handleAddToInventory={handleAddToInventory}
-                    inventory={inventory}
-                    navigate={navigate}
-                />
+            {loading ? (
+                <div className='pt-10'><Loading /></div>
             ) : (
-                <SpecificCategory
-                    specificProducts={specificProducts}
-                    handleAddToInventory={handleAddToInventory}
-                    inventory={inventory}
-                    navigate={navigate}
-                    selectedSubCategory={selectedSubCategory}
-                    totalProducts={total}
-                    currentPage={page}
-                    onPageChange={setPage}
-                />
-            )}
+                <>
+                    {selectedSubCategory === "All Categories" ? (
+                        <AllCategories
+                            products={products}
+                            handleAddToInventory={handleAddToInventory}
+                            inventory={inventory}
+                            setSelectedSubCategory={setSelectedSubCategory}
+                        />
+                    ) : selectedSubCategory === "Search Results" ? (
+                        <SearchResults
+                            results={searchResults}
+                            handleAddToInventory={handleAddToInventory}
+                            inventory={inventory}
+                            navigate={navigate}
+                        />
+                    ) : (
+                        <SpecificCategory
+                            specificProducts={specificProducts}
+                            handleAddToInventory={handleAddToInventory}
+                            inventory={inventory}
+                            navigate={navigate}
+                            selectedSubCategory={selectedSubCategory}
+                            totalProducts={total}
+                            currentPage={page}
+                            onPageChange={setPage}
+                        />
+                    )}
+                </>
+            )
+            }
         </div>
     );
 }

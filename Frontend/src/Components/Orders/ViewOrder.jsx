@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import Cart, { Total } from './Cart';
-import { cartItems } from '../Listings/sampleData';
 import { Clock, PackageCheck, XCircle, AlertTriangle, CheckCircle, Ban } from 'lucide-react';
 import { useOutletContext, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';

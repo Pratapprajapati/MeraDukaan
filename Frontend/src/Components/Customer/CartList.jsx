@@ -8,7 +8,7 @@ import { convertToAmPm } from '../utility';
 
 export default function Cart() {
     const customer = useOutletContext();
-    const [cart, setCart] = useState(null);
+    const [cart, setCart] = useState([]);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
 
@@ -42,8 +42,6 @@ export default function Cart() {
                 .finally(() => setLoading(false));
         }
     }, []);
-
-    if (loading) return <Loading />;
 
     const handleCardClick = (id) => {
         navigate("/order/place", { state: id });
@@ -84,8 +82,10 @@ export default function Cart() {
             <p className="mt-3 text-gray-300">
                 Your cart items are sorted according to their respective vendors.
             </p>
+            {cart.length > 0 ? (
+                <>
             <div className="mt-8 flex flex-col space-y-8">
-                {cart && cart.map((vendor) => (
+                {cart.map((vendor) => (
                     <div
                         key={vendor.id}
                         onClick={() => handleCardClick(vendor.id)}
@@ -136,6 +136,14 @@ export default function Cart() {
             <button className='w-full bg-stone-950/80 hover:bg-stone-800 text-white p-2 text-lg font-semibold rounded-md mt-4 transform hover:scale-95 transition-transform' onClick={clearCart}>
                 <Trash2 className='inline-flex' /> Clear cart for all vendors
             </button>
+                </>
+            ) : (
+                <div className="flex items-center justify-center h-full">
+                {loading ? <Loading /> : (
+                    <p className="text-xl text-gray-400">Your cart is empty</p>
+                )}
+            </div>
+            )}
         </div>
     );
 }

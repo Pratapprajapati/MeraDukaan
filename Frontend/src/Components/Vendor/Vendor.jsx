@@ -142,10 +142,56 @@ export default function ShopDetailsPage() {
                 }
             }
         }
-
-        else setIsEditing(!isEditing);
+        setIsEditing(!isEditing);
     };
 
+
+    const toggleOpen = (open) => {
+        const title = open
+            ? "Do you want to open your shop?"
+            : "Are you sure you want to close your shop?";
+
+        const html = open
+            ? "Your shop will be displayed as open, and customers can place orders during shop hours."
+            : "Your shop will be displayed as closed, and customers will not be able to place orders.";
+
+        const confirmButtonText = open ? "Open Shop!" : "Close Shop!";
+        const successTitle = open ? "Your shop is online!" : "Your shop is offline!";
+        const successText = open
+            ? "Customers can now place orders during shop hours."
+            : "You can open your shop again whenever you want (given it's under shop hours).";
+
+        // Fire the Swal modal
+        Swal.fire({
+            title: title,
+            html: html,
+            icon: 'question',
+            color: 'white',
+            background: '#1a1a2e',
+            showCancelButton: true,
+            confirmButtonText: confirmButtonText,
+            cancelButtonText: 'No, cancel',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.patch(`/api/vendor/update/open`, { status: open })
+                    .then(res => {
+                        const data = res.data.data;
+                        user.setOpen(data)
+                    })
+                    .catch(e => console.error(e));
+
+                // Fire success modal after the operation
+                Swal.fire({
+                    title: successTitle,
+                    text: successText,
+                    icon: 'success',
+                    color: 'white',
+                    background: '#1a1a2e',
+                });
+            }
+        });
+    }
 
     if (loading || !vendorDetails) return <Loading />;
 
@@ -169,11 +215,11 @@ export default function ShopDetailsPage() {
                                 </span>
                             </div>
                             <button
-                                className={`px-3 py-1 rounded ${vendorDetails.isOpen ? 'bg-green-600' : 'bg-red-600'} text-white`}
-                                onClick={() => vendor.userType === "vendor" && setVendorDetails(prev => ({ ...prev, isOpen: !prev.isOpen }))}
+                                className={`px-3 py-1 rounded ${user.open ? 'bg-green-600' : 'bg-red-600'} text-white transform hover:scale-110 transition-transform`}
+                                onClick={() => toggleOpen(!user.open)}
                                 disabled={vendor.userType === "customer"}
                             >
-                                {vendorDetails.isOpen ? "OPEN" : "CLOSED"}
+                                {user.open ? "OPEN" : "CLOSED"}
                             </button>
                         </div>
                         <h1 className="text-3xl font-bold text-yellow-400 mb-4">
@@ -435,8 +481,7 @@ export default function ShopDetailsPage() {
                                     </div>
                                 ) : (
                                     <span>
-                                        {convertToAmPm(vendorDetails.shopTimings.start)} -
-                                        {convertToAmPm(vendorDetails.shopTimings.end)}
+                                        {convertToAmPm(vendorDetails.shopTimings.start)} - {convertToAmPm(vendorDetails.shopTimings.end)}
                                         {' / '}
                                         {vendorDetails.shopOpen}
                                     </span>

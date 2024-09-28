@@ -90,12 +90,13 @@ const login = async (req, res) => {
 
     const { start, end } = user.shopTimings;
     const shouldBeOpen = isShopOpen(start, end);
+    console.log(shouldBeOpen)
 
     // If everything checks out
     const vendor = await Vendor.findByIdAndUpdate(
         user?._id,
         {$set: {isOpen: shouldBeOpen}},
-        {new: true, select: (" _id userStatus userType")}
+        {new: true, select: (" _id userStatus userType isOpen")}
     )
 
     const vendorData = CryptoJS.AES.encrypt(JSON.stringify(vendor), "secretKey").toString()
@@ -190,6 +191,25 @@ const changeShopImage = async (req, res) => {
     console.log("Deleted old shop image")
 
     return res.status(200).json(new ApiResponse(200, updatedDetail, "Shop image changed"))
+}
+
+// TOGGLE SHOP OPEN/CLOSE
+const toggleIsOpen = async (req, res) => {
+    const {status} = req.body
+
+    let open = req.user.isOpen
+
+    if (status != null && open !== status) {
+        const result = await Vendor.findByIdAndUpdate(
+            req.user._id,
+            {$set: {isOpen: status}},
+            {new: true, select: "isOpen"}
+        )
+
+        open = result.isOpen
+    }
+
+    return res.status(200).json(new ApiResponse(200, open, "Shop open status fetched"))
 }
 
 // VENDORS NEAR YOU
@@ -290,6 +310,7 @@ export {
     logout,
     updateVendor,
     changePassword,
+    toggleIsOpen,
     getVendor,
     changeShopImage,
     nearbyVendors,

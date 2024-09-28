@@ -19,6 +19,14 @@ const Alert = (message) => {
     });
 };
 
+const shopOpenOptions = [
+    'Everyday',
+    'Weekdays',
+    'Sundays Off',
+    'Saturdays Off',
+    'Mon-Sat',
+    'Custom'
+];
 
 export default function ShopDetailsPage() {
     const [isEditing, setIsEditing] = useState(false);
@@ -182,7 +190,7 @@ export default function ShopDetailsPage() {
                             )}
                         </h1>
                         <div className="text-gray-300 mb-4 flex">
-                            <MapPin className="inline-block mr-2" />
+                            <MapPin className="mr-2 min-w-6 min-h-6" />
                             {isEditing ? (
                                 <div className="space-y-2">
                                     <textarea rows={2}
@@ -191,8 +199,9 @@ export default function ShopDetailsPage() {
                                         value={vendorDetails.location.address}
                                         onChange={handleInputChange}
                                         className="bg-gray-700 border resize-none border-gray-500 text-white py-1 px-2 rounded w-full"
+                                        placeholder='Your address/ street name'
                                     />
-                                    <div className="flex flex-wrap gap-2">
+                                    <div className="flex max-lg:flex-wrap  gap-2">
                                         <input
                                             type="text"
                                             name="location.area"
@@ -236,7 +245,7 @@ export default function ShopDetailsPage() {
                                     <ShoppingCart className="mr-2" /> Cart Items of this Vendor
                                 </button>
                                 <button
-                                    onClick={() => navigate("storefront", {state: originalDetails})}
+                                    onClick={() => navigate("storefront", { state: originalDetails })}
                                     className="flex items-center w-full bg-teal-500 hover:bg-teal-600 text-black font-bold py-4 px-4 rounded"
                                 >
                                     <Package className="mr-2" /> View Products
@@ -409,15 +418,19 @@ export default function ShopDetailsPage() {
                                             />
                                         </div>
                                         <div className="flex items-center lg:mx-2">
-                                            <label className="text-gray-200">Open:</label>
-                                            <input
-                                                type="text"
+                                            <label className="text-gray-200 mr-2">Open:</label>
+                                            <select
                                                 name="shopOpen"
                                                 value={vendorDetails.shopOpen}
                                                 onChange={handleInputChange}
-                                                className={inputStyle}
-                                                placeholder="Open/Closed"
-                                            />
+                                                className={`py-2 mb-1 ${inputStyle} w-[180px]`}
+                                            >
+                                                {shopOpenOptions.map((option) => (
+                                                    <option key={option} value={option}>
+                                                        {option}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
                                     </div>
                                 ) : (
@@ -427,7 +440,6 @@ export default function ShopDetailsPage() {
                                         {' / '}
                                         {vendorDetails.shopOpen}
                                     </span>
-
                                 )}
                             </dd>
                         </div>

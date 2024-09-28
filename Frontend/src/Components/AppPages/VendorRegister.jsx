@@ -120,287 +120,11 @@ export default function VendorRegister() {
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6">
-                    <div className="mb-8">
-                        <h2 className="text-xl font-semibold mb-2">Personal Details</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="mb-2">
-                                <label htmlFor="username" className={labelStyle}>Owner's Name</label>
-                                <input
-                                    type="text"
-                                    id="username"
-                                    name="username"
-                                    value={formData.username}
-                                    onChange={handleInput}
-                                    placeholder="Full Name"
-                                    required
-                                    className={inputStyle}
-                                />
-                            </div>
-                            <div className="mb-2">
-                                <label htmlFor="email" className={labelStyle}>Email</label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleInput}
-                                    placeholder="Email Address"
-                                    required
-                                    className={inputStyle}
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="password" className={labelStyle}>Password</label>
-                                <div className="relative">
-                                    <input
-                                        type={showPassword ? 'text' : 'password'}
-                                        id="password"
-                                        name="password"
-                                        value={formData.password}
-                                        onChange={handlePasswordChange}
-                                        className={inputStyle}
-                                        placeholder="Enter your password"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={togglePasswordVisibility}
-                                        className="absolute right-0 top-0 mt-2 mr-2 text-gray-600"
-                                    >
-                                        {showPassword ? 'Hide' : 'Show'}
-                                    </button>
-                                </div>
-                                {formData.password && (
-                                    <p className={`text-sm mt-2 ${passwordStrength === 'Strong' ? 'text-green-600' : passwordStrength === 'Medium' ? 'text-yellow-600' : 'text-red-600'}`}>
-                                        Password Strength: {passwordStrength}
-                                    </p>
-                                )}
-                            </div>
+                    <PersonalDetails />
 
-                            <div className="mb-4">
-                                <label htmlFor="confirm-password" className={labelStyle}>Confirm Password</label>
-                                <input
-                                    type={showPassword ? 'text' : 'password'}
-                                    id="confirm-password"
-                                    name="confirmPassword"
-                                    value={formData.confirmPassword}
-                                    onChange={handleConfirmPasswordChange}
-                                    className={inputStyle}
-                                    placeholder="Re-enter your password"
-                                />
-                                {formData.confirmPassword && (
-                                    <p className={`text-sm mt-2 ${passwordMatch ? 'text-green-600' : 'text-red-600'}`}>
-                                        {passwordMatch ? 'Passwords match' : 'Passwords do not match'}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+                    <ShopDetails />
 
-                    <div className="mb-8">
-                        <h2 className="text-xl font-semibold mb-2">Shop Details</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                            <div className="mb-2">
-                                <label htmlFor="shopName" className={labelStyle}>Shop Name</label>
-                                <input
-                                    type="text"
-                                    id="shopName"
-                                    name="shopName"
-                                    value={formData.shopName}
-                                    onChange={handleInput}
-                                    placeholder="Shop Name"
-                                    required
-                                    className={inputStyle}
-                                />
-                            </div>
-                            <div className="mb-2">
-                                <label htmlFor="shopType" className={labelStyle}>Shop Type</label>
-                                <select
-                                    id="shopType"
-                                    name="shopType"
-                                    value={formData.shopType}
-                                    onChange={handleInput}
-                                    required
-                                    className={inputStyle}
-                                >
-                                    <option value="General">General</option>
-                                </select>
-                            </div>
-                            <div className="mb-2">
-                                <label htmlFor="registrationNumber" className={labelStyle}>Registration Number</label>
-                                <input
-                                    type="text"
-                                    id="registrationNumber"
-                                    name="registrationNumber"
-                                    value={formData.registrationNumber}
-                                    onChange={handleInput}
-                                    placeholder="Registration Number"
-                                    required
-                                    className={inputStyle}
-                                />
-                            </div>
-                            <div className="col-span-full mb-2">
-                                <label htmlFor="address" className={labelStyle}>Address</label>
-                                <textarea
-                                    type="text"
-                                    id="address"
-                                    name="address"
-                                    value={formData.address}
-                                    onChange={handleInput}
-                                    placeholder="Full Address"
-                                    required
-                                    className={`${inputStyle} resize-none`}
-                                />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                            <div className="mb-2">
-                                <label htmlFor="city" className={labelStyle}>City</label>
-                                <input
-                                    type="text"
-                                    id="city"
-                                    name="city"
-                                    value={formData.city}
-                                    onChange={handleInput}
-                                    placeholder="City"
-                                    required
-                                    className={inputStyle}
-                                />
-                            </div>
-                            <div className="mb-2">
-                                <label htmlFor="area" className={labelStyle}>Area</label>
-                                <input
-                                    type="text"
-                                    id="area"
-                                    name="area"
-                                    value={formData.area}
-                                    onChange={handleInput}
-                                    placeholder="area"
-                                    required
-                                    className={inputStyle}
-                                />
-                            </div>
-                            <div className="mb-2">
-                                <label htmlFor="pincode" className={labelStyle}>Pincode</label>
-                                <input
-                                    type="number"
-                                    id="pincode"
-                                    name="pincode"
-                                    value={formData.pincode}
-                                    onChange={handleInput}
-                                    placeholder="Pincode"
-                                    required
-                                    className={inputStyle}
-                                />
-                            </div>
-                            <div className="mb-2">
-                                <label htmlFor="shopImage" className={labelStyle}>Shop Image</label>
-                                <input
-                                    type="file"
-                                    id="shopImage"
-                                    onChange={(e) => setShopImageFile(e.target.files[0])}
-                                    required
-                                    className={`${inputStyle} py-1.5 text-gray-300`}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="mb-8">
-                        <h2 className="text-xl font-semibold mb-2">Contact & Operations</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                            <div className="mb-2">
-                                <label htmlFor="primary" className={labelStyle}>Primary Contact</label>
-                                <input
-                                    type="number"
-                                    id="primary"
-                                    name="primary"
-                                    value={formData.primary}
-                                    onChange={handleInput}
-                                    placeholder="Primary Phone"
-                                    required
-                                    className={inputStyle}
-                                />
-                            </div>
-                            <div className="mb-2">
-                                <label htmlFor="secondary" className={labelStyle}>Secondary Contact</label>
-                                <input
-                                    type="number"
-                                    id="secondary"
-                                    name="secondary"
-                                    value={formData.secondary}
-                                    onChange={handleInput}
-                                    placeholder="Secondary Phone (Optional)"
-                                    className={inputStyle}
-                                />
-                            </div>
-                            <div className="mb-2">
-                                <label htmlFor="shopOpen" className={labelStyle}>Shop Open Days</label>
-                                <input
-                                    type="text"
-                                    id="shopOpen"
-                                    name="shopOpen"
-                                    value={formData.shopOpen}
-                                    onChange={handleInput}
-                                    placeholder="e.g. Everyday, Mon-Fri"
-                                    required
-                                    className={inputStyle}
-                                />
-                            </div>
-                        </div>
-                        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                            <div className="mb-2">
-                                <label htmlFor="shopTimingsStart" className={labelStyle}>Shop Start Time</label>
-                                <input
-                                    type="time"
-                                    id="shopTimingsStart"
-                                    name="shopTimingsStart"
-                                    value={formData.shopTimingsStart}
-                                    onChange={handleInput}
-                                    required
-                                    className={inputStyle}
-                                />
-                            </div>
-                            <div className="mb-2">
-                                <label htmlFor="shopTimingsEnd" className={labelStyle}>Shop End Time</label>
-                                <input
-                                    type="time"
-                                    id="shopTimingsEnd"
-                                    name="shopTimingsEnd"
-                                    value={formData.shopTimingsEnd}
-                                    onChange={handleInput}
-                                    required
-                                    className={inputStyle}
-                                />
-                            </div>
-                            <div className="mb-2">
-                                <label htmlFor="returnPol" className={labelStyle}>Return Policy</label>
-                                <input
-                                    type="text"
-                                    id="returnPol"
-                                    name="returnPol"
-                                    value={formData.returnPol}
-                                    onChange={handleInput}
-                                    placeholder="e.g. Return, No Return"
-                                    className={inputStyle}
-                                />
-                            </div>
-                            <div className="mb-2">
-                                <label htmlFor="delivery" className={labelStyle}>Delivery Available</label>
-                                <div className='mt-3'>
-                                    <Toggle
-                                        id="delivery"
-                                        name="delivery"
-                                        checked={formData.delivery}
-                                        onChange={handleToggleChange('delivery')}
-                                        className="align-middle"
-                                    />
-                                    <span className="ml-2 text-sm text-gray-300">
-                                        {formData.delivery ? "Yes" : "No"}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <ContactOps />
 
                     {errorMessage && (
                         <div className="mb-2 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -424,4 +148,323 @@ export default function VendorRegister() {
             </div>
         </div>
     );
+
+
+    function PersonalDetails() {
+        return (
+            <div className="mb-8">
+                <h2 className="text-xl font-semibold mb-2">Personal Details</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="mb-2">
+                        <label htmlFor="username" className={labelStyle}>Owner's Name</label>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleInput}
+                            placeholder="Full Name"
+                            required
+                            className={inputStyle}
+                        />
+                    </div>
+                    <div className="mb-2">
+                        <label htmlFor="email" className={labelStyle}>Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInput}
+                            placeholder="Email Address"
+                            required
+                            className={inputStyle}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label htmlFor="password" className={labelStyle}>Password</label>
+                        <div className="relative">
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                id="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handlePasswordChange}
+                                className={inputStyle}
+                                placeholder="Enter your password"
+                            />
+                            <button
+                                type="button"
+                                onClick={togglePasswordVisibility}
+                                className="absolute right-0 top-0 mt-2 mr-2 text-gray-600"
+                            >
+                                {showPassword ? 'Hide' : 'Show'}
+                            </button>
+                        </div>
+                        {formData.password && (
+                            <p className={`text-sm mt-2 ${passwordStrength === 'Strong' ? 'text-green-600' : passwordStrength === 'Medium' ? 'text-yellow-600' : 'text-red-600'}`}>
+                                Password Strength: {passwordStrength}
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="mb-4">
+                        <label htmlFor="confirm-password" className={labelStyle}>Confirm Password</label>
+                        <input
+                            type={showPassword ? 'text' : 'password'}
+                            id="confirm-password"
+                            name="confirmPassword"
+                            value={formData.confirmPassword}
+                            onChange={handleConfirmPasswordChange}
+                            className={inputStyle}
+                            placeholder="Re-enter your password"
+                        />
+                        {formData.confirmPassword && (
+                            <p className={`text-sm mt-2 ${passwordMatch ? 'text-green-600' : 'text-red-600'}`}>
+                                {passwordMatch ? 'Passwords match' : 'Passwords do not match'}
+                            </p>
+                        )}
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    function ShopDetails() {
+        return (
+            <div className="mb-8">
+                <h2 className="text-xl font-semibold mb-2">Shop Details</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="mb-2">
+                        <label htmlFor="shopName" className={labelStyle}>Shop Name</label>
+                        <input
+                            type="text"
+                            id="shopName"
+                            name="shopName"
+                            value={formData.shopName}
+                            onChange={handleInput}
+                            placeholder="Shop Name"
+                            required
+                            className={inputStyle}
+                        />
+                    </div>
+                    <div className="mb-2">
+                        <label htmlFor="shopType" className={labelStyle}>Shop Type</label>
+                        <select
+                            id="shopType"
+                            name="shopType"
+                            value={formData.shopType}
+                            onChange={handleInput}
+                            required
+                            className={inputStyle}
+                        >
+                            <option value="General">General</option>
+                        </select>
+                    </div>
+                    <div className="mb-2">
+                        <label htmlFor="registrationNumber" className={labelStyle}>Registration Number</label>
+                        <input
+                            type="text"
+                            id="registrationNumber"
+                            name="registrationNumber"
+                            value={formData.registrationNumber}
+                            onChange={handleInput}
+                            placeholder="Registration Number"
+                            required
+                            className={inputStyle}
+                        />
+                    </div>
+                    <div className="col-span-full mb-2">
+                        <label htmlFor="address" className={labelStyle}>Address</label>
+                        <textarea
+                            type="text"
+                            id="address"
+                            name="address"
+                            value={formData.address}
+                            onChange={handleInput}
+                            placeholder="Full Address"
+                            required
+                            className={`${inputStyle} resize-none`}
+                        />
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="mb-2">
+                        <label htmlFor="city" className={labelStyle}>City</label>
+                        <input
+                            type="text"
+                            id="city"
+                            name="city"
+                            value={formData.city}
+                            onChange={handleInput}
+                            placeholder="City"
+                            required
+                            className={inputStyle}
+                        />
+                    </div>
+                    <div className="mb-2">
+                        <label htmlFor="area" className={labelStyle}>Area</label>
+                        <input
+                            type="text"
+                            id="area"
+                            name="area"
+                            value={formData.area}
+                            onChange={handleInput}
+                            placeholder="Area"
+                            required
+                            className={inputStyle}
+                        />
+                    </div>
+                    <div className="mb-2">
+                        <label htmlFor="pincode" className={labelStyle}>Pincode</label>
+                        <input
+                            type="number"
+                            id="pincode"
+                            name="pincode"
+                            value={formData.pincode}
+                            onChange={handleInput}
+                            placeholder="Pincode"
+                            required
+                            className={inputStyle}
+                        />
+                    </div>
+                    <div className="mb-2">
+                        <label htmlFor="shopImage" className={labelStyle}>Shop Image</label>
+                        <input
+                            type="file"
+                            id="shopImage"
+                            onChange={(e) => setShopImageFile(e.target.files[0])}
+                            required
+                            className={`${inputStyle} py-1.5 text-gray-300`}
+                        />
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    function ContactOps() {
+        const shopOpenOptions = [
+            'Everyday',
+            'Weekdays',
+            'Sundays Off',
+            'Saturdays Off',
+            'Mon-Sat'
+        ];
+    
+        const returnPolicyOptions = [
+            'Return Available',
+            'Exchange Available',
+            'No Returns',
+            'No Exchange',
+            'No Return if Used'
+        ];
+    
+        return (
+            <div className="mb-8">
+                <h2 className="text-xl font-semibold mb-2">Contact & Operations</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="mb-2">
+                        <label htmlFor="primary" className={labelStyle}>Primary Contact</label>
+                        <input
+                            type="number"
+                            id="primary"
+                            name="primary"
+                            value={formData.primary}
+                            onChange={handleInput}
+                            placeholder="Primary Phone"
+                            required
+                            className={inputStyle}
+                        />
+                    </div>
+                    <div className="mb-2">
+                        <label htmlFor="secondary" className={labelStyle}>Secondary Contact</label>
+                        <input
+                            type="number"
+                            id="secondary"
+                            name="secondary"
+                            value={formData.secondary}
+                            onChange={handleInput}
+                            placeholder="Secondary Phone (Optional)"
+                            className={inputStyle}
+                        />
+                    </div>
+                    <div className="mb-2">
+                        <label htmlFor="shopOpen" className={labelStyle}>Shop Open Days</label>
+                        <select
+                            id="shopOpen"
+                            name="shopOpen"
+                            value={formData.shopOpen}
+                            onChange={handleInput}
+                            required
+                            className={inputStyle}
+                        >
+                            {shopOpenOptions.map((option) => (
+                                <option key={option} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+                <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="mb-2">
+                        <label htmlFor="shopTimingsStart" className={labelStyle}>Shop Start Time</label>
+                        <input
+                            type="time"
+                            id="shopTimingsStart"
+                            name="shopTimingsStart"
+                            value={formData.shopTimingsStart}
+                            onChange={handleInput}
+                            required
+                            className={inputStyle}
+                        />
+                    </div>
+                    <div className="mb-2">
+                        <label htmlFor="shopTimingsEnd" className={labelStyle}>Shop End Time</label>
+                        <input
+                            type="time"
+                            id="shopTimingsEnd"
+                            name="shopTimingsEnd"
+                            value={formData.shopTimingsEnd}
+                            onChange={handleInput}
+                            required
+                            className={inputStyle}
+                        />
+                    </div>
+                    <div className="mb-2">
+                        <label htmlFor="returnPol" className={labelStyle}>Return Policy</label>
+                        <select
+                            id="returnPol"
+                            name="returnPol"
+                            value={formData.returnPol}
+                            onChange={handleInput}
+                            className={inputStyle}
+                        >
+                            {returnPolicyOptions.map((option) => (
+                                <option key={option} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="mb-2">
+                        <label htmlFor="delivery" className={labelStyle}>Delivery Available</label>
+                        <div className='mt-3'>
+                            <Toggle
+                                id="delivery"
+                                name="delivery"
+                                checked={formData.delivery}
+                                onChange={handleToggleChange('delivery')}
+                                className="align-middle"
+                            />
+                            <span className="ml-2 text-sm text-gray-300">
+                                {formData.delivery ? "Yes" : "No"}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
 }

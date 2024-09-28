@@ -88,7 +88,6 @@ customerSchema.methods.generateAccessToken = function(){
         {
             _id: this._id,
             userType: this.userType,
-            username: this.username,
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
@@ -103,6 +102,7 @@ customerSchema.methods.generateRefreshToken = function(){
     return jwt.sign(
         {
             _id: this._id,
+            userType: this.userType,
         },
         process.env.REFRESH_TOKEN_SECRET,
         {

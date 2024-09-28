@@ -2,6 +2,7 @@ import Vendor from "../models/vendor.model.js"
 import ApiResponse from "../utils/ApiResponse.js"
 import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js"
 import CryptoJS from 'crypto-js'
+import isShopOpen from "../utils/shopOpen.js";
 
 const registerVendor = async (req, res) => {
 
@@ -87,8 +88,15 @@ const login = async (req, res) => {
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
 
+    const { start, end } = user.shopTimings;
+    const shouldBeOpen = isShopOpen(start, end);
+
     // If everything checks out
-    const vendor = await Vendor.findById(user?._id).select("-password -refreshToken")
+    const vendor = await Vendor.findByIdAndUpdate(
+        user?._id,
+        {$set: {isOpen: shouldBeOpen}},
+        {new: true, select: (" _id userStatus userType")}
+    )
 
     const vendorData = CryptoJS.AES.encrypt(JSON.stringify(vendor), "secretKey").toString()
 
@@ -164,7 +172,7 @@ const changePassword = async (req, res) => {
     return res.status(200).json(new ApiResponse(200, "", "Password changed."))
 }
 
-// CHANGE SHOP NAME
+// CHANGE SHOP IMAGE
 const changeShopImage = async (req, res) => {
     const shopImagePath = req.file?.path
     if (!shopImagePath) return res.status(404).json(new ApiResponse(404, null, "Shop image missing"))

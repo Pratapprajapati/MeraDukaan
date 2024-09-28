@@ -3,24 +3,7 @@ import Inventory from "../models/inventory.model.js";
 import mongoose, { isValidObjectId } from "mongoose";
 import Product from "../models/product.model.js";
 
-const createInventory = async (req, res) => {
-
-    const existing = await Inventory.findById(req.user._id)
-    if (existing) return res.status(400).json(new ApiResponse(400, null, "Existing inventory"))
-
-    const { productList } = req.body
-    if (!productList) return res.status(404).json(new ApiResponse(404, null, "Product list missing"))
-
-    const inventory = await Inventory.create({
-        _id: req.user._id,
-        productList
-    })
-    if (!inventory) return res.status(500).json(new ApiResponse(500, null, "Something went wrong"))
-
-    return res.status(201).json(new ApiResponse(201, inventory, "Inventory created"))
-}
-
-// ADD SINGLE PRODUCT
+// ADD SINGLE PRODUCT INTO EXISTING INVENTORY OR CREATE NEW
 const addProduct = async (req, res) => {
 
     const { product, price, stock, description } = req.body
@@ -29,7 +12,18 @@ const addProduct = async (req, res) => {
     const productExists = await Product.findById(product)
     if (!productExists) return res.status(404).json(new ApiResponse(404, null, "Product not found"))
 
-    const inventory = await Inventory.findById(req.user._id)
+    let inventory = await Inventory.findById(req.user._id)
+
+    // If inventory doesn't exist, create a new one
+    if (!inventory) {
+        inventory = await Inventory.create({
+            _id: req.user._id,
+            productList: []
+        });
+        if (!inventory) {
+            return res.status(500).json(new ApiResponse(500, null, "Failed to create inventory"));
+        }
+    }
 
     const duplicate = inventory.productList.find(prod => prod.product._id.toString() === product);
     if (duplicate) return res.status(400).json(new ApiResponse(400, null, "Product exists"))
@@ -272,7 +266,6 @@ const inventoryOverview = async (req, res) => {
 
 
 export {
-    createInventory,
     addProduct,
     addMultipleProducts,
     updateProduct,

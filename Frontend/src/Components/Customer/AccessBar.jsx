@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu, ShoppingCart, History, User, LogOut, X, Store, Archive, CalendarClock } from 'lucide-react';
 import { Outlet, useNavigate, NavLink } from 'react-router-dom';
 import logo from "../assets/logo.png";
@@ -13,6 +13,12 @@ export default function AccessBar() {
     const signedIn = Cookies.get("user")
     let user = signedIn ? decrypt() : null
 
+    useEffect(() => {
+        if (user.userType !== "customer" || user.userStatus !== "active") {
+            navigate(-1)
+        }
+    }, [])
+    
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     };

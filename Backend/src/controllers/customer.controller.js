@@ -302,6 +302,12 @@ const getCart = async (req, res) => {
                 }
             },
             {
+                // Filter out cart items where inventoryDetails is null (i.e., product not found in inventory)
+                $match: {
+                    inventoryDetails: { $ne: null }
+                }
+            },
+            {
                 $project: {
                     _id: 0,
                     "cart.product": {
@@ -332,7 +338,7 @@ const getCart = async (req, res) => {
             return res.status(404).json(new ApiResponse(404, null, "Cart not found"));
         }
 
-        // Group cart items by vendorId
+        // Group cart items by vendorId and filter out products not found in inventory
         let cartByVendor = {};
         customerCart.forEach(item => {
             const vendorId = item.cart.vendor._id.toString();
@@ -350,12 +356,17 @@ const getCart = async (req, res) => {
             cartByVendor[vendorId].products.push({
                 product: item.cart.product,
                 count: item.cart.count,
-                price: item.cart.inventoryDetails ? item.cart.inventoryDetails.price : null,
-                stock: item.cart.inventoryDetails ? item.cart.inventoryDetails.stock : null,
-                description: item.cart.inventoryDetails ? item.cart.inventoryDetails.description : null,
-                discount: item.cart.inventoryDetails ? item.cart.inventoryDetails.discount : null
+                price: item.cart.inventoryDetails.price, // Use inventory price
+                stock: item.cart.inventoryDetails.stock,
+                description: item.cart.inventoryDetails.description,
+                discount: item.cart.inventoryDetails.discount
             });
         });
+
+        // If no products are left in the cart after filtering, return an empty cart
+        if (!Object.keys(cartByVendor).length) {
+            return res.status(404).json(new ApiResponse(404, null, "No products found in inventory"));
+        }
 
         // Return the cart grouped by vendors
         return res.status(200).json(new ApiResponse(200, cartByVendor, "Cart fetched successfully"));
@@ -365,12 +376,11 @@ const getCart = async (req, res) => {
     }
 };
 
-
 // SPECIFIC VENDOR'S CART
 const vendorCart = async (req, res) => {
     try {
         const { vendorId } = req.params; // Get vendorId from the request parameters
-        const user = req.user
+        const user = req.user;
 
         // Aggregate customer's cart for the specific vendor with product and inventory details
         const customerCart = await Customer.aggregate([
@@ -440,6 +450,10 @@ const vendorCart = async (req, res) => {
                     path: "$inventoryDetails", // Unwind inventory details if available
                     preserveNullAndEmptyArrays: true // Allow null inventory details if not found
                 }
+            },
+            {
+                // Match only items that exist in both the inventory and the product collection
+                $match: { "inventoryDetails.productDetails": { $exists: true } }
             },
             {
                 $project: {

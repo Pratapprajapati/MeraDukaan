@@ -71,11 +71,7 @@ export default function PlaceOrder() {
                         const data = res.data.data;
 
                         if (clear) {
-                            axios.delete(`/api/customer/items/${data.vendor}`)
-                                .then(res => {
-                                    const data = res.data.data;
-                                    console.log(data);
-                                })
+                            axios.delete(`/api/customer/cart/items/${data.vendor}`)
                                 .catch(e => console.error(e.response.data.message));
                         }
 
@@ -84,7 +80,7 @@ export default function PlaceOrder() {
                     .catch(e => console.error(e));
                 Swal.fire({
                     title: 'Ordered!',
-                    text: 'You can track your order in recent orders.',
+                    html: `You can track your order in recent orders.${clear ? "<br><br>The items in your cart for this vendor has also been cleared" : ""}`,
                     icon: 'success',
                     color: 'white',
                     background: '#1a1a2e',

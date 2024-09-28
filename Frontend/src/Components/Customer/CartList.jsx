@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { ShoppingCart, Clock } from "lucide-react";
+import { ShoppingCart, Clock, Trash2 } from "lucide-react";
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 import Loading from '../AppPages/Loading';
 import { convertToAmPm } from '../utility';
 
@@ -45,18 +46,44 @@ export default function Cart() {
     if (loading) return <Loading />;
 
     const handleCardClick = (id) => {
-        console.log(id)
-        navigate("/order/place", {state: id});
+        navigate("/order/place", { state: id });
     };
+
+    const clearCart = () => {
+        Swal.fire({
+            title: "Are you sure?",
+            html: "This will clear all your items for all vendors",
+            icon: 'question',
+            color: 'white',
+            background: '#1a1a2e',
+            showCancelButton: true,
+            confirmButtonText: delivery ? 'Yes, Order!' : 'Okay',
+            cancelButtonText: 'No, cancel',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed && delivery) {
+                axios.delete(`/api/customer/cart/clear`)
+                    .then(res => {
+                        Swal.fire({
+                            title: 'All clear!',
+                            icon: 'success',
+                            color: 'white',
+                            background: '#1a1a2e',
+                        });
+                    })
+                    .catch(e => console.error(e.response.data.message));
+            }
+        });
+    }
 
     return (
         <div className="mx-auto my-4 max-w-7xl p-4 md:my-6 rounded-lg bg-black/20 shadow-lg shadow-black/50">
-            <h2 className="text-3xl font-bold text-teal-500 flex items-end">
+            <h2 className="text-3xl font-bold text-green-500 flex items-end">
                 <ShoppingCart className="inline-flex w-10 h-10 me-2 items-start" />Your Cart
             </h2>
-            <div className="mt-3 text-gray-300">
+            <p className="mt-3 text-gray-300">
                 Your cart items are sorted according to their respective vendors.
-            </div>
+            </p>
             <div className="mt-8 flex flex-col space-y-8">
                 {cart && cart.map((vendor) => (
                     <div
@@ -68,7 +95,7 @@ export default function Cart() {
                             <div className="flex flex-col space-y-1.5 -my-3">
                                 <div className="flex justify-between">
                                     <p className='text-2xl font-bold text-yellow-500'>{vendor.shopName}</p>
-                                    {vendor.isOpen ? 
+                                    {vendor.isOpen ?
                                         <span className="text-green-500 flex items-center"><Clock className="w-4 h-4 mr-1" /> Open</span> :
                                         <span className="text-red-500 flex items-center"><Clock className="w-4 h-4 mr-1" /> Closed</span>
                                     }
@@ -77,7 +104,7 @@ export default function Cart() {
                                     <span className="font-semibold">Address:</span> {vendor.shopAddress}
                                 </p>
                                 <p className="text-md text-gray-400">
-                                    <span className="font-semibold">Shop Timings: </span> 
+                                    <span className="font-semibold">Shop Timings: </span>
                                     {convertToAmPm(vendor.shopTimings.start) + " - " + convertToAmPm(vendor.shopTimings.end)}
                                 </p>
                             </div>
@@ -106,6 +133,9 @@ export default function Cart() {
                     </div>
                 ))}
             </div>
+            <button className='w-full bg-stone-950/80 hover:bg-stone-800 text-white p-2 text-lg font-semibold rounded-md mt-4 transform hover:scale-95 transition-transform' onClick={clearCart}>
+                <Trash2 className='inline-flex' /> Clear cart for all vendors
+            </button>
         </div>
     );
 }

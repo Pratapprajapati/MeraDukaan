@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Menu, Home, BarChart, History, Archive, PlusCircle, LogOut, X, Store } from 'lucide-react';
 import { Outlet, useNavigate, NavLink } from 'react-router-dom';
 import logo from "../assets/logo.png"
@@ -13,9 +13,13 @@ export default function Sidebar() {
     let user = signedIn ? decrypt() : null
     const navigate = useNavigate()
     const [open, setOpen] = useState(user.isOpen)
-    
+
     useEffect(() => {
-        axios.patch(`/api/vendor/update/open`, {status: null})
+        if (user.userType !== "vendor" || user.userStatus !== "active") {
+            navigate(-1)
+        }
+
+        axios.patch(`/api/vendor/update/open`, { status: null })
             .then(res => {
                 const data = res.data.data;
                 setOpen(data);
@@ -35,7 +39,7 @@ export default function Sidebar() {
             .catch(e => console.log(e.response.data.message))
     }
 
-    user = {...user, open, setOpen}
+    user = { ...user, open, setOpen }
 
     return (
         <div className="flex h-screen">

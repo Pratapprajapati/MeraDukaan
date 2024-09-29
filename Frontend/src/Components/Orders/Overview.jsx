@@ -38,8 +38,6 @@ export default function Overview() {
     }, [selectedStatus]);
 
 
-    if (loading) return <Loading />;
-
     return (
         <div className="bg-black/30 text-white p-4 rounded-md flex flex-col h-full">
             <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center text-left mb-6">
@@ -61,7 +59,7 @@ export default function Overview() {
                 <div className="space-y-4">
                     {orders.length === 0 ? (
                         <div className='flex justify-center items-center mt-10 text-2xl'>
-                            You have no {selectedStatus} orders
+                            {loading ? <Loading /> :`You have no ${selectedStatus} orders`}
                         </div>
                     ) : (
                         orders.map((order) => (

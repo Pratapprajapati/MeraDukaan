@@ -422,7 +422,8 @@ const orderOverview = async (req, res) => {
         .select("bill orderStatus")
 
     const total = overview.reduce((sum, curr) => {
-        return sum + curr.bill
+        if (curr.orderStatus == "delivered") sum + curr.bill
+        return sum
     }, 0)
 
     return res.status(200).json(new ApiResponse(200, { overview, total }, "Order overview fetched"))

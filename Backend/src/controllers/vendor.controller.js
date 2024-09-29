@@ -96,7 +96,7 @@ const login = async (req, res) => {
     const vendor = await Vendor.findByIdAndUpdate(
         user?._id,
         {$set: {isOpen: shouldBeOpen}},
-        {new: true, select: (" _id userStatus userType isOpen")}
+        {new: true, select: (" _id userStatus userType isOpen shopName registrationNumber ")}
     )
 
     const vendorData = CryptoJS.AES.encrypt(JSON.stringify(vendor), "secretKey").toString()

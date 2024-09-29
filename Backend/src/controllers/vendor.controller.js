@@ -4,6 +4,9 @@ import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js
 import CryptoJS from 'crypto-js'
 import isShopOpen from "../utils/shopOpen.js";
 
+// Cookies cannot be accessed by client-side scriptsand are sent by HTTPS only 
+const options = { httpOnly: true, secure: true }
+
 const registerVendor = async (req, res) => {
 
     const {
@@ -14,43 +17,55 @@ const registerVendor = async (req, res) => {
         start, end, shopOpen
     } = req.body;
 
-    // Check if the email or username is already registered
-    const existingVendor = await Vendor.findOne({ $or: [{ email }, { username }, { registrationNumber }] });
+    // Check if the email, username, or registration number is already registered
+    const existingVendor = await Vendor.findOne({
+        $or: [{ email }, { username }, { registrationNumber }]
+    });
     if (existingVendor) {
         return res.status(400).json(new ApiResponse(400, null, "Vendor with this email, username, or registration number already exists."));
     }
 
-    const shopImagePath = req.files?.shopImage[0]?.path
-    if (!shopImagePath) return res.status(404).json(new ApiResponse(404, null, "Shop image path missing"))
+    // Check if shop image is present
+    const shopImagePath = req.files?.shopImage?.[0]?.path;
+    if (!shopImagePath) {
+        return res.status(404).json(new ApiResponse(404, null, "Shop image path missing"));
+    }
 
-    let qrCodeImagePath
-    if (req.files?.qrCodeImage && Array.isArray(req.files?.qrCodeImage) && req.files.qrCodeImage.length > 0) qrCodeImagePath = req.files?.qrCodeImage[0]?.path
+    // Upload the shop image to Cloudinary (or any other service)
+    const shopImageCloud = await uploadOnCloudinary(shopImagePath);
+    if (!shopImageCloud) {
+        return res.status(404).json(new ApiResponse(404, null, "Shop image missing from cloudinary"));
+    }
 
-    const shopImageCloud = await uploadOnCloudinary(shopImagePath)
-    const qrCodeImageCloud = await uploadOnCloudinary(qrCodeImagePath)
-
-    if (!shopImageCloud) return res.status(404).json(new ApiResponse(404, null, "Shop image missing from cloudinary"))
-
-    const vendor = await Vendor.create({
-        username,
-        email,
-        password,
-        shopName,
-        shopType,
-        delivery,
-        shopOpen,
-        returnPol,
+    const vendorFields = {
+        username, email, password,
+        shopName, shopType, delivery, shopOpen, returnPol,
         registrationNumber,
-        location: { city, address: address + " @ " + area, pincode },
-        contact: { primary, secondary },
+        location: { city, address, area, pincode },
+        contact: { primary, },
         shopImage: shopImageCloud.secure_url,
-        qrCodeImage: qrCodeImageCloud.secure_url,
-        shopTimings: { start, end },
-    });
+        shopTimings: { start, end }
+    };
 
-    const vendorShop = await Vendor.findById(vendor._id).select(" -password ")
+    if (secondary) {
+        vendorFields.contact.secondary = secondary;
+    }
 
-    return res.status(201).json(new ApiResponse(201, vendorShop, "Vendor registered successfully"));
+    const vendor = await Vendor.create(vendorFields);
+
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(vendor._id)
+
+    const vendorDetails = await Vendor.findById(vendor._id).select(" _id userStatus userType isOpen shopName registrationNumber ")
+
+    const vendorData = CryptoJS.AES.encrypt(JSON.stringify(vendorDetails), "secretKey").toString()
+
+    return res.status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .cookie("user", vendorData)
+        .json(
+            new ApiResponse(200, vendorDetails, "Vendor logged in successfully!!")
+        )
 };
 
 const generateAccessAndRefreshTokens = async (vendorId) => {
@@ -71,8 +86,6 @@ const generateAccessAndRefreshTokens = async (vendorId) => {
     }
 }
 
-const options = { httpOnly: true, secure: true }
-
 // LOGIN
 const login = async (req, res) => {
     const { username, email, password } = req.body
@@ -90,13 +103,12 @@ const login = async (req, res) => {
 
     const { start, end } = user.shopTimings;
     const shouldBeOpen = isShopOpen(start, end);
-    console.log(shouldBeOpen)
 
     // If everything checks out
     const vendor = await Vendor.findByIdAndUpdate(
         user?._id,
-        {$set: {isOpen: shouldBeOpen}},
-        {new: true, select: (" _id userStatus userType isOpen shopName registrationNumber ")}
+        { $set: { isOpen: shouldBeOpen } },
+        { new: true, select: (" _id userStatus userType isOpen username registrationNumber ") }
     )
 
     const vendorData = CryptoJS.AES.encrypt(JSON.stringify(vendor), "secretKey").toString()
@@ -195,15 +207,15 @@ const changeShopImage = async (req, res) => {
 
 // TOGGLE SHOP OPEN/CLOSE
 const toggleIsOpen = async (req, res) => {
-    const {status} = req.body
+    const { status } = req.body
 
     let open = req.user.isOpen
 
     if (status != null && open !== status) {
         const result = await Vendor.findByIdAndUpdate(
             req.user._id,
-            {$set: {isOpen: status}},
-            {new: true, select: "isOpen"}
+            { $set: { isOpen: status } },
+            { new: true, select: "isOpen" }
         )
 
         open = result.isOpen

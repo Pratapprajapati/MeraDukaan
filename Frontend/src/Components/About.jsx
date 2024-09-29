@@ -1,520 +1,139 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-import img from "./Profiles/img1.webp"
-export default function About() {
+import React from 'react';
+import { ShoppingBag, Store, Truck } from 'lucide-react';
+import Cookies from "js-cookie"
+import { useNavigate } from 'react-router-dom';
+
+const AboutPage = () => {
+    const signedIn = Cookies.get("user") ? true : false
+    const navigate = useNavigate()
+
     return (
-        <div class="bg-slate-950 grid  h-screen overflow-x-hidden">
-            <div class="text-center space-y-5">
-                <h1 class="text-white text-6xl p-7 pt-11">
-                    WELCOME TO MERADUKAAN ONLINE COMMUNITY MARKETPLACE
-                </h1>
-
-                <p class="text-white text-2xl"
-                >Discover and support local business in your area on our vibrant
-                    online platform</p>
-
-                <div class="w-full">
-                    <div
-                        class="inline-flex flex-nowrap w-screen h-auto overflow-x-scroll"
-                    >
-                        <ul
-                            class="flex items-start justify-start md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-infinite-scroll "
-                        >
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26.35)]"
-                                    src={img}
-                                    alt="img1"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26.35)]"
-                                    src={img}
-                                    alt="img2"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26.35)]"
-                                    src={img}
-                                    alt="img3"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26.35)]"
-                                    src={img}
-                                    alt="img4"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26.35)]"
-                                    src={img}
-                                    alt="img5"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26.35)]"
-                                    src={img}
-                                    alt="img6"
-                                />
-                            </li>
-                        </ul>
-                        <ul
-                            class="flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-infinite-scroll"
-                        >
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26,0.35)]"
-                                    src={img}
-                                    alt="img1"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26,0.35)]"
-                                    src={img}
-                                    alt="img2"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26,0.35)]"
-                                    src={img}
-                                    alt="img3"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26,0.35)]"
-                                    src={img}
-                                    alt="img4"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26,0.35)]"
-                                    src={img}
-                                    alt="img5"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26,0.35)]"
-                                    src={img}
-                                    alt="img6"
-                                />
-                            </li>
-                        </ul>
+        <div className="bg-[#0f1729] text-white rounded-lg">
+            {/* Hero Section */}
+            <section className="relative py-20">
+                <div className="absolute inset-0 z-0">
+                    <img
+                        className="w-full h-full object-cover opacity-20"
+                        src="https://images.unsplash.com/photo-1534723452862-4c874018d66d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+                        alt="Local market"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#0f1729] to-transparent"></div>
+                </div>
+                <div className="container mx-auto px-4 relative z-10">
+                    <p className="text-blue-400 mb-3">Revolutionizing local commerce</p>
+                    <h1 className="text-5xl font-bold mb-4">Empowering street-side shops in the digital age</h1>
+                    <p className="text-xl text-gray-300 mb-8">
+                        MeraDukaan bridges the gap between traditional local shops and the convenience of online shopping,
+                        creating a vibrant digital marketplace for your neighborhood.
+                    </p>
+                    <div className="flex space-x-4">
+                        {!signedIn && (
+                            <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition duration-300" onClick={() => navigate("/signin")}>
+                                Sign In
+                            </button>
+                        )}
                     </div>
                 </div>
-                <div class="pl-60">
-                    <div class="flex pb-12 pt-8">
-                        <img src={img} />
-                        <span class="border-l-4 h-24 ml-28"></span>
-                        <div class="text-white ">
-                            <h2 class="text-5xl">Local Business Directory</h2>
-                            <p2 class="text-2xl">Discover local businesses</p2>
-                            <h2 class="text-5xl">Boost Local Businesses</h2>
-                            <p2 class="text-2xl">Support Local Economy</p2>
-                            <h2 class="text-5xl">Community Engagement</h2>
-                            <p2 class="text-2xl">Connect With Local Businesses </p2>
-                        </div>
-                    </div>
-                    <div class="overflow-hiddenhidden pr-52 pt-12 pb-12">
-                        <div class="bg-yellow-700 w-full h-80   rotate-2 hover:bg-white">
-                            <div class="bg-yellow-500 w-full h-80    -rotate-2 text-left pt-14 font-serif hover:bg-white ">
-                                <h class="text-4xl text-black pl-4  rotate-0">Join meraDukaan Community Marketplace</h>
-                                <h class="text-4xl pl-4">Today!</h>
-                                <p class="text-xl text-black pl-4 rotate-0">connect with local businesses and shop from a wide range of product and services</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex pt-12 pb-12 pr-52">
-                        <span class="border-l-4 h-24 "></span>
-                        <div class="text-white text-start ml-4 ">
-                            <h2 class="text-5xl">Feature #1</h2>
-                            <p2 class="text-xl">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat.</p2>
-                            <h2 class="text-5xl">Local Business Community</h2>
-                            <p2 class="text-xl">Connect with local businesses in your area and support your community by shopping from them.</p2>
-                            <h2 class="text-5xl">Feature #3</h2>
-                            <p2 class="text-xl">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat.</p2>
-                        </div>
-                        <img class=" w-2/5 ml-7" src={img} />
-                    </div>
-                    <div class=" pt-12 pb-12 pr-48">
-                        <div class="flex">
-                            <div class="text-white text-start pr-20">
-                                <h2 class="text-5xl ">Discover the power of our product</h2>
-                                <p class="text-xl pr-20">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat.</p>
-                            </div>
-                            <div className="space-y-10">
-                                <div class="bg-yellow-500 -rotate-2">
-                                    <h class="text-black text-4xl text-start pr-80">Sign up for meraDukaan 01</h>
-                                    <p class="text-black">Create an account on meraDukaan to start exploring local businesses and products in your area.</p>
-                                </div>
-                                <div class="bg-yellow-500 rotate-2">
-                                    <h class="text-black text-4xl text-start pr-80">Discover local businesses 02</h>
-                                    <p class="text-black">Browse through a wide range of local businesses, from restaurants to boutiques, and find unique products and services.</p>
-                                </div>
-                                <div class="bg-yellow-500 -rotate-2">
-                                    <h class="text-black text-4xl text-start pr-80">Support local sellers 03</h>
-                                    <p class="text-black">Show your support for small businesses in your community by making purchases directly from local sellers on meraDukaan.</p>
-                                </div>
-                                <div class="bg-yellow-500 rotate-2">
-                                    <h class="text-black text-4xl text-start pr-80">Join the community 04</h>
-                                    <p class="text-black">Connect with other ustext-black your favorite finds, and stay updated on the latest offerings from local businesses.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="font-serif pt-12 pb-6">
-                            <h2 class="text-5xl text-white pr-40">Testimonials</h2>
-                            <p class="text-xl text-white pr-40">See what our users have to say about their experience with meraDukaan.</p>
-                        </div>
-                        <div class="pr-32 pb-24">
-                            <div class="flex">
-                                <div class="overflow-hiddenhidden pr-14 pt-12  ">
-                                    <div class="bg-yellow-700  h-52   hover:-rotate-3 ">
-                                        <div class="bg-yellow-500  h-52    hover:-rotate-3 text-left pt-6 font-serif   ">
-                                            <div class="content-center justify-center pl-6">
-                                                <div class="flex">
-                                                    <img class="rounded-full w-12 h-12" src={img} />
-                                                    <div>
-                                                        <h class="text-2xl text-white font-semibold pl-4  rotate-0">Emily Brown</h>
-                                                        <p class="text-2xl text-white pl-4 rotate-0">regular shopper</p>
-                                                    </div>
-                                                </div>
-                                                <p>As a consumer I appreciate the personalized recommendations I recieve on meraDukaan.It feels like a tailored shopping experience everytime</p>
-                                            </div>
+            </section>
 
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="overflow-hiddenhidden pr-14 pt-12 ">
-                                    <div class="bg-yellow-700  h-52   hover:-rotate-3">
-                                        <div class="bg-yellow-500  h-52    hover:-rotate-3 text-left pt-6 font-serif   ">
-                                            <div class="pl-6">
-                                                <div class="flex ">
-                                                    <img class="rounded-full w-12 h-12" src={img} />
-                                                    <div>
-                                                        <h class="text-2xl text-white font-semibold pl-4  rotate-0">Emily Brown</h>
-                                                        <p class="text-2xl text-white pl-4 rotate-0">regular shopper</p>
-                                                    </div>
-                                                </div>
-                                                <p>As a consumer I appreciate the personalized recommendations I recieve on meraDukaan.It feels like a tailored shopping experience everytime</p>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex">
-                                <div class="overflow-hiddenhidden pr-14 pt-12  ">
-                                    <div class="bg-yellow-700  h-52   hover:-rotate-3 ">
-                                        <div class="bg-yellow-500  h-52    hover:-rotate-3 text-left pt-6 font-serif   ">
-                                            <div class="content-center justify-center pl-6">
-                                                <div class="flex">
-                                                    <img class="rounded-full w-12 h-12" src={img} />
-                                                    <div>
-                                                        <h class="text-2xl text-white font-semibold pl-4  rotate-0">Emily Brown</h>
-                                                        <p class="text-2xl text-white pl-4 rotate-0">regular shopper</p>
-                                                    </div>
-                                                </div>
-                                                <p>As a consumer I appreciate the personalized recommendations I recieve on meraDukaan.It feels like a tailored shopping experience everytime</p>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="overflow-hiddenhidden pr-14 pt-12 ">
-                                    <div class="bg-yellow-700 h-52   hover:-rotate-3">
-                                        <div class="bg-yellow-500  h-52    hover:-rotate-3 text-left pt-6 font-serif   ">
-                                            <div class="pl-6">
-                                                <div class="flex ">
-                                                    <img class="rounded-full w-12 h-12" src={img} />
-                                                    <div>
-                                                        <h class="text-2xl text-white font-semibold pl-4  rotate-0">Emily Brown</h>
-                                                        <p class="text-2xl text-white pl-4 rotate-0">regular shopper</p>
-                                                    </div>
-                                                </div>
-                                                <p>As a consumer I appreciate the personalized recommendations I recieve on meraDukaan.It feels like a tailored shopping experience everytime</p>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            {/* Vendor Section */}
+            <section className="py-20 bg-gray-900">
+                <div className="container mx-auto px-4 flex items-center">
+                    <div className="w-1/2 pr-8">
+                        <h2 className="text-3xl font-bold mb-4">For Vendors: Expand Your Reach</h2>
+                        <p className="text-gray-300 mb-6">
+                            Join MeraDukaan to bring your local shop into the digital world. Reach more customers,
+                            manage your inventory effortlessly, and grow your business with our easy-to-use platform.
+                        </p>
+                        <ul className="space-y-4">
+                            <Feature icon={<Store />} text="Set up your digital storefront in minutes" />
+                            <Feature icon={<ShoppingBag />} text="Manage orders and inventory all in one place" />
+                            <Feature icon={<Truck />} text="Flexible delivery options for your customers" />
+                        </ul>
+                        {!signedIn && (
+                            <button className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition duration-300" onClick={() => navigate("register/vendor")}>
+                                Register as Vendor
+                            </button>
+                        )}
                     </div>
-
+                    <div className="w-1/2">
+                        <img
+                            src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+                            alt="Vendor using digital tools"
+                            className="rounded-lg shadow-xl"
+                        />
+                    </div>
                 </div>
-            </div>
+            </section>
+
+            {/* Customer Section */}
+            <section className="py-20 bg-gray-800">
+                <div className="container mx-auto px-4 flex items-center">
+                    <div className="w-1/2">
+                        <img
+                            src="https://images.unsplash.com/photo-1557821552-17105176677c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80"
+                            alt="Customer shopping online"
+                            className="rounded-lg shadow-xl"
+                        />
+                    </div>
+                    <div className="w-1/2 pl-8">
+                        <h2 className="text-3xl font-bold mb-4">For Customers: Shop Local, Online</h2>
+                        <p className="text-gray-300 mb-6">
+                            Discover and support your local shops from the comfort of your home. Enjoy the convenience
+                            of online shopping while keeping your money in your community.
+                        </p>
+                        <ul className="space-y-4">
+                            <Feature icon={<Store />} text="Browse products from your favorite local shops" />
+                            <Feature icon={<ShoppingBag />} text="Easy ordering and secure payment options" />
+                            <Feature icon={<Truck />} text="Choose between delivery or in-store pickup" />
+                        </ul>
+                        {!signedIn && (
+                            <button className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition duration-300" onClick={() => navigate("register/customer")}>
+                                Register as Customer
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </section>
+
+            {/* MeraDukaan Overview */}
+            <section className="py-16 bg-gray-900 text-center">
+                <div className="container mx-auto px-4">
+                    <h2 className="text-3xl font-bold mb-8">Why Choose MeraDukaan?</h2>
+                    <div className="grid grid-cols-3 gap-8">
+                        <OverviewCard
+                            title="Support Local Economy"
+                            description="Every purchase through MeraDukaan directly supports a local business in your community."
+                        />
+                        <OverviewCard
+                            title="Convenience Meets Tradition"
+                            description="Enjoy the ease of online shopping without losing the personal touch of local vendors."
+                        />
+                        <OverviewCard
+                            title="Building Stronger Communities"
+                            description="MeraDukaan helps preserve the charm of local markets in the digital age."
+                        />
+                    </div>
+                </div>
+            </section>
         </div>
-    )
-}
->>>>>>> 24c0ddd (Added subcategory and discount fields and About.jsx. Made changes to Inventory.jsx)
-=======
-import img from "./assets/img1.webp"
-export default function About() {
-    return (
-        <div class="bg-slate-950 grid  h-screen overflow-x-hidden">
-            <div class="text-center space-y-5">
-                <h1 class="text-white text-6xl p-7 pt-11">
-                    WELCOME TO MERADUKAAN ONLINE COMMUNITY MARKETPLACE
-                </h1>
+    );
+};
 
-                <p class="text-white text-2xl"
-                >Discover and support local business in your area on our vibrant
-                    online platform</p>
-
-                <div class="w-full">
-                    <div
-                        class="inline-flex flex-nowrap w-screen h-auto overflow-x-scroll"
-                    >
-                        <ul
-                            class="flex items-start justify-start md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-infinite-scroll "
-                        >
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26.35)]"
-                                    src={img}
-                                    alt="img1"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26.35)]"
-                                    src={img}
-                                    alt="img2"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26.35)]"
-                                    src={img}
-                                    alt="img3"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26.35)]"
-                                    src={img}
-                                    alt="img4"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26.35)]"
-                                    src={img}
-                                    alt="img5"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26.35)]"
-                                    src={img}
-                                    alt="img6"
-                                />
-                            </li>
-                        </ul>
-                        <ul
-                            class="flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-infinite-scroll"
-                        >
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26,0.35)]"
-                                    src={img}
-                                    alt="img1"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26,0.35)]"
-                                    src={img}
-                                    alt="img2"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26,0.35)]"
-                                    src={img}
-                                    alt="img3"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26,0.35)]"
-                                    src={img}
-                                    alt="img4"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26,0.35)]"
-                                    src={img}
-                                    alt="img5"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    class="w-80 h-64 drop-shadow-[15px_35px_35px_rgb(219,194,26,0.35)]"
-                                    src={img}
-                                    alt="img6"
-                                />
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="pl-60">
-                    <div class="flex pb-12 pt-8">
-                        <img src={img} />
-                        <span class="border-l-4 h-24 ml-28"></span>
-                        <div class="text-white ">
-                            <h2 class="text-5xl">Local Business Directory</h2>
-                            <p2 class="text-2xl">Discover local businesses</p2>
-                            <h2 class="text-5xl">Boost Local Businesses</h2>
-                            <p2 class="text-2xl">Support Local Economy</p2>
-                            <h2 class="text-5xl">Community Engagement</h2>
-                            <p2 class="text-2xl">Connect With Local Businesses </p2>
-                        </div>
-                    </div>
-                    <div class="overflow-hiddenhidden pr-52 pt-12 pb-12">
-                        <div class="bg-yellow-700 w-full h-80   rotate-2 hover:bg-white">
-                            <div class="bg-yellow-500 w-full h-80    -rotate-2 text-left pt-14 font-serif hover:bg-white ">
-                                <h class="text-4xl text-black pl-4  rotate-0">Join meraDukaan Community Marketplace</h>
-                                <h class="text-4xl pl-4">Today!</h>
-                                <p class="text-xl text-black pl-4 rotate-0">connect with local businesses and shop from a wide range of product and services</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex pt-12 pb-12 pr-52">
-                        <span class="border-l-4 h-24 "></span>
-                        <div class="text-white text-start ml-4 ">
-                            <h2 class="text-5xl">Feature #1</h2>
-                            <p2 class="text-xl">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat.</p2>
-                            <h2 class="text-5xl">Local Business Community</h2>
-                            <p2 class="text-xl">Connect with local businesses in your area and support your community by shopping from them.</p2>
-                            <h2 class="text-5xl">Feature #3</h2>
-                            <p2 class="text-xl">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat.</p2>
-                        </div>
-                        <img class=" w-2/5 ml-7" src={img} />
-                    </div>
-                    <div class=" pt-12 pb-12 pr-48">
-                        <div class="flex">
-                            <div class="text-white text-start pr-20">
-                                <h2 class="text-5xl ">Discover the power of our product</h2>
-                                <p class="text-xl pr-20">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat.</p>
-                            </div>
-                            <div className="space-y-10">
-                                <div class="bg-yellow-500 -rotate-2">
-                                    <h class="text-black text-4xl text-start pr-80">Sign up for meraDukaan 01</h>
-                                    <p class="text-black">Create an account on meraDukaan to start exploring local businesses and products in your area.</p>
-                                </div>
-                                <div class="bg-yellow-500 rotate-2">
-                                    <h class="text-black text-4xl text-start pr-80">Discover local businesses 02</h>
-                                    <p class="text-black">Browse through a wide range of local businesses, from restaurants to boutiques, and find unique products and services.</p>
-                                </div>
-                                <div class="bg-yellow-500 -rotate-2">
-                                    <h class="text-black text-4xl text-start pr-80">Support local sellers 03</h>
-                                    <p class="text-black">Show your support for small businesses in your community by making purchases directly from local sellers on meraDukaan.</p>
-                                </div>
-                                <div class="bg-yellow-500 rotate-2">
-                                    <h class="text-black text-4xl text-start pr-80">Join the community 04</h>
-                                    <p class="text-black">Connect with other ustext-black your favorite finds, and stay updated on the latest offerings from local businesses.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="font-serif pt-12 pb-6">
-                            <h2 class="text-5xl text-white pr-40">Testimonials</h2>
-                            <p class="text-xl text-white pr-40">See what our users have to say about their experience with meraDukaan.</p>
-                        </div>
-                        <div class="pr-32 pb-24">
-                            <div class="flex">
-                                <div class="overflow-hiddenhidden pr-14 pt-12  ">
-                                    <div class="bg-yellow-700  h-52   hover:-rotate-3 ">
-                                        <div class="bg-yellow-500  h-52    hover:-rotate-3 text-left pt-6 font-serif   ">
-                                            <div class="content-center justify-center pl-6">
-                                                <div class="flex">
-                                                    <img class="rounded-full w-12 h-12" src={img} />
-                                                    <div>
-                                                        <h class="text-2xl text-white font-semibold pl-4  rotate-0">Emily Brown</h>
-                                                        <p class="text-2xl text-white pl-4 rotate-0">regular shopper</p>
-                                                    </div>
-                                                </div>
-                                                <p>As a consumer I appreciate the personalized recommendations I recieve on meraDukaan.It feels like a tailored shopping experience everytime</p>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="overflow-hiddenhidden pr-14 pt-12 ">
-                                    <div class="bg-yellow-700  h-52   hover:-rotate-3">
-                                        <div class="bg-yellow-500  h-52    hover:-rotate-3 text-left pt-6 font-serif   ">
-                                            <div class="pl-6">
-                                                <div class="flex ">
-                                                    <img class="rounded-full w-12 h-12" src={img} />
-                                                    <div>
-                                                        <h class="text-2xl text-white font-semibold pl-4  rotate-0">Emily Brown</h>
-                                                        <p class="text-2xl text-white pl-4 rotate-0">regular shopper</p>
-                                                    </div>
-                                                </div>
-                                                <p>As a consumer I appreciate the personalized recommendations I recieve on meraDukaan.It feels like a tailored shopping experience everytime</p>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex">
-                                <div class="overflow-hiddenhidden pr-14 pt-12  ">
-                                    <div class="bg-yellow-700  h-52   hover:-rotate-3 ">
-                                        <div class="bg-yellow-500  h-52    hover:-rotate-3 text-left pt-6 font-serif   ">
-                                            <div class="content-center justify-center pl-6">
-                                                <div class="flex">
-                                                    <img class="rounded-full w-12 h-12" src={img} />
-                                                    <div>
-                                                        <h class="text-2xl text-white font-semibold pl-4  rotate-0">Emily Brown</h>
-                                                        <p class="text-2xl text-white pl-4 rotate-0">regular shopper</p>
-                                                    </div>
-                                                </div>
-                                                <p>As a consumer I appreciate the personalized recommendations I recieve on meraDukaan.It feels like a tailored shopping experience everytime</p>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="overflow-hiddenhidden pr-14 pt-12 ">
-                                    <div class="bg-yellow-700 h-52   hover:-rotate-3">
-                                        <div class="bg-yellow-500  h-52    hover:-rotate-3 text-left pt-6 font-serif   ">
-                                            <div class="pl-6">
-                                                <div class="flex ">
-                                                    <img class="rounded-full w-12 h-12" src={img} />
-                                                    <div>
-                                                        <h class="text-2xl text-white font-semibold pl-4  rotate-0">Emily Brown</h>
-                                                        <p class="text-2xl text-white pl-4 rotate-0">regular shopper</p>
-                                                    </div>
-                                                </div>
-                                                <p>As a consumer I appreciate the personalized recommendations I recieve on meraDukaan.It feels like a tailored shopping experience everytime</p>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
+const Feature = ({ icon, text }) => (
+    <li className="flex items-center space-x-3">
+        <div className="bg-blue-600 p-2 rounded-full">
+            {React.cloneElement(icon, { size: 20 })}
         </div>
-    )
-}
->>>>>>> e64d1f4 (Added context for vendor (vendor pages access). Minor additions in other pages. Removed header footer)
+        <span>{text}</span>
+    </li>
+);
+
+const OverviewCard = ({ title, description }) => (
+    <div className="bg-gray-800 p-6 rounded-lg">
+        <h3 className="text-xl font-semibold mb-3">{title}</h3>
+        <p className="text-gray-400">{description}</p>
+    </div>
+);
+
+export default AboutPage;

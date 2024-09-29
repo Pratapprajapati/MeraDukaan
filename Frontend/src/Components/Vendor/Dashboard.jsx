@@ -113,7 +113,7 @@ const UserProfileDashboard = () => {
                 setInventory(updatedInventory);
                 setTotalProd(total);
             })
-            .catch(e => console.error(e.response));
+            .catch(e => console.error(e.response.data.message));
 
         setLoading(false);
     }, [timePeriod]);
@@ -125,7 +125,7 @@ const UserProfileDashboard = () => {
             <div className="flex justify-between items-center mb-4 border-b border-b-gray-700 pb-4">
                 <div className="">
                     <div className="text-sm text-gray-400">Welcome back,</div>
-                    <div className="text-3xl font-bold text-yellow-400">{vendor.shopName}</div>
+                    <div className="text-3xl font-bold text-yellow-400">{vendor.username}</div>
                     <div className="text-sm text-gray-400">
                         Shop Registration ID: <span>{vendor.registrationNumber}</span>
                     </div>

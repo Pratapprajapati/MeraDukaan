@@ -25,12 +25,12 @@ export default function Inventory() {
                 // console.log(data);
                 setEditableProducts(data)
             })
-            .catch(e => console.error(e.response.data))
+            .catch(e => console.error(e.response))
             .finally(() => setLoading(false)); // Only set loading to false after data is fetched
     }, [])
 
     // Sorting available categories
-    const categories = editableProducts.reduce((acc, cur) => {
+    const categories = editableProducts?.reduce((acc, cur) => {
         if (!acc.includes(cur.product.subCategory)) acc.push(cur.product.subCategory)
         return acc
     }, [])
@@ -49,7 +49,7 @@ export default function Inventory() {
 
     // Product edit section
     const handleSave = (id) => {
-        const updatedProduct = editableProducts.find((product) => product.product._id === id);
+        const updatedProduct = editableProducts?.find((product) => product.product._id === id);
 
         const productData = {
             price: updatedProduct.price,
@@ -170,13 +170,13 @@ export default function Inventory() {
                         onChange={e => setSelectedCategory(e.target.value)}
                     >
                         <option value="All Categories" key={"all"}>All Categories</option>
-                        {categories.map(cat => (
+                        {categories?.map(cat => (
                             <option key={cat} value={cat}>{cat}</option>
                         ))}
                     </select>
                 </div>
             </div>
-            {filteredProducts.length > 0 ? (
+            {filteredProducts?.length > 0 ? (
                 <div className="pb-4 mt-4 grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
                     {
                         filteredProducts.map((prod) => (
@@ -220,7 +220,7 @@ export default function Inventory() {
                                                         tooltip.classList.add('hidden');
                                                     }}
                                                 />
-                                                <div className="absolute hidden w-48 p-2 text-xs text-white bg-black rounded-lg shadow-lg -right-2 top-8 z-10">
+                                                <div className={`absolute hidden ${!prod.description && "opacity-0"} w-48 p-2 text-xs text-white bg-black rounded-lg shadow-lg -right-2 top-8 z-10`}>
                                                     {prod.description}
                                                 </div>
                                             </div>

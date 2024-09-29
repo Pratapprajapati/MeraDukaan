@@ -7,9 +7,12 @@ import Review from "../models/review.model.js"
 import Product from "../models/product.model.js"
 import CryptoJS from 'crypto-js'
 
+// Cookies cannot be accessed by client-side scriptsand are sent by HTTPS only 
+const options = { httpOnly: true, secure: true }
+
 const register = async (req, res) => {
 
-    const { username, email, age, password, primary, secondary, address, city, pincode } = req.body
+    const { username, email, age, password, primary, secondary, address, area, city, pincode } = req.body
 
     const existingUser = await Customer.findOne({
         $or: [{ username }, { email }]
@@ -17,18 +20,31 @@ const register = async (req, res) => {
     if (existingUser) return res.status(400).json(new ApiResponse(400, "User with email or username already exists"))
 
     const user = await Customer.create({
-        username,
-        email,
-        age,
-        password,
+        username, email, age, password,
         contact: { primary, secondary },
-        location: { address, city, pincode }
+        location: { address, area, city, pincode }
     })
     if (!user) return res.status(500).json(new ApiResponse(500, "Something went wrong!"))
 
-    const customer = await Customer.findById(user?._id).select("-password")
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
 
-    return res.status(201).json(new ApiResponse(201, customer, "Customer created!"))
+    const customer = await Customer.findById(user?._id).select(" _id userType userStatus")
+
+    const customerData = CryptoJS.AES.encrypt(JSON.stringify(customer), "secretKey").toString()
+
+    return res.status(201)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .cookie("user", customerData)
+        .json(
+            new ApiResponse(
+                201,
+                {
+                    customer, accessToken, refreshToken
+                },
+                "Customer logged in successfully!!"
+            )
+        )
 }
 
 const generateAccessAndRefreshTokens = async (customerId) => {
@@ -47,9 +63,6 @@ const generateAccessAndRefreshTokens = async (customerId) => {
         return res.json(new ApiResponse(500, [], "Something went wrong while generation tokens!"))
     }
 }
-
-// Cookies cannot be accessed by client-side scriptsand are sent by HTTPS only 
-const options = { httpOnly: true, secure: true }
 
 // LOGIN
 const login = async (req, res) => {

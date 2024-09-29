@@ -75,7 +75,7 @@ const vendorSchema = new Schema({
     },
     isOpen: {
         type: Boolean,
-        default: false
+        default: true
     },
     shopType: {
         type : String,

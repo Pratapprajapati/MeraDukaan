@@ -121,6 +121,7 @@ const removeProduct = async (req, res) => {
 
 const inventoryProds = async (req, res) => {
     const inventory = await Inventory.findById(req.user._id).select("productList.product");
+    if (!inventory) return res.status(200).json(new ApiResponse(200, [], "No inventory found"));
 
     // Extract just the product IDs from the productList array
     const productIds = inventory.productList.map(item => item.product);
@@ -180,6 +181,7 @@ const getInventory = async (req, res) => {
             }
         }
     ]);
+    if (inventory.length == 0) return res.status(200).json(new ApiResponse(200, [], "Inventory empty"));
 
     return res.status(200).json(new ApiResponse(200, inventory[0], "Inventory fetched"));
 };
@@ -224,7 +226,7 @@ const inventoryOverview = async (req, res) => {
 
     // Check if inventory data is empty
     if (inventoryData.length === 0) {
-        return res.status(400).json(new ApiResponse(400, null, "Couldn't fetch inventory"));
+        return res.status(200).json(new ApiResponse(200, null, "Couldn't fetch inventory"));
     }
 
     // List of product IDs that are missing in the Products collection

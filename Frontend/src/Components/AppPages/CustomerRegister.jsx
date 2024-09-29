@@ -2,13 +2,16 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from "react-router-dom"
 import Cookies from "js-cookie"
 import logo from "../assets/logo.png";
+import PasswordStrengthIndicator from './PasswordChecker';
+import axios from "axios"
+import Swal from 'sweetalert2';
 
 export default function CustomerRegister() {
     const navigate = useNavigate()
 
     const [errorMessage, setErrorMessage] = useState("");
     const [formData, setFormData] = useState({
-        name: "",
+        username: "",
         email: "",
         age: "",
         password: "",
@@ -17,16 +20,16 @@ export default function CustomerRegister() {
         area: "",
         city: "",
         pincode: "",
+        primary: "",
+        secondary: "",
     });
 
     const [showPassword, setShowPassword] = useState(false);
-    const [passwordStrength, setPasswordStrength] = useState('');
     const [passwordMatch, setPasswordMatch] = useState(false);
 
     // If user logged in then redirect to home page
     useEffect(() => {
         const user = Cookies.get("user") ? true : false
-
         if (user) navigate(-1)
     }, [])
 
@@ -36,7 +39,6 @@ export default function CustomerRegister() {
             ...prevData,
             password: value
         }));
-        evaluatePasswordStrength(value);
         setPasswordMatch(value === formData.confirmPassword);
     };
 
@@ -47,19 +49,6 @@ export default function CustomerRegister() {
             confirmPassword: value
         }));
         setPasswordMatch(value === formData.password);
-    };
-
-    const evaluatePasswordStrength = (password) => {
-        let strength = '';
-        if (password.length > 8) {
-            strength = 'Weak';
-            if (/[A-Z]/.test(password) && /[0-9]/.test(password) && /[!@#$%^&*]/.test(password)) {
-                strength = 'Strong';
-            } else if ((/[A-Z]/.test(password) && /[0-9]/.test(password)) || /[A-Z]/.test(password) && /[!@#$%^&*]/.test(password)) {
-                strength = 'Medium';
-            }
-        }
-        setPasswordStrength(strength);
     };
 
     const togglePasswordVisibility = () => {
@@ -77,7 +66,19 @@ export default function CustomerRegister() {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log(formData);
-        // Implement form submission logic here
+
+        axios.post(`/api/customer/register`, formData)
+            .then(res => {
+                Swal.fire({
+                    title: 'Registration Successful!',
+                    text: 'Start exploring nearby shops or discover products that match your needs!',
+                    icon: 'success',
+                    confirmButtonText: 'Let\'s Go!'
+                });
+                
+                navigate("/")
+            })
+            .catch(e => setErrorMessage(e.response.data.message));
     }
 
     const inputStyle = "shadow appearance-none border border-gray-600 rounded w-full py-2 px-3 text-gray-300 leading-tight focus:outline-none focus:shadow-outline";
@@ -105,12 +106,12 @@ export default function CustomerRegister() {
                         <h2 className="text-xl font-semibold mb-4">Personal Details</h2>
                         <div className="flex w-full max-sm:flex-col gap-4 mb-4">
                             <div className='md:w-2/5'>
-                                <label htmlFor="name" className={labelStyle}>Full Name</label>
+                                <label htmlFor="username" className={labelStyle}>Full Name</label>
                                 <input
                                     type="text"
-                                    id="name"
-                                    name="name"
-                                    value={formData.name}
+                                    id="username"
+                                    name="username"
+                                    value={formData.username}
                                     onChange={handleInput}
                                     placeholder="Full Name"
                                     required
@@ -144,6 +145,37 @@ export default function CustomerRegister() {
                                 />
                             </div>
                         </div>
+
+                        {/* Primary and Secondary Contact Numbers */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label htmlFor="primary" className={labelStyle}>Primary Contact Number</label>
+                                <input
+                                    type="number"
+                                    id="primary"
+                                    name="primary"
+                                    value={formData.primary}
+                                    onChange={handleInput}
+                                    placeholder="Primary Contact"
+                                    required
+                                    className={inputStyle}
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="secondary" className={labelStyle}>Secondary Contact Number</label>
+                                <input
+                                    type="number"
+                                    id="secondary"
+                                    name="secondary"
+                                    value={formData.secondary}
+                                    onChange={handleInput}
+                                    placeholder="Secondary Contact (Optional)"
+                                    className={inputStyle}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Password and Confirm Password Fields */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label htmlFor="password" className={labelStyle}>Password</label>
@@ -167,9 +199,7 @@ export default function CustomerRegister() {
                                     </button>
                                 </div>
                                 {formData.password && (
-                                    <p className={`text-sm mt-2 ${passwordStrength === 'Strong' ? 'text-green-600' : passwordStrength === 'Medium' ? 'text-yellow-600' : 'text-red-600'}`}>
-                                        Password Strength: {passwordStrength}
-                                    </p>
+                                    <PasswordStrengthIndicator password={formData.password} />
                                 )}
                             </div>
                             <div>
@@ -193,6 +223,7 @@ export default function CustomerRegister() {
                         </div>
                     </div>
 
+                    {/* Address Fields */}
                     <div className="mb-8">
                         <h2 className="text-xl font-semibold mb-4">Address Details</h2>
                         <div className="mb-4">

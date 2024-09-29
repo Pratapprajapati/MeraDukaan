@@ -57,7 +57,7 @@ const ProductCard = ({ product, handleAddToInventory, inventory, }) => {
                                     <div className="flex justify-between space-x-2">
                                         <Button
                                             className="flex-1 relative group"
-                                            onClick={() => handleAddToInventory(product._id)}
+                                            onClick={() => handleAddToInventory(product.id)}
                                         >
                                             <Plus size={14} className="mr-1 inline" /> Quick Add
                                             <div className="absolute hidden group-hover:block w-48 p-2 text-xs text-white bg-black rounded-lg shadow-lg left-24 -translate-x-1/2 bottom-full mb-2 z-10">

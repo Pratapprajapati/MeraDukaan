@@ -2,7 +2,7 @@ import Vendor from "../models/vendor.model.js"
 import ApiResponse from "../utils/ApiResponse.js"
 import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js"
 import CryptoJS from 'crypto-js'
-import isShopOpen from "../utils/shopOpen.js";
+import isShopOpen from "../utils/ShopOpen.js";
 
 // Cookies cannot be accessed by client-side scriptsand are sent by HTTPS only 
 const options = { httpOnly: true, secure: true }

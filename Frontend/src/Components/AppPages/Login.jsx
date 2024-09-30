@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { ArrowRight } from 'lucide-react'
 import { CheckCircle, Store, ShoppingBag } from 'lucide-react';
 import { Link, useNavigate } from "react-router-dom"
+import logo from "../assets/logo.png";
 import axios from "axios"
 import Cookies from "js-cookie"
 
@@ -31,12 +32,12 @@ export default function SignIn() {
 
         if (userType === "vendor") {
             axios.post("/api/vendor/login", formData)
-                .then(navigate("/vendor/overview"))
+                .then(res => navigate("/vendor/overview"))
                 .catch(e => setErrorMessage(e.response.data.message))
         }
         else {
             axios.post("/api/customer/login", formData)
-                .then(navigate("/home"))
+                .then(res => navigate("/home"))
                 .catch(e => setErrorMessage(e.response.data.message))
         }
     }
@@ -76,8 +77,13 @@ export default function SignIn() {
                 {/* Right side content with modifications */}
                 <div className="flex items-center justify-center px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
                     <div className="xl:mx-auto xl:w-full xl:max-w-sm 2xl:max-w-md">
-                        <h2 className="text-3xl font-bold leading-tight text-white sm:text-4xl">Sign in</h2>
-                        <p className='text-lg mt-2 font-semibold'>Read more about <span className='text-yellow-500 cursor-pointer' onClick={() => navigate("/")}>MeraDukaan</span></p>
+                        <div className='flex'>
+                            <img src={logo} alt="" className='h-20 w-20 me-2' />
+                            <div>
+                                <h2 className="text-3xl font-bold leading-tight text-white sm:text-4xl">Sign in</h2>
+                                <p className='text-lg mt-2 font-semibold'>Read more about <span className='text-yellow-500 cursor-pointer' onClick={() => navigate("/")}>MeraDukaan</span></p>
+                            </div>
+                        </div>
                         {/* User type toggle buttons */}
                         <div className="mt-6 font-semibold flex space-x-4 bg-gray-200 p-1 rounded-md">
                             <button

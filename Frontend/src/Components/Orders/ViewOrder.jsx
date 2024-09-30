@@ -18,15 +18,6 @@ export const orderStatuses = {
 
 export default function Order() {
     const [orderDetails, setOrderDetails] = useState(null);
-    const [customerDetails, setCustomerDetails] = useState({
-        customerName: "John Doe",
-        totalItems: 5,
-        totalPrice: "₹7,850",
-        orderStatus: "pending",
-        orderNumber: "ORD12345",
-        code: 23214,
-        note: "Please deliver between 2-4 PM."
-    });
 
     const params = useParams()
     const customer = useOutletContext()

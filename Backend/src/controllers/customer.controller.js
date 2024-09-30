@@ -30,7 +30,7 @@ const register = async (req, res) => {
 
     const customer = await Customer.findById(user?._id).select(" _id userType userStatus")
 
-    const customerData = CryptoJS.AES.encrypt(JSON.stringify(customer), "secretKey").toString()
+    const customerData = CryptoJS.AES.encrypt(JSON.stringify(customer), process.env.VITE_KEY).toString()
 
     return res.status(201)
         .cookie("accessToken", accessToken, options)
@@ -66,7 +66,6 @@ const generateAccessAndRefreshTokens = async (customerId) => {
 
 // LOGIN
 const login = async (req, res) => {
-    // Fetch username or email and password
     const { username, email, password } = req.body
     if (!username && !email) new ApiResponse(400, null, "Username or Email is required!!")
 
@@ -82,7 +81,7 @@ const login = async (req, res) => {
 
     const customer = await Customer.findById(user?._id).select(" _id userType userStatus")
 
-    const customerData = CryptoJS.AES.encrypt(JSON.stringify(customer), "secretKey").toString()
+    const customerData = CryptoJS.AES.encrypt(JSON.stringify(customer), process.env.VITE_KEY).toString()
 
     return res.status(200)
         .cookie("accessToken", accessToken, options)

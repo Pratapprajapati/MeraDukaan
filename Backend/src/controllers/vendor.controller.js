@@ -57,7 +57,7 @@ const registerVendor = async (req, res) => {
 
     const vendorDetails = await Vendor.findById(vendor._id).select(" _id userStatus userType isOpen shopName registrationNumber ")
 
-    const vendorData = CryptoJS.AES.encrypt(JSON.stringify(vendorDetails), "secretKey").toString()
+    const vendorData = CryptoJS.AES.encrypt(JSON.stringify(vendorDetails), process.env.VITE_KEY).toString()
 
     return res.status(200)
         .cookie("accessToken", accessToken, options)
@@ -111,7 +111,7 @@ const login = async (req, res) => {
         { new: true, select: (" _id userStatus userType isOpen username registrationNumber ") }
     )
 
-    const vendorData = CryptoJS.AES.encrypt(JSON.stringify(vendor), "secretKey").toString()
+    const vendorData = CryptoJS.AES.encrypt(JSON.stringify(vendor), process.env.VITE_KEY).toString()
 
     return res.status(200)
         .cookie("accessToken", accessToken, options)

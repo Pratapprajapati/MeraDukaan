@@ -4,6 +4,7 @@ import Cart, { Total } from './Cart';
 import { useOutletContext, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Loading from '../AppPages/Loading';
+import { orderStatuses } from './ViewOrder';
 
 const Modal = ({ isOpen, title, children }) => {
     if (!isOpen) return null;
@@ -18,22 +19,13 @@ const Modal = ({ isOpen, title, children }) => {
     );
 };
 
-export const orderStatuses = {
-    "pending": "yellow-500",
-    "cancelled": "red-500",
-    "accepted": "green-500",
-    "rejected":  "red-500",
-    "incomplete": "orange-500",
-    "delivered":  "green-500",
-    "failed": "red-500",
-};
-
 export default function Order() {
     const [orderDetails, setOrderDetails] = useState(null);
     const [isAcceptModalOpen, setIsAcceptModalOpen] = useState(false);
     const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
     const [acceptNote, setAcceptNote] = useState('');
     const [rejectNote, setRejectNote] = useState('');
+    const [code, setCode] = useState(null)
 
     const params = useParams()
     const vendor = useOutletContext();
@@ -61,7 +53,7 @@ export default function Order() {
         }
         axios.patch(`/api/order/manage/${params.orderId}`, data)
             .then(res => {
-                setOrderDetails({...orderDetails, orderStatus: "accepted"})
+                setOrderDetails({ ...orderDetails, orderStatus: "accepted" })
             })
             .catch(e => console.error(e.response.data.message));
 
@@ -106,7 +98,7 @@ export default function Order() {
 
                 axios.patch(`/api/order/manage/${params.orderId}`, data)
                     .then(res => {
-                        setOrderDetails({...orderDetails, orderStatus: "rejected"})
+                        setOrderDetails({ ...orderDetails, orderStatus: "rejected" })
                     })
                     .catch(e => console.error(e.response.data.message));
 
@@ -121,6 +113,43 @@ export default function Order() {
             }
         });
     };
+
+    const submitCode = () => {
+        const data = {
+            orderStatus: "delivered",
+            deliveryCode: code
+        };
+
+        axios.patch(`/api/order/manage/${params.orderId}`, data)
+            .then(res => {
+                setOrderDetails({ ...orderDetails, orderStatus: "delivered" });
+                setCode(null)
+                // Success alert
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Order Delivered',
+                    text: 'The order has been successfully delivered!',
+                    confirmButtonText: 'OK',
+                    color: "white",
+                    background: '#1a1a2e',
+
+                });
+            })
+            .catch(e => {
+                // Error alert
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Incorrect Code',
+                    text: 'The delivery code you entered is incorrect. Please try again.',
+                    confirmButtonText: 'Retry',
+                    color: "white",
+                    background: '#1a1a2e',
+
+                });
+                console.error(e.response.data.message);
+            });
+    };
+
 
     if (loading) return <Loading />;
     if (!orderDetails) return null;
@@ -149,7 +178,10 @@ export default function Order() {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400">Order Status:</label>
-                                    <h1 className="mt-1 text-lg text-gray-200 bg-transparent">{orderStatus}</h1>
+                                    <div className={`flex mt-1 items-center text-${orderStatuses[orderStatus].color}`}>
+                                        {orderStatuses[orderStatus].icon}
+                                        <span className="ml-2 text-lg capitalize">{orderStatus}</span>
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400">Delivery Address:</label>
@@ -187,8 +219,24 @@ export default function Order() {
                                         Accept Order
                                     </button>
                                 </div>
+                            ) : orderStatus === "accepted" ? (
+                                <div className="w-full mt-6 flex justify-between items-center">
+                                    <input
+                                        type="number"
+                                        className="w-full px-4 py-1 border rounded-lg text-3xl text-white tracking-widest"
+                                        placeholder="Enter the delivery code"
+                                        value={code}
+                                        onChange={(e) => setCode(e.target.value)}
+                                    />
+                                    <button
+                                        className="px-4 py-2 bg-green-500 hover:bg-green-600 text-gray-950 text-2xl font-semibold rounded-lg transform hover:scale-90 transition-transform ml-4"
+                                        onClick={submitCode}
+                                    >
+                                        Submit
+                                    </button>
+                                </div>
                             ) : (
-                                <div className={`w-full mt-2 bg-${orderStatuses[orderStatus]} text-black p-2 rounded-lg text-3xl capitalize font-semibold text-center`}>
+                                <div className={`w-full mt-2 bg-${orderStatuses[orderStatus].color} text-black p-2 rounded-lg text-3xl capitalize font-semibold text-center`}>
                                     -- {orderStatus} --
                                 </div>
                             )

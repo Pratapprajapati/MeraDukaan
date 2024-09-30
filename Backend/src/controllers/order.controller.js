@@ -112,7 +112,7 @@ const manageOrder = async (req, res) => {
     const { orderId } = req.params
     if (!orderId || !isValidObjectId(orderId)) return res.status(400).json(new ApiResponse(400, null, "OrderId missing"))
 
-    const { orderStatus, description } = req.body
+    const { orderStatus, description, deliveryCode } = req.body
     if (!orderStatus) return res.status(400).json(new ApiResponse(400, null, "Order status missing"))
 
     const statuses = ["pending", "accepted", "rejected", "incomplete", "undelivered", "delivered", "failed", "cancelled"]
@@ -136,19 +136,18 @@ const manageOrder = async (req, res) => {
         let code = Math.floor(100000 + Math.random() * 900000)
         order.code = code
     }
-
-    if (orderStatus === "delivered" && order?.code != code) {
+    
+    if (orderStatus === "delivered" && order?.code != deliveryCode) {
         return res.status(400).json(new ApiResponse(400, null, "Invalid code"))
     }
-
-    // Update the order fields
+    
+    // Update the order status and vendor note
     order.orderStatus = orderStatus;
     order.description = {
         ...order.description, // Preserve existing customer field
         vendor: description   // Update only the vendor field
     };
 
-    // Save the updated order
     const updatedOrder = await order.save();
 
     if (!updatedOrder) return res.status(500).json(new ApiResponse(500, null, "Order didn't update"))

@@ -14,7 +14,7 @@ import VendorRegister from "./Components/AppPages/VendorRegister.jsx"
 import CustomerRegister from './Components/AppPages/CustomerRegister.jsx'
 
 // Customer Pages
-import Home from './Components/Home.jsx'
+import Home from './Components/Customer/Home.jsx'
 import Shops from './Components/Customer/ShopPages/Shops.jsx'
 import Customer from './Components/Customer/Customer.jsx'
 import StoreFront from './Components/Customer/ShopPages/StoreFront.jsx'

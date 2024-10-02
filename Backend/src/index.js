@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
 import dotenv from "dotenv"
 import cors from "cors"
 import express from "express"
@@ -10,10 +6,6 @@ import connectDB from "./db.js";
 
 dotenv.config({ path: "./env" })
 
-<<<<<<< HEAD
-}
->>>>>>> 0382384 (Test if works)
-=======
 const app = express()
 
 // To handle middlewares
@@ -42,32 +34,8 @@ import inventoryRouter from "./routes/inventory.routes.js"
 import orderRouter from "./routes/order.routes.js"
 import vendorRouter from "./routes/vendor.routes.js"
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    console.log(sampleCustomer);
-    let customer = await Customer.findById(sampleCustomer._id)
-    if(!customer) res.status(404).send("Not found")    
-    res.status(200).send(customer);
-})
->>>>>>> 4ccb03a (FIxed database connectivity issue, added middlewares and added Customer, Vendor, Product and Order models)
-=======
-app.use("/api/customer", customerRouter)
-<<<<<<< HEAD
->>>>>>> fe896f9 (Added Register and login controllers and routes. Added bycrypt and fixed bugs. Added ApiResponse)
-=======
 app.use("/api/customer", customerRouter)
 app.use("/api/product", productRouter)
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 60ef479 (Added Customer controllers routes and Product controllers and routes)
-=======
-app.use("/api/product", productRouter)
-=======
 app.use("/api/inventory", inventoryRouter)
->>>>>>> dc4fd55 (Added Inventory model, control and routes. Changed Product mod, cont and route. Added return Pol in vendor model)
-app.use("/api/order", orderRouter)
->>>>>>> 7cb4ec8 (Added removeProduct and getInventory)
-=======
 app.use("/api/order", orderRouter)
 app.use("/api/vendor", vendorRouter)
->>>>>>> 4a0caa0 (Added vender controls, seperate auths and routes with updated auth details)

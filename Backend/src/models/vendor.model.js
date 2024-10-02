@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 import { Schema, model } from "mongoose";
 import bycrypt from "bcrypt"
 import jwt from "jsonwebtoken"
@@ -144,4 +142,3 @@ vendorSchema.methods.generateRefreshToken = function(){
 
 const Vendor = model("Vendor",vendorSchema);
 export default Vendor;
->>>>>>> 4ccb03a (FIxed database connectivity issue, added middlewares and added Customer, Vendor, Product and Order models)
